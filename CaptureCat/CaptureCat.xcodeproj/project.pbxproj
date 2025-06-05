@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 92AC185D2DF197FA00A1D83B /* .swiftlint.yml */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		92AC15B52DEE873E00A1D83B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		92AC15A72DEE873C00A1D83B /* CaptureCat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaptureCat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC15B42DEE873E00A1D83B /* CaptureCatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC15BE2DEE873E00A1D83B /* CaptureCatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		92AC185D2DF197FA00A1D83B /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		92AC159E2DEE873C00A1D83B = {
 			isa = PBXGroup;
 			children = (
+				92AC185D2DF197FA00A1D83B /* .swiftlint.yml */,
 				92AC15A92DEE873C00A1D83B /* CaptureCat */,
 				92AC15B72DEE873E00A1D83B /* CaptureCatTests */,
 				92AC15C12DEE873E00A1D83B /* CaptureCatUITests */,
@@ -106,6 +112,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				92AC186B2DF19D8800A1D83B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				92AC15A92DEE873C00A1D83B /* CaptureCat */,
@@ -195,6 +202,9 @@
 			);
 			mainGroup = 92AC159E2DEE873C00A1D83B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 92AC15A82DEE873C00A1D83B /* Products */;
 			projectDirPath = "";
@@ -212,6 +222,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +276,10 @@
 			isa = PBXTargetDependency;
 			target = 92AC15A62DEE873C00A1D83B /* CaptureCat */;
 			targetProxy = 92AC15BF2DEE873E00A1D83B /* PBXContainerItemProxy */;
+		};
+		92AC186B2DF19D8800A1D83B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 92AC186A2DF19D8800A1D83B /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -403,8 +418,10 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -431,8 +448,10 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -558,6 +577,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.59.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		92AC186A2DF19D8800A1D83B /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 92AC159F2DEE873C00A1D83B /* Project object */;
 }
