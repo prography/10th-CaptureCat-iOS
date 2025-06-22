@@ -50,9 +50,13 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DesignSystem/Color/Colors.xcassets,
+				DesignSystem/Font/CFont.swift,
+				"DesignSystem/Font/Font+TextStyle.swift",
+				DesignSystem/Font/FontType.swift,
 				"DesignSystem/Font/OTF/Pretendard-Bold.otf",
 				"DesignSystem/Font/OTF/Pretendard-Regular.otf",
 				"DesignSystem/Font/OTF/Pretendard-SemiBold.otf",
+				"DesignSystem/Font/View+CFont.swift",
 			);
 			target = 92AC15B32DEE873E00A1D83B /* CaptureCatTests */;
 		};
@@ -60,6 +64,13 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DesignSystem/Color/Colors.xcassets,
+				DesignSystem/Font/CFont.swift,
+				"DesignSystem/Font/Font+TextStyle.swift",
+				DesignSystem/Font/FontType.swift,
+				"DesignSystem/Font/OTF/Pretendard-Bold.otf",
+				"DesignSystem/Font/OTF/Pretendard-Regular.otf",
+				"DesignSystem/Font/OTF/Pretendard-SemiBold.otf",
+				"DesignSystem/Font/View+CFont.swift",
 			);
 			target = 92AC15BD2DEE873E00A1D83B /* CaptureCatUITests */;
 		};
@@ -69,6 +80,7 @@
 		92AC15A92DEE873C00A1D83B /* CaptureCat */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				929844A02E0835C70036DBFA /* Exceptions for "CaptureCat" folder in "CaptureCat" target */,
 				92AC18A52DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatTests" target */,
 				92AC18A62DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatUITests" target */,
 			);
@@ -457,6 +469,7 @@
 				DEVELOPMENT_TEAM = BMG3X5CM6G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CaptureCat/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -487,6 +500,7 @@
 				DEVELOPMENT_TEAM = BMG3X5CM6G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CaptureCat/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
