@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 92AC185D2DF197FA00A1D83B /* .swiftlint.yml */; };
+		92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
+		92AC188A2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
+		92AC188B2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,11 +35,33 @@
 		92AC15B42DEE873E00A1D83B /* CaptureCatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC15BE2DEE873E00A1D83B /* CaptureCatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC185D2DF197FA00A1D83B /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		92AC18882DFA636C00A1D83B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		92AC18A52DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DesignSystem/Color/Colors.xcassets,
+			);
+			target = 92AC15B32DEE873E00A1D83B /* CaptureCatTests */;
+		};
+		92AC18A62DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DesignSystem/Color/Colors.xcassets,
+			);
+			target = 92AC15BD2DEE873E00A1D83B /* CaptureCatUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		92AC15A92DEE873C00A1D83B /* CaptureCat */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				92AC18A52DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatTests" target */,
+				92AC18A62DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatUITests" target */,
+			);
 			path = CaptureCat;
 			sourceTree = "<group>";
 		};
@@ -80,6 +105,7 @@
 		92AC159E2DEE873C00A1D83B = {
 			isa = PBXGroup;
 			children = (
+				92AC18882DFA636C00A1D83B /* Localizable.xcstrings */,
 				92AC185D2DF197FA00A1D83B /* .swiftlint.yml */,
 				92AC15A92DEE873C00A1D83B /* CaptureCat */,
 				92AC15B72DEE873E00A1D83B /* CaptureCatTests */,
@@ -199,6 +225,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = 92AC159E2DEE873C00A1D83B;
 			minimizedProjectReferenceProxies = 1;
@@ -223,6 +250,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */,
+				92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +258,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92AC188A2DFA636C00A1D83B /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92AC188B2DFA636C00A1D83B /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +374,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -401,6 +432,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
