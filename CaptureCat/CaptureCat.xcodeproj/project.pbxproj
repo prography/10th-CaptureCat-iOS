@@ -39,10 +39,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		929844A02E0835C70036DBFA /* Exceptions for "CaptureCat" folder in "CaptureCat" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 92AC15A62DEE873C00A1D83B /* CaptureCat */;
+		};
 		92AC18A52DFA820E00A1D83B /* Exceptions for "CaptureCat" folder in "CaptureCatTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DesignSystem/Color/Colors.xcassets,
+				"DesignSystem/Font/OTF/Pretendard-Bold.otf",
+				"DesignSystem/Font/OTF/Pretendard-Regular.otf",
+				"DesignSystem/Font/OTF/Pretendard-SemiBold.otf",
 			);
 			target = 92AC15B32DEE873E00A1D83B /* CaptureCatTests */;
 		};
