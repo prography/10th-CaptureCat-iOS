@@ -29,4 +29,20 @@ extension Button {
             )
         )
     }
+    
+    func primaryStyle(
+        cornerRadius: CGFloat = 8,
+        backgroundColor: Color = .primary01,
+        foregroundColor: Color = .white,
+        verticalPadding: CGFloat = 14
+    ) -> some View {
+        self.buttonStyle(
+            PrimaryButtonStyle(
+                cornerRadius: cornerRadius,
+                backgroundColor: backgroundColor,
+                foregroundColor: foregroundColor,
+                verticalPadding: verticalPadding
+            )
+        )
+    }
 }
