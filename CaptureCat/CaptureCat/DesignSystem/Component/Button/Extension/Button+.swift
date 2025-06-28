@@ -36,14 +36,16 @@ extension Button {
         cornerRadius: CGFloat = 4,
         backgroundColor: Color = .primary01,
         foregroundColor: Color = .white,
-        verticalPadding: CGFloat = 14
+        verticalPadding: CGFloat = 14,
+        fillWidth: Bool = true
     ) -> some View {
         self.buttonStyle(
             PrimaryButtonStyle(
                 cornerRadius: cornerRadius,
                 backgroundColor: backgroundColor,
                 foregroundColor: foregroundColor,
-                verticalPadding: verticalPadding
+                verticalPadding: verticalPadding,
+                fillWidth: fillWidth
             )
         )
     }

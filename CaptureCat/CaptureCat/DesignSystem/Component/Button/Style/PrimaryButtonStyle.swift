@@ -14,6 +14,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     let backgroundColor: Color
     let foregroundColor: Color
     let verticalPadding: CGFloat
+    let fillWidth: Bool
     
     func makeBody(configuration: Configuration) -> some View {
         let background = isEnabled ? backgroundColor : Color.gray04
@@ -22,8 +23,9 @@ struct PrimaryButtonStyle: ButtonStyle {
         return configuration.label
             .CFont(.subhead01Bold)
             .foregroundColor(foreground)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: fillWidth ? .infinity : nil)
             .padding(.vertical, verticalPadding)
+            .padding(.horizontal, 16)
             .background(background)
             .cornerRadius(cornerRadius)
             .opacity(configuration.isPressed ? 0.7 : 1.0)
