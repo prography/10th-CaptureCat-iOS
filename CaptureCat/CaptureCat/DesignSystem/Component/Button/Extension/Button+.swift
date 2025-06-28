@@ -14,7 +14,8 @@ extension Button {
         selectedForeground: Color = .white,
         unselectedBackground: Color = .white,
         unselectedForeground: Color = .gray09,
-        borderColor: Color? = .gray09,
+        selectedBorderColor: Color? = nil,
+        unselectedBorderColor: Color? = .gray04,
         icon: Image? = nil
     ) -> some View {
         buttonStyle(
@@ -24,7 +25,8 @@ extension Button {
                 selectedForeground: selectedForeground,
                 unselectedBackground: unselectedBackground,
                 unselectedForeground: unselectedForeground,
-                borderColor: borderColor,
+                selectedBorderColor: selectedBorderColor,
+                unselectedBorderColor: unselectedBorderColor,
                 icon: icon
             )
         )
