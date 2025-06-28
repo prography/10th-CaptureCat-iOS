@@ -33,7 +33,7 @@ extension Button {
     }
     
     func primaryStyle(
-        cornerRadius: CGFloat = 8,
+        cornerRadius: CGFloat = 4,
         backgroundColor: Color = .primary01,
         foregroundColor: Color = .white,
         verticalPadding: CGFloat = 14
