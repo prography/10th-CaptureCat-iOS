@@ -16,7 +16,7 @@ struct TabContainerView: View {
             Group {
                 switch selectedTab {
                 case .temporaryStorage:
-                    EmptyView()
+                    StorageView()
                 case .home:
                     HomeView()
                 case .tag:
@@ -28,7 +28,6 @@ struct TabContainerView: View {
             VStack {
                 Spacer()
                 CustomTabView(selectedTab: $selectedTab)
-                    .padding(.horizontal)
             }
         }
     }
