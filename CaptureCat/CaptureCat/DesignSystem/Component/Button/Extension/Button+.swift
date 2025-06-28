@@ -14,7 +14,8 @@ extension Button {
         selectedForeground: Color = .white,
         unselectedBackground: Color = .white,
         unselectedForeground: Color = .gray09,
-        borderColor: Color? = .gray09,
+        selectedBorderColor: Color? = nil,
+        unselectedBorderColor: Color? = .gray04,
         icon: Image? = nil
     ) -> some View {
         buttonStyle(
@@ -24,14 +25,15 @@ extension Button {
                 selectedForeground: selectedForeground,
                 unselectedBackground: unselectedBackground,
                 unselectedForeground: unselectedForeground,
-                borderColor: borderColor,
+                selectedBorderColor: selectedBorderColor,
+                unselectedBorderColor: unselectedBorderColor,
                 icon: icon
             )
         )
     }
     
     func primaryStyle(
-        cornerRadius: CGFloat = 8,
+        cornerRadius: CGFloat = 4,
         backgroundColor: Color = .primary01,
         foregroundColor: Color = .white,
         verticalPadding: CGFloat = 14

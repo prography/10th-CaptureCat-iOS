@@ -13,7 +13,8 @@ struct ChipButtonStyle: ButtonStyle {
     let selectedForeground: Color
     let unselectedBackground: Color
     let unselectedForeground: Color
-    let borderColor: Color?
+    let selectedBorderColor: Color?
+    let unselectedBorderColor: Color?
     let icon: Image?
     
     func makeBody(configuration: Configuration) -> some View {
@@ -26,10 +27,10 @@ struct ChipButtonStyle: ButtonStyle {
                     .frame(width: 16, height: 16)
             }
             configuration.label
-                .CFont(.subhead02Bold)
+                .CFont(isSelected ? .subhead02Bold : .body02Regular)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
         .foregroundColor(isSelected ? selectedForeground : unselectedForeground)
         .background(
             Group {
@@ -42,7 +43,10 @@ struct ChipButtonStyle: ButtonStyle {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(borderColor ?? (isSelected ? selectedBackground : unselectedBackground), lineWidth: 2)
+                .stroke(
+                    (isSelected ? selectedBorderColor : unselectedBorderColor) ?? (isSelected ? selectedBackground : unselectedBackground),
+                    lineWidth: 1.5
+                )
         )
         .cornerRadius(20)
         .opacity(configuration.isPressed ? 0.7 : 1.0)

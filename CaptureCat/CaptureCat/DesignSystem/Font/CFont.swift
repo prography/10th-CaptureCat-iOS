@@ -155,10 +155,9 @@ struct CFontModifier: ViewModifier {
             forTextStyle: font.textStyle.toUIFontTextStyle()
         ).pointSize
         let appliedSize = font.fontSize
-        let extraSpacing = max(font.lineHeight - appliedSize, 0)
         
         return content
             .font(.custom(font.fontType.name, size: appliedSize, relativeTo: font.textStyle))
-            .lineSpacing(extraSpacing)
+            .lineSpacing(0)
     }
 }
