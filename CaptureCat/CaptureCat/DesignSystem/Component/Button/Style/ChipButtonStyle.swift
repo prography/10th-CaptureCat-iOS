@@ -45,7 +45,7 @@ struct ChipButtonStyle: ButtonStyle {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(
                     (isSelected ? selectedBorderColor : unselectedBorderColor) ?? (isSelected ? selectedBackground : unselectedBackground),
-                    lineWidth: 2
+                    lineWidth: 1.5
                 )
         )
         .cornerRadius(20)
