@@ -12,6 +12,8 @@ struct ToastModifier: ViewModifier {
     let message: String
     let textColor: Color
     let duration: TimeInterval
+    let fillWidth: Bool
+    let cornerRadius: CGFloat
     
     func body(content: Content) -> some View {
         content
@@ -22,10 +24,10 @@ struct ToastModifier: ViewModifier {
                         .foregroundColor(textColor)
                         .multilineTextAlignment(.center)
                         .frame(height: 46)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.black.opacity(0.75))
-                        .cornerRadius(8)
                         .padding(.horizontal, 16)
+                        .frame(maxWidth: fillWidth ? .infinity : nil)
+                        .background(.overlayDim)
+                        .cornerRadius(cornerRadius)
                         .padding(.bottom, 72)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
@@ -38,7 +40,6 @@ struct ToastModifier: ViewModifier {
                         }
                     }
                 }
-                
             }
     }
 }

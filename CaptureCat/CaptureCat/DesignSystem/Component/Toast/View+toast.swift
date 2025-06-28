@@ -11,13 +11,17 @@ extension View {
     func toast(isShowing: Binding<Bool>,
                message: String,
                textColor: Color = .white,
-               duration: TimeInterval = 1) -> some View {
+               duration: TimeInterval = 1,
+               fillWidth: Bool = true,
+               cornerRadius: CGFloat = 8) -> some View {
         self.modifier(
             ToastModifier(
                 isShowing: isShowing,
                 message: message,
                 textColor: textColor,
-                duration: duration
+                duration: duration,
+                fillWidth: fillWidth,
+                cornerRadius: cornerRadius
             )
         )
     }
