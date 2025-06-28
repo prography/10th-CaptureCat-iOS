@@ -28,26 +28,26 @@ struct PopUpViewModifier: ViewModifier {
                         }
                     }
                 
-                VStack(spacing: 16) {
+                VStack(alignment: .center, spacing: 16) {
                     Text(title)
                         .CFont(.headline02Bold)
                         .foregroundStyle(.text01)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
+                        .multilineTextAlignment(.center)
                     Text(message)
                         .CFont(.body02Regular)
                         .foregroundStyle(.text01)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
+                        .multilineTextAlignment(.center)
                     
                     HStack(spacing: 8) {
                         Button(action: {
                             withAnimation { isPresented = false }
                         }) {
                             Text(cancelTitle)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
-                                .background(Color.primaryLow)
-                                .foregroundStyle(.primary01)
+                                .frame(maxWidth: .infinity, minHeight: 48)
+                                .background(Color.gray02)
+                                .foregroundStyle(.text03)
                                 .cornerRadius(6)
                                 .CFont(.subhead01Bold)
                         }
@@ -57,8 +57,7 @@ struct PopUpViewModifier: ViewModifier {
                             confirmAction()
                         }) {
                             Text(confirmTitle)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity, minHeight: 48)
                                 .background(Color.primary01)
                                 .foregroundStyle(.white)
                                 .cornerRadius(6)
@@ -69,9 +68,10 @@ struct PopUpViewModifier: ViewModifier {
                 .padding(20)
                 .background(Color.white)
                 .cornerRadius(12)
-                .frame(maxWidth: 300)
+                .frame(maxWidth: .infinity)
                 .transition(.scale.combined(with: .opacity))
                 .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isPresented)
+                .padding(.horizontal, 16)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
