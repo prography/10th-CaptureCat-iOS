@@ -29,12 +29,6 @@ struct HomeView: View {
             Text("스크린샷을 동기화해서 관리해보세요")
                 .CFont(.body01Regular)
                 .foregroundStyle(.text03)
-            Button {
-                
-            } label: {
-                Text("동기화하기")
-            }
-            .primaryStyle(fillWidth: false)
             Spacer()
         }
     }
