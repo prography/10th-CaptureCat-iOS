@@ -27,5 +27,20 @@ extension View {
             )
         )
     }
+    
+    func singlePopUp(
+        isPresented: Binding<Bool>,
+        title: String? = nil,
+        message: String,
+        cancelTitle: String) -> some View {
+            modifier(
+                SinglePopUpViewModifier(
+                    isPresented: isPresented,
+                    title: title,
+                    message: message,
+                    cancelTitle: cancelTitle
+                )
+            )
+        }
 }
 
