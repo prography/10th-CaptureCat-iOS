@@ -55,7 +55,6 @@ struct SingleCardView<Content: View>: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 .opacity(Double(-dragOffset.height / 100).clamped(to: 0...1))
-                .animation(.easeIn, value: dragOffset)
             }
         }
         .offset(y: dragOffset.height)
