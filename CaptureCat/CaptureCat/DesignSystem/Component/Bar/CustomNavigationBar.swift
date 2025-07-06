@@ -14,11 +14,6 @@ struct CustomNavigationBar: View {
     let onAction: (() -> Void)?
     let isSaveEnabled: Bool
 
-    private let enabledColor: Color   = .primary01
-    private let disabledColor: Color  = .gray04
-    private let enabledFont: CFont    = .subhead01Bold
-    private let disabledFont: CFont   = .body01Regular
-
     var body: some View {
         ZStack {
             HStack {
@@ -35,21 +30,12 @@ struct CustomNavigationBar: View {
 
                 if let onAction, let actionTitle {
                     Button(actionTitle, action: onAction)
-                        .buttonStyle(
-                            PrimaryTextButtonStyle(
-                                isEnabled: isSaveEnabled,
-                                enabledColor: enabledColor,
-                                disabledColor: disabledColor,
-                                enabledFont: enabledFont,
-                                disabledFont: disabledFont
-                            )
-                        )
+                        .primaryTextStyle(isEnabled: isSaveEnabled)
                         .disabled(!isSaveEnabled)
                 }
             }
             .padding(.horizontal, 16)
         }
-        .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
         .padding(.bottom, 10)
     }
 }
