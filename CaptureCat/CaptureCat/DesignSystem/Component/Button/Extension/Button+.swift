@@ -49,4 +49,22 @@ extension Button {
             )
         )
     }
+    
+    func primaryTextStyle(
+        isEnabled: Bool,
+        enabledColor: Color = .primary01,
+        disabledColor: Color = .gray04,
+        enabledFont: CFont = .subhead01Bold,
+        disabledFont: CFont = .body01Regular
+    ) -> some View {
+        self.buttonStyle(
+            PrimaryTextButtonStyle(
+                isEnabled: isEnabled,
+                enabledColor: enabledColor,
+                disabledColor: disabledColor,
+                enabledFont: enabledFont,
+                disabledFont: disabledFont
+            )
+        )
+    }
 }

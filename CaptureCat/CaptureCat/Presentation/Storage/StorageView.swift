@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StorageView: View {
     @StateObject private var viewModel = StorageViewModel()
+    @EnvironmentObject private var router: Router
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
@@ -49,19 +50,28 @@ struct StorageView: View {
 
     // MARK: - Sub-views
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("임시보관함")
-                .CFont(.headline02Bold)
-                .foregroundStyle(.text01)
-
-            Text("\(viewModel.totalCount)장의 스크린샷이 있어요.")
-                .CFont(.body02Regular)
-                .foregroundStyle(.text01)
+        HStack {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("임시보관함")
+                    .CFont(.headline02Bold)
+                    .foregroundStyle(.text01)
+                
+                Text("\(viewModel.totalCount)장의 스크린샷이 있어요.")
+                    .CFont(.body02Regular)
+                    .foregroundStyle(.text01)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 12)
+            
+            Button {
+                router.push(.tag(assets: viewModel.selectedAssets()))
+            } label: {
+                Text("다음")
+            }
+            .primaryTextStyle(isEnabled: viewModel.selectedIDs.count > 0 && viewModel.selectedIDs.count <= 20)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.leading, 16)
-        .padding(.top, 16)
-        .padding(.bottom, 12)
     }
     
     private var selectionBar: some View {

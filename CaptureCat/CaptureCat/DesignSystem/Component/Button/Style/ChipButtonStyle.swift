@@ -19,15 +19,15 @@ struct ChipButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: icon == nil ? 0 : 6) {
+            configuration.label
+                .CFont(isSelected ? .subhead02Bold : .body02Regular)
             if let icon {
                 icon
                     .resizable()
                     .renderingMode(.template)
                     .scaledToFit()
-                    .frame(width: 16, height: 16)
+                    .frame(width: 24, height: 24)
             }
-            configuration.label
-                .CFont(isSelected ? .subhead02Bold : .body02Regular)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)

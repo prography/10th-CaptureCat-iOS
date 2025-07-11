@@ -97,6 +97,14 @@ final class StorageViewModel: ObservableObject {
         }
         manager.delete(assets: toDelete)
     }
+    
+    func selectedAssets() -> [PHAsset] {
+        let selectedAssets = manager.assets.filter {
+            selectedIDs.contains($0.localIdentifier)
+        }
+        
+        return selectedAssets
+    }
 
     // MARK: - Private
     private func triggerCountToast() {
