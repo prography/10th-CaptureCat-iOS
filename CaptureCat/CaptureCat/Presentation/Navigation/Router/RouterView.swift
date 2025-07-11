@@ -24,10 +24,9 @@ struct RouterView<Content: View>: View {
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
                     case .tag(let assets):
-                        EmptyView()
-//                        TagView(assets: assets)
-//                            .navigationBarBackButtonHidden()
-//                            .toolbar(.hidden, for: .navigationBar)
+                        TagView(assets: assets)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }
