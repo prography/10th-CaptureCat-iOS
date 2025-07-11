@@ -151,13 +151,11 @@ struct CFontModifier: ViewModifier {
     let font: CFont
     
     func body(content: Content) -> some View {
-        let baseSize = UIFont.preferredFont(
-            forTextStyle: font.textStyle.toUIFontTextStyle()
-        ).pointSize
         let appliedSize = font.fontSize
+        let spacing = font.lineHeight - appliedSize
         
         return content
             .font(.custom(font.fontType.name, size: appliedSize, relativeTo: font.textStyle))
-            .lineSpacing(0)
+            .lineSpacing(spacing)
     }
 }
