@@ -22,7 +22,9 @@ struct AuthenticatedView: View {
                     TabContainerView()
                 }
             case .start:
-                StartGetScreenshotView()
+                RouterView {
+                    StartGetScreenshotView()
+                }
             case .guest:
                 RecommandLoginView(viewModel: authViewModel)
             }
