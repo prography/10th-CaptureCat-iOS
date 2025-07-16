@@ -19,7 +19,7 @@ struct RecommandLoginView: View {
                     .foregroundStyle(.text01)
             }
             .padding(.bottom, 16)
-            .padding(.top, 60)
+            .padding(.top, 33)
             .padding(.leading, 16)
             
             VStack(spacing: 8) {

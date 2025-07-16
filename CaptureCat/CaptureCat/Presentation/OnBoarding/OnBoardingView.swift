@@ -23,6 +23,7 @@ struct OnBoardingView: View {
                 }
             }
             .padding(.horizontal, 16)
+            .padding(.top, 33)
             
             Image(viewModel.onBoardingPages[viewModel.currentPage].image)
                 .resizable()
