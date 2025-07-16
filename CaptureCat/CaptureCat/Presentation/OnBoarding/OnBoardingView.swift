@@ -19,6 +19,7 @@ struct OnBoardingView: View {
                 } label: {
                     Text("건너뛰기")
                         .CFont(.body02Regular)
+                        .foregroundStyle(.text03)
                 }
             }
             .padding(.horizontal, 16)
