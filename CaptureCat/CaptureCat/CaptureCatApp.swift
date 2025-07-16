@@ -11,7 +11,13 @@ import SwiftUI
 struct CaptureCatApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if onBoardingViewModel.isOnBoarding {
+                OnBoardingView(viewModel: $onBoardingViewModel)
+            } else {
+                RouterView {
+                    TabContainerView()
+                }
+            }
         }
     }
 }
