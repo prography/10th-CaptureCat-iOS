@@ -11,8 +11,9 @@ final class KeyChainModule {
     enum Key: String {
         case accessToken
         case refreshToken
-        case isLogin
-        case guestMode
+        case kakaoToken
+        case appleToken
+        case didStarted
     }
     
     static func create(key: Key, data: String) {
