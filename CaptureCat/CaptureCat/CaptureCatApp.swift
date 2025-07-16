@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct CaptureCatApp: App {
+    @State var onBoardingViewModel: OnBoardingViewModel = OnBoardingViewModel()
     var body: some Scene {
         WindowGroup {
             if onBoardingViewModel.isOnBoarding {
