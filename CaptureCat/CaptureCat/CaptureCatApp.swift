@@ -12,6 +12,11 @@ import KakaoSDKAuth
 @main
 struct CaptureCatApp: App {
     @State var onBoardingViewModel: OnBoardingViewModel = OnBoardingViewModel()
+    
+    init() {
+        KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
+    }
+    
     var body: some Scene {
         WindowGroup {
             if onBoardingViewModel.isOnBoarding {
