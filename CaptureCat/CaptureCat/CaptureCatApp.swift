@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import KakaoSDKCommon
+import KakaoSDKAuth
 
 @main
 struct CaptureCatApp: App {
@@ -15,10 +17,14 @@ struct CaptureCatApp: App {
             if onBoardingViewModel.isOnBoarding {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
-                RouterView {
-                    TabContainerView()
-                }
+                AuthenticatedView()
+                    .onOpenURL { url in
+                        if (AuthApi.isKakaoTalkLoginUrl(url)) {
+                            _ = AuthController.handleOpenUrl(url: url)
+                        }
+                    }
             }
+            
         }
     }
 }
