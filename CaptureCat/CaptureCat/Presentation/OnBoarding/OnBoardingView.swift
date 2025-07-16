@@ -19,9 +19,11 @@ struct OnBoardingView: View {
                 } label: {
                     Text("건너뛰기")
                         .CFont(.body02Regular)
+                        .foregroundStyle(.text03)
                 }
             }
             .padding(.horizontal, 16)
+            .padding(.top, 33)
             
             Image(viewModel.onBoardingPages[viewModel.currentPage].image)
                 .resizable()

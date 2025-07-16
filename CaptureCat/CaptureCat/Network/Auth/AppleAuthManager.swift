@@ -6,36 +6,53 @@
 //
 
 import AuthenticationServices
-import SwiftUI
 
-final class AppleAuthManager: NSObject, ASAuthorizationControllerDelegate {
-    var onSuccess: ((String) -> Void)?
-    var onFailure: ((Error) -> Void)?
-    
-    func signInWithApple() {
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = [.email]
+final class AppleLoginManager: NSObject {
+    var completion: ((String, String) -> Void)?
 
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.performRequests()
-    }
+    func login() async throws -> (String, String) {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.completion = { token, code in
+                continuation.resume(returning: (token, code))
+            }
+            
+            let request = ASAuthorizationAppleIDProvider().createRequest()
+            request.requestedScopes = [.fullName, .email]
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        guard
-            let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
-            let tokenData = credential.identityToken,
-            let idToken = String(data: tokenData, encoding: .utf8)
-        else {
-            print("❌ Apple ID Token 추출 실패")
-            return
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            controller.performRequests()
         }
-        
-        onSuccess?(idToken)
-        
+    }
+}
+
+extension AppleLoginManager: ASAuthorizationControllerDelegate {
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        switch authorization.credential {
+        case let credential as ASAuthorizationAppleIDCredential:
+            if let authorizationCode = credential.authorizationCode,
+               let code = String(data: authorizationCode, encoding: .utf8),
+               let token = credential.identityToken,
+               let tokenString = String(data: token, encoding: .utf8) {
+                completion?(tokenString, code)
+            }
+        default:
+            break
+        }
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        print("❌ Apple 로그인 에러:", error.localizedDescription)
+        debugPrint("Apple Login Error: \(error.localizedDescription)")
+        completion?("", "")
+    }
+}
+
+extension AppleLoginManager: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        guard let window = UIApplication.shared.windows.first else {
+            fatalError()
+        }
+        return window
     }
 }

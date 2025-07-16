@@ -6,18 +6,30 @@
 //
 
 import SwiftUI
+import KakaoSDKCommon
+import KakaoSDKAuth
 
 @main
 struct CaptureCatApp: App {
+    @State var onBoardingViewModel: OnBoardingViewModel = OnBoardingViewModel()
+    
+    init() {
+        KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
+    }
+    
     var body: some Scene {
         WindowGroup {
             if onBoardingViewModel.isOnBoarding {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
-                RouterView {
-                    TabContainerView()
-                }
+                AuthenticatedView()
+                    .onOpenURL { url in
+                        if (AuthApi.isKakaoTalkLoginUrl(url)) {
+                            _ = AuthController.handleOpenUrl(url: url)
+                        }
+                    }
             }
+            
         }
     }
 }
