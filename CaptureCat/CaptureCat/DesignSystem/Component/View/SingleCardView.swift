@@ -27,7 +27,7 @@ struct SingleCardView<Content: View>: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Color.mint)
+                .fill(Color.white)
                 .overlay(
                     content
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))

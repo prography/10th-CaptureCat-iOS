@@ -117,7 +117,6 @@ struct TagView: View {
                 }
                 .scaleEffect(1.0 - abs(distance(index) * 0.2))
                 .opacity(1.0 - abs(distance(index)) * 0.3 )
-                .blur(radius: blurRadius(for: index))
                 .offset(x: myXOffset(index), y: 0)
                 .zIndex(1.0 - abs(distance(index)) * 0.1)
             }
@@ -159,11 +158,5 @@ struct TagView: View {
     
     func myXOffset(_ item: Int) -> Double {
         return distance(item) * 280
-    }
-    
-    func blurRadius(for index: Int) -> CGFloat {
-        let dist = abs(distance(index))
-        // 중앙(0)에서는 blur = 0, 양옆으로 갈수록 blur 강해짐
-        return min(dist * 5, 10)
     }
 }
