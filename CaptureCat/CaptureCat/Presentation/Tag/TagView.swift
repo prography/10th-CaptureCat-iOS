@@ -9,23 +9,29 @@ import SwiftUI
 import Photos
 
 struct TagView: View {
-    @EnvironmentObject private var router: Router
     @StateObject private var viewModel: TagViewModel
-
+    @EnvironmentObject private var authViewModel: AuthViewModel
+    @EnvironmentObject private var router: Router
+    @State private var snappedItem = 0.0
+    @State private var draggingItem = 0.0
+    
     init(assets: [PHAsset]) {
         _viewModel = StateObject(wrappedValue: TagViewModel(assets: assets))
     }
-
+    
     var body: some View {
         VStack {
             CustomNavigationBar(
-                title: "태그하기",
+                title: viewModel.selectedIndex == 0 ? "태그하기" : "태그하기 \(viewModel.progress)",
                 onBack: { router.pop() },
                 actionTitle: "저장",
-                onAction: { viewModel.save() },
+                onAction: {
+                    viewModel.save()
+                    authViewModel.authenticationState = .signIn
+                },
                 isSaveEnabled: viewModel.hasChanges
             )
-
+            
             Picker("options", selection: $viewModel.selectedIndex) {
                 ForEach(0..<viewModel.segments.count, id: \.self) { index in
                     Text(viewModel.segments[index])
@@ -35,20 +41,21 @@ struct TagView: View {
             }
             .pickerStyle(.segmented)
             .frame(width: 200)
-
+            .onChange(of: viewModel.selectedIndex) { _, _ in
+                viewModel.onModeChanged()
+            }
+            
             if viewModel.selectedIndex == 0 {
                 MultiCardView {
-                    Image(.accountCircle)
-                        .resizable()
-                        .scaledToFit()
+                    RoundedRectangle(cornerRadius: 12)
+                        .phAssetImage(asset: viewModel.displayAsset!)
                 }
-                .padding(50)
+                .padding(40)
             } else {
-                SingleCardView {
-                }
-                .padding(60)
+                carouselView
+                    .padding(.vertical, 30)
             }
-
+            
             HStack {
                 Text("최근 추가한 태그")
                     .CFont(.subhead01Bold)
@@ -57,7 +64,7 @@ struct TagView: View {
                     .CFont(.caption02Regular)
             }
             .padding(.horizontal, 16)
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(viewModel.displayTags, id: \.self) { tag in
@@ -68,7 +75,7 @@ struct TagView: View {
                         }
                         .chipStyle(isSelected: viewModel.selectedTags.contains(tag), selectedBackground: .primary01)
                     }
-
+                    
                     Button {
                         viewModel.addTagButtonTapped()
                     } label: {
@@ -81,7 +88,7 @@ struct TagView: View {
                 }
             }
             .padding(.leading, 16)
-
+            
             Spacer()
         }
         .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
@@ -91,5 +98,51 @@ struct TagView: View {
                 isPresented: $viewModel.isShowingAddTagSheet
             )
         }
+    }
+    
+    private var carouselView: some View {
+        ZStack {
+            ForEach(Array(viewModel.assets.enumerated()), id: \.element.localIdentifier) { index, asset in
+                ZStack {
+                    SingleCardView {
+                        RoundedRectangle(cornerRadius: 12)
+                            .phAssetImage(asset: asset)
+                    }
+                }
+                .scaleEffect(1.0 - abs(distance(index) * 0.2))
+                .opacity(1.0 - abs(distance(index)) * 0.3 )
+                .blur(radius: blurRadius(for: index))
+                .offset(x: myXOffset(index), y: 0)
+                .zIndex(1.0 - abs(distance(index)) * 0.1)
+            }
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 10)
+                .onChanged { value in
+                    guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                    draggingItem = snappedItem + value.translation.width / 100
+                }
+                .onEnded { value in
+                    withAnimation {
+                        draggingItem = snappedItem + value.predictedEndTranslation.width / 100
+                        draggingItem = round(draggingItem).remainder(dividingBy: Double(viewModel.assets.count))
+                        snappedItem = draggingItem
+                    }
+                }
+        )
+    }
+    
+    func distance(_ item: Int) -> Double {
+        return (draggingItem - Double(item)).remainder(dividingBy: Double(viewModel.assets.count))
+    }
+    
+    func myXOffset(_ item: Int) -> Double {
+        return distance(item) * 280
+    }
+    
+    func blurRadius(for index: Int) -> CGFloat {
+        let dist = abs(distance(index))
+        // 중앙(0)에서는 blur = 0, 양옆으로 갈수록 blur 강해짐
+        return min(dist * 5, 10)
     }
 }
