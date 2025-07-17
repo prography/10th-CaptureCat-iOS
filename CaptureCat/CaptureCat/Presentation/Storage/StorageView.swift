@@ -10,17 +10,38 @@ import SwiftUI
 struct StorageView: View {
     @StateObject private var viewModel = StorageViewModel()
     @EnvironmentObject private var router: Router
+    @EnvironmentObject private var authViewModel: AuthViewModel
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
     var body: some View {
-        VStack(alignment: .leading) {
+        ZStack {
             ScrollView {
                 header
                 selectionBar
                 screenshotGrid
             }
-            Spacer()
+            .disabled(AccountStorage.shared.isGuest == true) // ✅ 스크롤 자체를 막음
+
+            if AccountStorage.shared.isGuest == true {
+                VStack {
+                    Spacer()
+
+                    Button {
+                        authViewModel.authenticationState = .initial
+                    } label: {
+                        Text("로그인 후 이용하기")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .primaryStyle()
+                    .padding(.horizontal, 32)
+                    .padding(.bottom, 80)
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.overlayDim.opacity(0.3))
+            }
         }
         .toast(
             isShowing: $viewModel.showOverlimitToast,
@@ -43,10 +64,12 @@ struct StorageView: View {
             title: "삭제할까요?",
             message: "\(viewModel.selectedIDs.count)개의 항목을 삭제하시겠습니까?\n삭제된 항목은 복구할 수 없습니다.",
             cancelTitle: "취소",
-            confirmTitle: "삭제") {
-                viewModel.deleteSelected()
-            }
+            confirmTitle: "삭제"
+        ) {
+            viewModel.deleteSelected()
+        }
     }
+
 
     // MARK: - Sub-views
     private var header: some View {
@@ -101,16 +124,21 @@ struct StorageView: View {
     }
 
     private var screenshotGrid: some View {
-        LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(viewModel.assets, id: \.localIdentifier) { asset in
-                ScreenshotThumbnailView(
-                    asset: asset,
-                    isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
-                )
-                .onTapGesture {
-                    viewModel.toggleSelection(of: asset)
+        ZStack {
+            // ✅ 기본 스크린샷 그리드
+            LazyVGrid(columns: columns, spacing: 4) {
+                ForEach(viewModel.assets, id: \.localIdentifier) { asset in
+                    ScreenshotThumbnailView(
+                        asset: asset,
+                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
+                    )
+                    .onTapGesture {
+                        viewModel.toggleSelection(of: asset)
+                    }
                 }
             }
+            .blur(radius: AccountStorage.shared.isGuest == true ? 8 : 0)
         }
     }
+
 }
