@@ -14,21 +14,24 @@ struct AuthenticatedView: View {
         VStack {
             switch authViewModel.authenticationState {
             case .initial:
-                LogInView(viewModel: authViewModel)
+                LogInView()
+                    .environmentObject(authViewModel)
             case .splash:
                 Text("Splash")
             case .signIn:
                 RouterView {
                     TabContainerView()
                 }
+                .environmentObject(authViewModel)
             case .start:
                 RouterView {
                     StartGetScreenshotView()
                 }
+                .environmentObject(authViewModel)
             case .guest:
-                RecommandLoginView(viewModel: authViewModel)
+                RecommandLoginView()
+                    .environmentObject(authViewModel)
             }
         }
     }
-    
 }
