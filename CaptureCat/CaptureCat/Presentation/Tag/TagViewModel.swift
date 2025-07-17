@@ -28,6 +28,15 @@ final class TagViewModel: ObservableObject {
         self.assets = assets
         loadTags()
         loadExistingTagsForAssets()
+        
+        // 각 asset의 초기 태그 상태를 맵에 로드
+        assets.forEach { asset in
+            if let screenshot = swiftDataManager.fetchScreenshot(with: asset.localIdentifier) {
+                assetTagsMap[asset.localIdentifier] = Set(screenshot.tags)
+            } else {
+                assetTagsMap[asset.localIdentifier] = []
+            }
+        }
     }
 
     var displayTags: [String] {
