@@ -27,7 +27,7 @@ struct SingleCardView<Content: View>: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Color.mint)
+                .fill(Color.white)
                 .overlay(
                     content
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
@@ -60,9 +60,10 @@ struct SingleCardView<Content: View>: View {
         .offset(y: dragOffset.height)
         .opacity(isDismissed ? 0 : 1)
         .animation(.easeOut, value: isDismissed)
-        .gesture(
-            DragGesture()
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0, coordinateSpace: .local)
                 .onChanged { value in
+                    guard abs(value.translation.height) > abs(value.translation.width) else { return }
                     // 오직 위 방향으로만
                     dragOffset.height = min(0, value.translation.height)
                 }

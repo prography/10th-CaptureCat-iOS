@@ -33,21 +33,26 @@ struct MultiCardView<Content: View>: View {
     }
     
     var body: some View {
-        ZStack {
-            // 뒤 레이어
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(backLayerStyle)
-                .rotationEffect(backgroundRotation)
-            
-            // 앞쪽 카드
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Color.white)
-                .overlay(
-                    content
-                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-                )
+        GeometryReader { geo in
+            ZStack {
+                // 뒤쪽 카드
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(backLayerStyle)
+                    .rotationEffect(backgroundRotation)
+                    .offset(x: backgroundOffset, y: backgroundOffset)
+
+                // 앞쪽 카드
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(Color.white)
+                    .overlay(
+                        content
+                            .frame(width: geo.size.width, height: geo.size.height) // ✅ 부모 크기에 맞춤
+                            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+                    )
+            }
+            .compositingGroup()
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
-        .compositingGroup() // 회전·오프셋 시 레이어 합성 품질 향상
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .aspectRatio(45 / 76, contentMode: .fit) // ✅ 원하는 비율 유지, 부모 레이아웃에 따라 자동 조절
     }
 }

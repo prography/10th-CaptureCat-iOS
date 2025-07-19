@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RecommandLoginView: View {
-    @ObservedObject var viewModel: AuthViewModel
+    @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
         VStack(alignment: .leading) {

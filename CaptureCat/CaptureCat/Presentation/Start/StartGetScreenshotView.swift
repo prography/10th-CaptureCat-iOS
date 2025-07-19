@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StartGetScreenshotView: View {
     @StateObject private var viewModel = StartGetScreenshotViewModel()
+    @EnvironmentObject private var router: Router
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
@@ -61,7 +62,7 @@ struct StartGetScreenshotView: View {
 
     private var actionButton: some View {
         Button("정리하기 \(viewModel.selectedIDs.count)/10") {
-            // TODO: 선택된 스크린샷 처리
+            router.push(.tag(assets: viewModel.selectedAssets()))
         }
         .primaryStyle()
         .disabled(viewModel.selectedIDs.isEmpty)

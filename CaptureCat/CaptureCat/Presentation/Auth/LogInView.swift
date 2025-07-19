@@ -9,7 +9,7 @@ import AuthenticationServices
 import SwiftUI
 
 struct LogInView: View {
-    @ObservedObject var viewModel: AuthViewModel
+    @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
         VStack {

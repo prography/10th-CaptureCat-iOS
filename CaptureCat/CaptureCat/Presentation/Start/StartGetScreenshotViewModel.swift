@@ -52,4 +52,9 @@ final class StartGetScreenshotViewModel: ObservableObject {
 
         selectedIDs.insert(id)
     }
+    
+    // 선택된 에셋들 반환
+    func selectedAssets() -> [PHAsset] {
+        return assets.filter { selectedIDs.contains($0.localIdentifier) }
+    }
 }
