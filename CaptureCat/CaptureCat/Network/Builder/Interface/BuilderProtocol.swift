@@ -22,9 +22,11 @@ protocol BuilderProtocol {
 }
 
 extension BuilderProtocol {
-    var headers: [String: String] { ["Content-Type": "application/json"] }
-
     var serializer: NetworkSerializable {
         JSONNetworkSerializer()
+    }
+    
+    var headers: [String: String] {
+        ["Content-Type": serializer.contentType]
     }
 }
