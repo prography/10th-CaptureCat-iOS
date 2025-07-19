@@ -31,9 +31,8 @@ struct StorageView: View {
                         authViewModel.authenticationState = .initial
                     } label: {
                         Text("로그인 후 이용하기")
-                            .frame(maxWidth: .infinity)
                     }
-                    .primaryStyle()
+                    .primaryStyle(fillWidth: false)
                     .padding(.horizontal, 32)
                     .padding(.bottom, 80)
 
