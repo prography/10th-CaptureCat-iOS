@@ -11,27 +11,28 @@ struct AuthenticatedView: View {
     @StateObject private var authViewModel: AuthViewModel = AuthViewModel()
     
     var body: some View {
-        VStack {
-            switch authViewModel.authenticationState {
-            case .initial:
-                LogInView()
-                    .environmentObject(authViewModel)
-            case .splash:
-                Text("Splash")
-            case .signIn:
-                RouterView {
-                    TabContainerView()
-                }
-                .environmentObject(authViewModel)
-            case .start:
-                RouterView {
-                    StartGetScreenshotView()
-                }
-                .environmentObject(authViewModel)
-            case .guest:
-                RecommandLoginView()
-                    .environmentObject(authViewModel)
+        if authViewModel.authenticationState == .start {
+            RouterView {
+                StartGetScreenshotView()
             }
+            .environmentObject(authViewModel)
+        } else {
+            RouterView {
+                TabContainerView()
+                    .fullScreenCover(
+                        isPresented: $authViewModel.isLogInPresented,
+                        onDismiss: {}
+                    ) {
+                        LogInView()
+                    }
+                    .fullScreenCover(
+                        isPresented: $authViewModel.isRecommandLogIn,
+                        onDismiss: {}
+                    ) {
+                        RecommandLoginView()
+                    }
+            }
+            .environmentObject(authViewModel)
         }
     }
 }

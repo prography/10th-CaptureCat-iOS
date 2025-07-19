@@ -16,7 +16,24 @@ class AuthViewModel: ObservableObject {
     private let socialManager: SocialManager = SocialManager()
     private let authService: AuthService = AuthService(networkManager: NetworkManager(baseURL: BaseURLType.production.url!))
     
-    @Published var authenticationState: AuthenticationState = .initial
+    @Published var authenticationState: AuthenticationState = .initial {
+        didSet {
+            if authenticationState == .initial {
+                isLogInPresented = true
+                isRecommandLogIn = false
+            } else if authenticationState == .guest {
+                isLogInPresented = false
+                isRecommandLogIn = true
+            } else {
+                isLogInPresented = false
+                isRecommandLogIn = false
+            }
+        }
+    }
+    
+    @Published var isLogInPresented: Bool = true
+    @Published var isRecommandLogIn: Bool = false
+    @Published var isStartedGetScreenshot: Bool = false
     
     @MainActor
     func send(action: Action) {

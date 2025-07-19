@@ -8,5 +8,7 @@
 import Foundation
 
 protocol NetworkSerializable {
+    var contentType: String { get }
+    
     func serialize(_ parameters: [String: Any]) async throws -> Data
 }

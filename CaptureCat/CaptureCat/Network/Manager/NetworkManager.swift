@@ -102,7 +102,7 @@ class NetworkManager {
         
         if builder.useAuthorization {
             let accesstoken = KeyChainModule.read(key: .accessToken) ?? ""
-            request.setValue("Bearer \(accesstoken)", forHTTPHeaderField: "Authorization")
+            request.setValue("\(accesstoken)", forHTTPHeaderField: "Authorization")
         }
         
         request.httpMethod = builder.method.typeName
@@ -115,9 +115,10 @@ class NetworkManager {
         debugPrint("URL:", request.url?.absoluteString ?? "nil")
         debugPrint("Method:", request.httpMethod ?? "nil")
         debugPrint("Headers:", request.allHTTPHeaderFields ?? [:])
-        if let body = request.httpBody,
-           let bodyString = String(data: body, encoding: .utf8) {
-            debugPrint("Body:", bodyString)
+        if let body = request.httpBody {
+            debugPrint("📦 Body length:", body.count)
+            let lossy = String(decoding: body.prefix(500), as: UTF8.self)  // 앞 200바이트만
+            debugPrint("🔍 Preview:", lossy)
         }
         
         return request
