@@ -8,6 +8,10 @@
 import Foundation
 
 struct JSONNetworkSerializer: NetworkSerializable {
+    var contentType: String {
+        "application/json"
+    }
+    
     init() {}
     
     func serialize(_ parameters: [String: Any]) throws -> Data {
