@@ -10,7 +10,7 @@ import SwiftUI
 enum Tab {
     case temporaryStorage
     case home
-    case tag
+    case search
 }
 
 struct CustomTabView: View {
@@ -52,16 +52,16 @@ struct CustomTabView: View {
                 }
                 Spacer()
                 Button {
-                    selectedTab = .tag
+                    selectedTab = .search
                 } label: {
                     VStack {
-                        Image(selectedTab == .tag ? .tagSelected : .tagUnselected)
+                        Image(selectedTab == .search ? .searchSelected : .searchUnselected)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 30)
-                        Text("태그")
-                            .CFont(selectedTab == .tag ? .caption01Semibold : .caption02Regular)
-                            .foregroundStyle(selectedTab == .tag ? .text01 : .text03)
+                        Text("검색")
+                            .CFont(selectedTab == .search ? .caption01Semibold : .caption02Regular)
+                            .foregroundStyle(selectedTab == .search ? .text01 : .text03)
                     }
                     
                 }
@@ -73,6 +73,6 @@ struct CustomTabView: View {
 }
 
 #Preview {
-    @Previewable @State var tab = Tab.tag
+    @Previewable @State var tab = Tab.search
     CustomTabView(selectedTab: $tab)
 }

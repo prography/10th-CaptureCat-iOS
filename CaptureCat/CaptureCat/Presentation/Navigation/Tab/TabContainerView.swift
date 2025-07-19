@@ -19,7 +19,7 @@ struct TabContainerView: View {
                     StorageView()
                 case .home:
                     HomeView()
-                case .tag:
+                case .search:
 //                    LogInView()
                     EmptyView()
                 }
