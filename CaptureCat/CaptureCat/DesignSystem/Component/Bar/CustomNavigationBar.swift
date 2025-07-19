@@ -13,18 +13,28 @@ struct CustomNavigationBar: View {
     let actionTitle: String?
     let onAction: (() -> Void)?
     let isSaveEnabled: Bool
+    let color: Color
+    
+    init(title: String, onBack: @escaping () -> Void, actionTitle: String? = nil, onAction: (() -> Void)? = nil, isSaveEnabled: Bool = false, color: Color = .black) {
+        self.title = title
+        self.onBack = onBack
+        self.actionTitle = actionTitle
+        self.onAction = onAction
+        self.isSaveEnabled = isSaveEnabled
+        self.color = color
+    }
 
     var body: some View {
         ZStack {
             HStack {
                 Button(action: onBack) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(color)
                 }
                 
                 Text(title)
                     .CFont(.headline03Bold)
-                    .foregroundColor(.text01)
+                    .foregroundColor(color)
 
                 Spacer()
 
