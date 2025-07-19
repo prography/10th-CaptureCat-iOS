@@ -50,18 +50,24 @@ struct TagView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .phAssetImage(asset: viewModel.displayAsset!)
                 }
-                .padding(40)
+                .padding(.horizontal, 40)
+                .padding(.top, 12)
             } else {
                 carouselView
-                    .padding(.vertical, 30)
+                    .padding(.top, 12)
             }
-            
+            Spacer()
             HStack {
                 Text("최근 추가한 태그")
                     .CFont(.subhead01Bold)
                 Spacer()
-                Text("태그는 최대 4개까지 저장할 수 있어요")
-                    .CFont(.caption02Regular)
+                Button {
+                    viewModel.addTagButtonTapped()
+                } label: {
+                    Text("추가")
+                        .CFont(.caption02Regular)
+                        .foregroundStyle(.text03)
+                }
             }
             .padding(.horizontal, 16)
             
@@ -75,16 +81,6 @@ struct TagView: View {
                         }
                         .chipStyle(isSelected: viewModel.selectedTags.contains(tag), selectedBackground: .primary01)
                     }
-                    
-                    Button {
-                        viewModel.addTagButtonTapped()
-                    } label: {
-                        Image(.plus)
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                            .foregroundStyle(.text01)
-                    }
-                    .chipStyle(isSelected: false, selectedBackground: .primary01)
                 }
             }
             .padding(.leading, 16)
