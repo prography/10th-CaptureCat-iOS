@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var router: Router
+    @EnvironmentObject private var authViewModel: AuthViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -36,6 +37,25 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.top)
+        .popUp(
+            isPresented: $authViewModel.isLogOutPresented,
+            title: "로그아웃하면",
+            message: "스크린샷을 관리하지 못할 수 있어요.\n그래도 로그아웃하시겠어요?",
+            cancelTitle: "취소",
+            confirmTitle: "로그아웃"
+        ) {
+            authViewModel.logOut()
+        }
+        .popUp(
+            isPresented: $authViewModel.isSignOutPresented,
+            title: "회원탈퇴하면",
+            message: "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?",
+            cancelTitle: "취소",
+            confirmTitle: "회원탈퇴"
+        ) {
+            //TODO: - signOutView 화면으로 이동
+            authViewModel.logOut()
+        }
     }
     
     private var guestCard: some View {
@@ -45,7 +65,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
             
             Button(action: {
-                // 로그인 액션
+                authViewModel.authenticationState = .initial
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)
@@ -100,7 +120,7 @@ struct SettingsView: View {
             }
             
             Button {
-                debugPrint("정보")
+                debugPrint("버전 정보")
             } label : {
                 Text("버전 정보")
                     .CFont(.body01Regular)
@@ -125,16 +145,6 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.gray02)
             
-            Button {
-                debugPrint("정보")
-            } label : {
-                Text("서비스 이용방법")
-                    .CFont(.body01Regular)
-                    .foregroundStyle(Color.text01)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
-            }
-            
             if AccountStorage.shared.isGuest == true {
                 Button {
                     debugPrint("정보")
@@ -147,7 +157,9 @@ struct SettingsView: View {
                 }
             } else {
                 Button {
-                    debugPrint("정보")
+                    withAnimation {
+                        authViewModel.isLogOutPresented = true
+                    }
                 } label : {
                     Text("로그아웃")
                         .CFont(.body01Regular)
@@ -156,7 +168,9 @@ struct SettingsView: View {
                         .padding(.horizontal, 16)
                 }
                 Button {
-                    debugPrint("정보")
+                    withAnimation {
+                        authViewModel.isSignOutPresented = true
+                    }
                 } label : {
                     Text("회원 탈퇴")
                         .CFont(.body02Regular)

@@ -11,12 +11,12 @@ struct AuthenticatedView: View {
     @StateObject private var authViewModel: AuthViewModel = AuthViewModel()
     
     var body: some View {
-        if authViewModel.authenticationState == .start {
-            RouterView {
-                StartGetScreenshotView()
-            }
-            .environmentObject(authViewModel)
-        } else {
+//        if authViewModel.authenticationState == .start {
+//            RouterView {
+//                StartGetScreenshotView()
+//            }
+//            .environmentObject(authViewModel)
+//        } else {
             RouterView {
                 TabContainerView()
                     .fullScreenCover(
@@ -33,6 +33,6 @@ struct AuthenticatedView: View {
                     }
             }
             .environmentObject(authViewModel)
-        }
+//        }
     }
 }

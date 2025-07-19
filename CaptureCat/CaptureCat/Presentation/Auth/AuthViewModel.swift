@@ -34,6 +34,8 @@ class AuthViewModel: ObservableObject {
     @Published var isLogInPresented: Bool = true
     @Published var isRecommandLogIn: Bool = false
     @Published var isStartedGetScreenshot: Bool = false
+    @Published var isLogOutPresented: Bool = false
+    @Published var isSignOutPresented: Bool = false
     
     @MainActor
     func send(action: Action) {
@@ -98,5 +100,19 @@ class AuthViewModel: ObservableObject {
     
     func guestMode() {
         self.authenticationState = .guest
+    }
+    
+    func logOut() {
+        KeyChainModule.delete(key: .accessToken)
+        KeyChainModule.delete(key: .refreshToken)
+        
+        self.authenticationState = .initial
+    }
+    
+    func signOut() {
+        KeyChainModule.delete(key: .accessToken)
+        KeyChainModule.delete(key: .refreshToken)
+        
+        self.authenticationState = .initial
     }
 }

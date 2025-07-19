@@ -40,7 +40,7 @@ struct AddTagSheet: View {
             
             // 선택된 태그 안내
             HStack {
-                Text("선택된 태그")
+                Text("추가된 태그")
                     .CFont(.headline03Bold)
                 Spacer()
                 Text("태그는 최대 4개까지 지정할 수 있어요")
