@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject var router: Router
+    
     var body: some View {
         VStack {
             HStack {
@@ -15,7 +17,7 @@ struct HomeView: View {
                     .CFont(.headline01Bold)
                 Spacer()
                 Button {
-                    print("마이페이지 버튼")
+                    router.push(.setting)
                 } label: {
                     Image(.accountCircle)
                 }
@@ -33,7 +35,7 @@ struct HomeView: View {
         }
     }
 }
-
-#Preview {
-    HomeView()
-}
+//
+//#Preview {
+//    HomeView()
+//}

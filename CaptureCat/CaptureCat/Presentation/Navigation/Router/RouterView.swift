@@ -27,6 +27,10 @@ struct RouterView<Content: View>: View {
                         TagView(assets: assets)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .setting:
+                        SettingsView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }
