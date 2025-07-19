@@ -6,36 +6,53 @@
 //
 
 import SwiftUI
+import Photos
 
 struct HomeView: View {
     @EnvironmentObject var router: Router
+    @StateObject private var viewModel = HomeViewModel()
+    
+    // Grid 레이아웃
+    private let columns = [
+        GridItem(.adaptive(minimum: 150), spacing: 12)
+    ]
     
     var body: some View {
         VStack {
+            // — Header
             HStack {
-                Text("캡쳐캣")
-                    .CFont(.headline01Bold)
+                Image(.mainLogo)
                 Spacer()
-                Button {
-                    router.push(.setting)
-                } label: {
+                Button { router.push(.setting) } label: {
                     Image(.accountCircle)
                 }
             }
             .padding(.horizontal, 16)
+            
             Spacer()
-            Text("아직 스크린샷이 없어요")
-                .CFont(.headline02Bold)
-                .foregroundStyle(.text02)
-                .padding(.bottom, 2)
-            Text("스크린샷을 동기화해서 관리해보세요")
-                .CFont(.body01Regular)
-                .foregroundStyle(.text03)
-            Spacer()
+            
+            if viewModel.items.isEmpty {
+                Text("저장된 스크린샷이 없습니다.")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach($viewModel.items) { item in
+                            NavigationLink {
+                                DetailView(item: item)
+                                    .navigationBarBackButtonHidden()
+                                    .toolbar(.hidden, for: .navigationBar)
+                            } label: {
+                                ScreenshotView(item: item)
+                                    .cornerRadius(4)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            }
         }
+        .onAppear { viewModel.loadScreenshotsFromLocal() }
     }
 }
-//
-//#Preview {
-//    HomeView()
-//}
