@@ -7,12 +7,15 @@
 
 enum PathURLType {
     case auth
+    case uploadImage
     
     func path() -> String {
         
         switch self {
         case .auth:
             return "/v1/auth"
+        case .uploadImage:
+            return "/v1/images/upload"
         }
     }
 }
