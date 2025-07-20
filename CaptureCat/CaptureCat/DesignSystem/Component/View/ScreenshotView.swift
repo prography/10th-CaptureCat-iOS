@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ScreenshotView: View {
-    @Binding var item: ScreenshotItem
+    @Binding var item: ScreenshotItemViewModel
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             Group {
-                item.imageData.toImage()
+                Image(uiImage: item.fullImage ?? .apple)
             }
             .clipped()
             

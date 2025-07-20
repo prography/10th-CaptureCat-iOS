@@ -9,21 +9,18 @@ import SwiftUI
 import Photos
 
 struct ScreenshotThumbnailView: View {
-    @State private var image: UIImage? = nil
-    
-    let asset: PHAsset
+    @StateObject var item: ScreenshotItemViewModel
     let isSelected: Bool
     
     var body: some View {
         ZStack(alignment: .topLeading) {
             Group {
-                if let image {
+                if let image = item.fullImage {
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(45 / 76, contentMode: .fill)
                 } else {
                     Color(white: 0.9)
-                        .onAppear { loadImage() }
                 }
             }
             .clipped()
@@ -34,22 +31,12 @@ struct ScreenshotThumbnailView: View {
                 .opacity(isSelected ? 1 : 0.6)
             
         }
+        .task {
+            await item.loadFullImage()
+        }
         .overlay(
             RoundedRectangle(cornerSize: .zero)
                 .stroke(isSelected ? Color.primary01 : Color.clear, lineWidth: 2)
         )
-    }
-    
-    private func loadImage() {
-        let manager = PHCachingImageManager()
-        
-        manager.requestImage(
-            for: asset,
-            targetSize: .zero,
-            contentMode: .aspectFill,
-            options: nil
-        ) { image, _ in
-            self.image = image
-        }
     }
 }
