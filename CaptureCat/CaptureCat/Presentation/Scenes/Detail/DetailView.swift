@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @Binding var item: ScreenshotItem
+    @Binding var item: ScreenshotItemViewModel
     @State private var isShowingAddTagSheet: Bool = false
     @State private var tempSelectedTags: Set<String> = []
     @State private var isDeleted: Bool = false
@@ -20,11 +20,11 @@ struct DetailView: View {
                 .ignoresSafeArea()
             
             VStack {
-                CustomNavigationBar(title: item.createDate, onBack: { dismiss() }, color: .white)
+                CustomNavigationBar(title: item.createDate.toString(), onBack: { dismiss() }, color: .white)
                     .padding(.top, 10)
                 ZStack(alignment:.bottomLeading) {
-                    item.imageData
-                        .toImage(contentMode: .fit)
+                    Image(uiImage: item.fullImage ?? UIImage(resource: .apple))
+//                        .toImage(contentMode: .fit)
                         .frame(maxWidth: .infinity)
                         .padding()
                     
@@ -98,5 +98,13 @@ struct DetailView: View {
             .foregroundStyle(.white)
             Spacer()
         }
+    }
+}
+
+extension Date {
+    func toString(format: String = "yyyy년 MM월 dd일") -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
     }
 }

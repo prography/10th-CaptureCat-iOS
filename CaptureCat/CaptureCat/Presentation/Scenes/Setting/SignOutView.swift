@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SignOutView: View {
-    //    @EnvironmentObject var router: Router
+    @Environment(\.dismiss) private var dismiss
     let reasons = ["캡쳐캣을 사용하기 어려움", "개인 정보가 우려됨", "캡쳐캣이 더 이상 유용하지 않음", "이미지 파일이 안전하지 않다고 생각됨"]
     @State private var selectedReason: String?
     
@@ -17,7 +17,7 @@ struct SignOutView: View {
             CustomNavigationBar(
                 title: "",
                 onBack: {
-                    //                router.pop()
+                    dismiss()
                 },
                 actionTitle: nil,
                 onAction: nil,
@@ -49,11 +49,12 @@ struct SignOutView: View {
             Spacer()
             VStack(spacing: 4) {
                 Button("계속") {
-                    print("계속")
+                    //TODO: - 회원 탈퇴 구현
+                    dismiss()
                 }
                 .primaryStyle()
                 Button("취소") {
-                    print("취소")
+                    dismiss()
                 }
                 .primaryStyle(backgroundColor: .gray02, foregroundColor: .text02)
             }

@@ -50,19 +50,19 @@ struct StartGetScreenshotView: View {
 
     private var screenshotGrid: some View {
         LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(viewModel.assets, id: \.localIdentifier) { asset in
+            ForEach(viewModel.items) { item in
                 ScreenshotThumbnailView(
-                    asset: asset,
-                    isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
+                    item: item,
+                    isSelected: viewModel.selectedIDs.contains(item.id)
                 )
-                .onTapGesture { viewModel.toggleSelection(of: asset) }
+                .onTapGesture { viewModel.toggleSelection(of: item.id) }
             }
         }
     }
 
     private var actionButton: some View {
         Button("정리하기 \(viewModel.selectedIDs.count)/10") {
-            router.push(.tag(assets: viewModel.selectedAssets()))
+            router.push(.tag(ids: Array(viewModel.selectedIDs)))
         }
         .primaryStyle()
         .disabled(viewModel.selectedIDs.isEmpty)

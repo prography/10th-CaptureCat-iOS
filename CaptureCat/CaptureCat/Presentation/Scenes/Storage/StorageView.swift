@@ -69,7 +69,6 @@ struct StorageView: View {
         }
     }
 
-
     // MARK: - Sub-views
     private var header: some View {
         HStack {
@@ -88,7 +87,7 @@ struct StorageView: View {
             .padding(.bottom, 12)
             
             Button {
-                router.push(.tag(assets: viewModel.selectedAssets()))
+                router.push(.tag(ids: Array(viewModel.selectedIDs)))
             } label: {
                 Text("다음")
             }
@@ -126,13 +125,13 @@ struct StorageView: View {
         ZStack {
             // ✅ 기본 스크린샷 그리드
             LazyVGrid(columns: columns, spacing: 4) {
-                ForEach(viewModel.assets, id: \.localIdentifier) { asset in
+                ForEach(viewModel.items) { item in
                     ScreenshotThumbnailView(
-                        asset: asset,
-                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
+                        item: item,
+                        isSelected: viewModel.selectedIDs.contains(item.id)
                     )
                     .onTapGesture {
-                        viewModel.toggleSelection(of: asset)
+                        viewModel.toggleSelection(of: item.id)
                     }
                 }
             }

@@ -13,17 +13,16 @@ struct TabContainerView: View {
     var body: some View {
         ZStack {
             // 1) 탭별 화면 분기
-            Group {
+//            Group {
                 switch selectedTab {
                 case .temporaryStorage:
                     StorageView()
                 case .home:
                     HomeView()
                 case .search:
-//                    LogInView()
-                    EmptyView()
+                    SearchView()
                 }
-            }
+//            }
 
             // 2) 화면 아래에 탭 바
             VStack {

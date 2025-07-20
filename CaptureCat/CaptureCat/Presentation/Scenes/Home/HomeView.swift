@@ -10,8 +10,8 @@ import Photos
 
 struct HomeView: View {
     @EnvironmentObject var router: Router
-    @StateObject private var viewModel = HomeViewModel()
-    
+    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
+
     // Grid 레이아웃
     private let columns = [
         GridItem(.adaptive(minimum: 150), spacing: 12)
@@ -31,14 +31,14 @@ struct HomeView: View {
             
             Spacer()
             
-            if viewModel.items.isEmpty {
+            if viewModel.itemVMs.isEmpty {
                 Text("저장된 스크린샷이 없습니다.")
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach($viewModel.items) { item in
+                        ForEach($viewModel.itemVMs) { item in
                             NavigationLink {
                                 DetailView(item: item)
                                     .navigationBarBackButtonHidden()
@@ -53,6 +53,5 @@ struct HomeView: View {
                 }
             }
         }
-        .onAppear { viewModel.loadScreenshotsFromLocal() }
     }
 }

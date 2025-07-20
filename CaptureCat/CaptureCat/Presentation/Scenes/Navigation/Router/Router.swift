@@ -10,7 +10,7 @@ import Photos
 
 final class Router: ObservableObject {
     enum Route: Hashable {
-        case tag(assets: [PHAsset])
+        case tag(ids: [String])
         case setting
     }
 

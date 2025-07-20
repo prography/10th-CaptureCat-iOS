@@ -11,39 +11,38 @@ import Combine
 
 final class StorageViewModel: ObservableObject {
     // MARK: - Published state
-    @Published var assets: [PHAsset] = []
+    @Published var items: [ScreenshotItemViewModel] = []
     @Published var selectedIDs: Set<String> = []
     @Published var showDeleteFailurePopup = false
     @Published var askDeletePopUp = false
     @Published var showOverlimitToast = false
     @Published var showCountToast = false
     @Published var isAllSelected = false
-
+    
     // MARK: - Constants
     private let maxSelection = 20
-
+    
     // MARK: - Dependencies
     private let manager = ScreenshotManager()
     private var cancellables = Set<AnyCancellable>()
-
+    
     // MARK: - Init
     init() {
         // 초기 데이터
-        assets = manager.assets
-
-        // ScreenshotManager → ViewModel 동기화
-        manager.$assets
+        items = manager.itemVMs
+        
+        //        // ScreenshotManager → ViewModel 동기화
+        manager.$itemVMs
             .receive(on: DispatchQueue.main)
-            .assign(to: &$assets)
+            .assign(to: \.items, on: self)
+            .store(in: &cancellables)
     }
-
+    
     // MARK: - Derived
     var totalCount: Int { manager.totalCount }
-
+    
     // MARK: - User intent
-    func toggleSelection(of asset: PHAsset) {
-        let id = asset.localIdentifier
-
+    func toggleSelection(of id: String) {
         // 이미 선택된 항목이면 해제
         if selectedIDs.contains(id) {
             selectedIDs.remove(id)
@@ -60,7 +59,7 @@ final class StorageViewModel: ObservableObject {
             withAnimation { showOverlimitToast = true }
             return
         }
-
+        
         selectedIDs.insert(id)
         triggerCountToast()
     }
@@ -105,7 +104,7 @@ final class StorageViewModel: ObservableObject {
         
         return selectedAssets
     }
-
+    
     // MARK: - Private
     private func triggerCountToast() {
         withAnimation { showCountToast = true }

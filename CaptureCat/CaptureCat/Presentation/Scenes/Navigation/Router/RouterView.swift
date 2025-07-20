@@ -23,8 +23,8 @@ struct RouterView<Content: View>: View {
             content
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
-                    case .tag(let assets):
-                        TagView(assets: assets)
+                    case .tag(let ids):
+                        TagView(itemsIDs: ids)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .setting:
