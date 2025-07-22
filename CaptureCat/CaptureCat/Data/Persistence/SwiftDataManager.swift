@@ -89,6 +89,20 @@ final class SwiftDataManager {
         context.delete(screenshot)
         try context.save()
     }
+    
+    // 전체 초기화
+    func deleteAllScreenshots() throws {
+        // 1) 모든 엔티티를 조회
+        let allScreenshots = try fetchAllEntities()
+        
+        // 2) 하나씩 삭제
+        for screenshot in allScreenshots {
+            context.delete(screenshot)
+        }
+        
+        // 3) 변경사항 저장
+        try context.save()
+    }
 }
 
 extension SwiftDataManager {

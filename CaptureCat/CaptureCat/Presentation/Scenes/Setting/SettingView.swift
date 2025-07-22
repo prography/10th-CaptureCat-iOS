@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
+    @State private var showInitPopUp: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -37,6 +38,21 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.top)
+        .popUp(
+            isPresented: $showInitPopUp,
+            title: "초기화하면",
+            message: "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?",
+            cancelTitle: "취소",
+            confirmTitle: "초기화"
+        ) {
+            UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
+            do {
+                try SwiftDataManager.shared.deleteAllScreenshots()
+                debugPrint("✅ SwiftData 초기화 완료")
+            } catch {
+                debugPrint("❌ SwiftData 초기화 중 에러:", error)
+            }
+        }
         .popUp(
             isPresented: $authViewModel.isLogOutPresented,
             title: "로그아웃하면",
@@ -101,7 +117,7 @@ struct SettingsView: View {
             
             Button {
                 debugPrint("정보")
-            } label : {
+            } label: {
                 Text("개인정보 처리 방침")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
@@ -111,7 +127,7 @@ struct SettingsView: View {
             
             Button {
                 debugPrint("정보")
-            } label : {
+            } label: {
                 Text("서비스 이용약관")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
@@ -121,7 +137,7 @@ struct SettingsView: View {
             
             Button {
                 debugPrint("버전 정보")
-            } label : {
+            } label: {
                 Text("버전 정보")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
@@ -147,8 +163,11 @@ struct SettingsView: View {
             
             if AccountStorage.shared.isGuest == true {
                 Button {
-                    debugPrint("정보")
-                } label : {
+                    debugPrint("초기화")
+                    withAnimation {
+                        showInitPopUp = true
+                    }
+                } label: {
                     Text("초기화")
                         .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
@@ -160,7 +179,7 @@ struct SettingsView: View {
                     withAnimation {
                         authViewModel.isLogOutPresented = true
                     }
-                } label : {
+                } label: {
                     Text("로그아웃")
                         .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
@@ -171,7 +190,7 @@ struct SettingsView: View {
                     withAnimation {
                         authViewModel.isSignOutPresented = true
                     }
-                } label : {
+                } label: {
                     Text("회원 탈퇴")
                         .CFont(.body02Regular)
                         .foregroundStyle(Color.text01)
