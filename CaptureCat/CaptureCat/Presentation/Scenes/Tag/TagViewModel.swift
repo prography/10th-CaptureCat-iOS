@@ -77,11 +77,7 @@ final class TagViewModel: ObservableObject {
     // MARK: - Tag Loading
     /// 전체 태그 목록을 로컬/서버에서 가져와 tags에 세팅
     func loadTags() {
-        do {
-            tags = try repository.fetchAllTags()
-        } catch {
-            print("🐞 태그 목록 가져와서 저장 중 에러: ", error.localizedDescription)
-        }
+        tags = UserDefaults.standard.stringArray(forKey: LocalUserKeys.selectedTopics.rawValue) ?? []
     }
     
     // mode 변경이나 asset 변경 시 호출해서 selectedTags 초기화

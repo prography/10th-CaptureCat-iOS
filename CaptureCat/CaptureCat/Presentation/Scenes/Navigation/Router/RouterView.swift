@@ -23,6 +23,10 @@ struct RouterView<Content: View>: View {
             content
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
+                    case .startGetScreenshot:
+                        StartGetScreenshotView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     case .tag(let ids):
                         TagView(itemsIDs: ids)
                             .navigationBarBackButtonHidden()
