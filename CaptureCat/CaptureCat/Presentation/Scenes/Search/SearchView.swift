@@ -35,23 +35,20 @@ struct SearchView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray06)
             
-            if let selectedTag = viewModel.selectedTag {
-                // 선택된 태그 칩 표시
-                HStack(spacing: 8) {
-                    Button {
-                        viewModel.clearSelectedTag()
-                    } label: {
-                        Text(selectedTag)
+            if !viewModel.selectedTags.isEmpty {
+                // 선택된 태그들을 칩 형태로 표시
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(viewModel.selectedTags, id: \.self) { tag in
+                            Button {
+                                viewModel.removeTag(tag)
+                            } label: {
+                                Text(tag)
+                            }
+                            .chipStyle(isSelected: true, selectedBackground: .white, selectedForeground: .primary01, selectedBorderColor: .primary01, icon: Image(.xmark))
+                        }
+                        Spacer()
                     }
-                    .chipStyle(
-                        isSelected: true,
-                        selectedBackground: .white,
-                        selectedForeground: .primary01,
-                        selectedBorderColor: .primary01,
-                        icon: Image(.xmark)
-                    )
-                    
-                    Spacer()
                 }
             } else {
                 // 기본 검색 TextField
@@ -69,61 +66,76 @@ struct SearchView: View {
     // MARK: - 태그 바로가기 섹션
     private var tagShortcutSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 섹션 제목
-            HStack {
-                Text("태그 바로가기")
-                    .CFont(.subhead01Bold)
-                    .foregroundColor(.text01)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            
-            // 태그 목록 (선택된 태그가 있으면 숨김)
-            if viewModel.selectedTag == nil {
-                if viewModel.isLoading {
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                            .scaleEffect(0.8)
-                        Spacer()
-                    }
-                    .padding(.vertical, 20)
-                } else if viewModel.filteredTags.isEmpty {
-                    HStack {
-                        Spacer()
-                        Text(viewModel.searchText.isEmpty ? "저장된 태그가 없습니다" : "검색 결과가 없습니다")
-                            .CFont(.body02Regular)
-                            .foregroundColor(.text03)
-                        Spacer()
-                    }
-                    .padding(.vertical, 20)
-                } else {
-                    tagGrid
+            // 태그 목록
+            if viewModel.selectedTags.isEmpty {
+                HStack {
+                    Text("태그 바로가기")
+                        .CFont(.subhead01Bold)
+                        .foregroundColor(.text01)
+                    Spacer()
                 }
+                .padding(.horizontal, 16)
+                // 기본 상태: 모든 태그 표시
+                defaultTagsSection
             } else {
-                // 선택된 태그가 있을 때 결과 표시 영역
-                selectedTagResults
+                // 선택된 태그가 있을 때: 연관 태그와 결과 표시
+                selectedTagsSection
             }
         }
     }
     
-    // MARK: - 태그 그리드
-    private var tagGrid: some View {
-        let columns = [
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ]
-        
-        return LazyVGrid(columns: columns, spacing: 12) {
-            ForEach(viewModel.filteredTags, id: \.self) { tag in
-                Button {
-                    viewModel.selectTag(tag)
-                } label: {
-                    Text(tag)
-                        .CFont(.body02Regular)
+    // MARK: - 기본 태그 목록
+    private var defaultTagsSection: some View {
+        Group {
+            if viewModel.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Spacer()
                 }
-                .chipStyle(isSelected: false)
+                .padding(.vertical, 20)
+            } else if viewModel.filteredTags.isEmpty {
+                HStack {
+                    Spacer()
+                    Text(viewModel.searchText.isEmpty ? "저장된 태그가 없습니다" : "검색 결과가 없습니다")
+                        .CFont(.body02Regular)
+                        .foregroundColor(.text03)
+                    Spacer()
+                }
+                .padding(.vertical, 20)
+            } else {
+                tagGrid(tags: viewModel.filteredTags)
+            }
+        }
+    }
+    
+    // MARK: - 선택된 태그 상태 섹션
+    private var selectedTagsSection: some View {
+        VStack(spacing: 20) {
+            // 연관 태그들 표시
+            if !viewModel.relatedTags.isEmpty {
+                tagGrid(tags: viewModel.relatedTags)
+            }
+            
+            // 선택된 태그들의 검색 결과
+            selectedTagResults
+        }
+    }
+    
+    // MARK: - 태그 그리드
+    private func tagGrid(tags: [String]) -> some View {
+        return ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(tags, id: \.self) { tag in
+                    Button {
+                        viewModel.selectTag(tag)
+                    } label: {
+                        Text(tag)
+                            .CFont(.body02Regular)
+                    }
+                    .chipStyle(isSelected: false)
+                }
             }
         }
         .padding(.horizontal, 16)
@@ -132,14 +144,6 @@ struct SearchView: View {
     // MARK: - 선택된 태그 결과
     private var selectedTagResults: some View {
         VStack(spacing: 16) {
-            HStack {
-                Text("'\(viewModel.selectedTag ?? "")'로 태그된 스크린샷")
-                    .CFont(.body01Regular)
-                    .foregroundColor(.text01)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            
             if viewModel.isLoadingScreenshots {
                 HStack {
                     Spacer()
@@ -150,7 +154,7 @@ struct SearchView: View {
                 .padding(.vertical, 20)
             } else if viewModel.filteredScreenshots.isEmpty {
                 VStack(spacing: 8) {
-                    Text("해당 태그가 포함된 스크린샷이 없습니다")
+                    Text("해당 태그들이 모두 포함된 스크린샷이 없습니다")
                         .CFont(.body02Regular)
                         .foregroundColor(.text03)
                     Text("다른 태그를 선택해보세요")

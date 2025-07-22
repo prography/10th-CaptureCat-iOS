@@ -121,6 +121,41 @@ extension SwiftDataManager {
         return try context.fetch(descriptor)
     }
     
+    /// 여러 태그를 모두 포함하는 Screenshot 엔티티들을 가져오기
+    func fetchEntitiesByTags(_ tags: [String]) throws -> [Screenshot] {
+        // 빈 배열이면 모든 엔티티 반환
+        guard !tags.isEmpty else {
+            return try fetchAllEntities()
+        }
+        
+        // 각 태그를 모두 포함하는 엔티티들을 필터링
+        let allEntities = try fetchAllEntities()
+        return allEntities.filter { screenshot in
+            let screenshotTags = screenshot.tags
+            return tags.allSatisfy { tag in
+                screenshotTags.contains(tag)
+            }
+        }
+    }
+    
+    /// 특정 태그들을 모두 포함하는 스크린샷들에서 그 외의 태그들을 반환
+    func fetchOtherTagsFromScreenshotsContaining(_ tags: [String]) throws -> [String] {
+        // 입력된 태그들을 모두 포함하는 스크린샷들 찾기
+        let matchingScreenshots = try fetchEntitiesByTags(tags)
+        
+        // 각 스크린샷에서 입력된 태그들을 제외한 나머지 태그들 수집
+        var otherTags: Set<String> = []
+        
+        for screenshot in matchingScreenshots {
+            let screenshotTags = screenshot.tags
+            let remainingTags = screenshotTags.filter { !tags.contains($0) }
+            otherTags.formUnion(remainingTags)
+        }
+        
+        // 정렬된 배열로 반환
+        return Array(otherTags).sorted()
+    }
+    
     /// 여러 아이템에 태그 일괄 추가
     func addTag(_ tag: String, toIDs ids: [String]) throws {
         let items = ids.compactMap {

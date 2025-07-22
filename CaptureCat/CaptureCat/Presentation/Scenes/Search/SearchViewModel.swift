@@ -13,7 +13,8 @@ final class SearchViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var allTags: [String] = []
     @Published var filteredTags: [String] = []
-    @Published var selectedTag: String? = nil
+    @Published var selectedTags: [String] = []  // 다중 태그 선택
+    @Published var relatedTags: [String] = []   // 연관 태그들
     @Published var filteredScreenshots: [ScreenshotItemViewModel] = []
     @Published var isLoading: Bool = false
     @Published var isLoadingScreenshots: Bool = false
@@ -26,7 +27,7 @@ final class SearchViewModel: ObservableObject {
         $searchText
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] searchText in
-                guard let self = self, self.selectedTag == nil else { return }
+                guard let self = self, self.selectedTags.isEmpty else { return }
                 self.filterTags(with: searchText)
             }
             .store(in: &cancellables)
@@ -56,15 +57,30 @@ final class SearchViewModel: ObservableObject {
     }
     
     func selectTag(_ tag: String) {
-        selectedTag = tag
+        // 이미 선택된 태그가 아닌 경우에만 추가
+        guard !selectedTags.contains(tag) else { return }
+        
+        selectedTags.append(tag)
         searchText = ""
-        loadScreenshotsByTag(tag)
+        loadScreenshotsByTags()
+        loadRelatedTags()
     }
     
-    private func loadScreenshotsByTag(_ tag: String) {
+    func removeTag(_ tag: String) {
+        selectedTags.removeAll { $0 == tag }
+        
+        if selectedTags.isEmpty {
+            clearAllSelections()
+        } else {
+            loadScreenshotsByTags()
+            loadRelatedTags()
+        }
+    }
+    
+    private func loadScreenshotsByTags() {
         isLoadingScreenshots = true
         do {
-            filteredScreenshots = try repository.loadByTag(tag)
+            filteredScreenshots = try repository.loadByTags(selectedTags)
             // 썸네일 로드
             Task {
                 await loadThumbnailsForFilteredScreenshots()
@@ -76,14 +92,30 @@ final class SearchViewModel: ObservableObject {
         isLoadingScreenshots = false
     }
     
+    private func loadRelatedTags() {
+        guard !selectedTags.isEmpty else {
+            relatedTags = []
+            return
+        }
+        
+        do {
+            let otherTags = try repository.fetchOtherTagsFromScreenshotsContaining(selectedTags)
+            relatedTags = otherTags
+        } catch {
+            print("연관 태그 로딩 실패: \(error)")
+            relatedTags = []
+        }
+    }
+    
     private func loadThumbnailsForFilteredScreenshots() async {
         for itemVM in filteredScreenshots {
             await itemVM.loadThumbnail(size: CGSize(width: 150, height: 150))
         }
     }
     
-    func clearSelectedTag() {
-        selectedTag = nil
+    func clearAllSelections() {
+        selectedTags = []
+        relatedTags = []
         filteredScreenshots = []
         filteredTags = allTags
     }
