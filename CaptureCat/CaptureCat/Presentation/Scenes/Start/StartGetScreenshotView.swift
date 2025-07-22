@@ -50,12 +50,12 @@ struct StartGetScreenshotView: View {
 
     private var screenshotGrid: some View {
         LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(viewModel.items) { item in
-                ScreenshotThumbnailView(
-                    item: item,
-                    isSelected: viewModel.selectedIDs.contains(item.id)
+            ForEach(viewModel.assets, id: \.localIdentifier) { asset in
+                PHAssetView(
+                    asset: asset,
+                    isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
                 )
-                .onTapGesture { viewModel.toggleSelection(of: item.id) }
+                .onTapGesture { viewModel.toggleSelection(of: asset) }
             }
         }
     }

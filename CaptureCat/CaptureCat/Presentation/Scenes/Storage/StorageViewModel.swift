@@ -11,7 +11,7 @@ import Combine
 
 final class StorageViewModel: ObservableObject {
     // MARK: - Published state
-    @Published var items: [ScreenshotItemViewModel] = []
+    @Published var assets: [PHAsset] = []
     @Published var selectedIDs: Set<String> = []
     @Published var showDeleteFailurePopup = false
     @Published var askDeletePopUp = false
@@ -29,20 +29,20 @@ final class StorageViewModel: ObservableObject {
     // MARK: - Init
     init() {
         // 초기 데이터
-        items = manager.itemVMs
-        
-        //        // ScreenshotManager → ViewModel 동기화
-        manager.$itemVMs
+        assets = manager.assets
+
+        // ScreenshotManager → ViewModel 동기화
+        manager.$assets
             .receive(on: DispatchQueue.main)
-            .assign(to: \.items, on: self)
-            .store(in: &cancellables)
+            .assign(to: &$assets)
     }
     
     // MARK: - Derived
     var totalCount: Int { manager.totalCount }
     
     // MARK: - User intent
-    func toggleSelection(of id: String) {
+    func toggleSelection(of asset: PHAsset) {
+        let id = asset.localIdentifier
         // 이미 선택된 항목이면 해제
         if selectedIDs.contains(id) {
             selectedIDs.remove(id)

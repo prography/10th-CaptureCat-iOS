@@ -125,13 +125,13 @@ struct StorageView: View {
         ZStack {
             // ✅ 기본 스크린샷 그리드
             LazyVGrid(columns: columns, spacing: 4) {
-                ForEach(viewModel.items) { item in
-                    ScreenshotThumbnailView(
-                        item: item,
-                        isSelected: viewModel.selectedIDs.contains(item.id)
+                ForEach(viewModel.assets, id: \.localIdentifier) { asset in
+                    PHAssetView(
+                        asset: asset,
+                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
                     )
                     .onTapGesture {
-                        viewModel.toggleSelection(of: item.id)
+                        viewModel.toggleSelection(of: asset)
                     }
                 }
             }
