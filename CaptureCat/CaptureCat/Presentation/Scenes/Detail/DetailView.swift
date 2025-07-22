@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @Binding var item: ScreenshotItemViewModel
+    @ObservedObject var item: ScreenshotItemViewModel
     @State private var isShowingAddTagSheet: Bool = false
     @State private var tempSelectedTags: Set<String> = []
     @State private var isDeleted: Bool = false
@@ -24,7 +24,8 @@ struct DetailView: View {
                     .padding(.top, 10)
                 ZStack(alignment:.bottomLeading) {
                     Image(uiImage: item.fullImage ?? UIImage(resource: .apple))
-//                        .toImage(contentMode: .fit)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: .infinity)
                         .padding()
                     

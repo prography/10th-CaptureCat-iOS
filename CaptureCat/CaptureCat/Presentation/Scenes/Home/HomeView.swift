@@ -11,7 +11,7 @@ import Photos
 struct HomeView: View {
     @EnvironmentObject var router: Router
     @StateObject private var viewModel: HomeViewModel = HomeViewModel()
-
+    
     // Grid 레이아웃
     private let columns = [
         GridItem(.adaptive(minimum: 150), spacing: 12)
@@ -38,19 +38,38 @@ struct HomeView: View {
             } else {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach($viewModel.itemVMs) { item in
+                        ForEach(viewModel.itemVMs) { item in
                             NavigationLink {
                                 DetailView(item: item)
                                     .navigationBarBackButtonHidden()
                                     .toolbar(.hidden, for: .navigationBar)
                             } label: {
-                                ScreenshotView(item: item)
-                                    .cornerRadius(4)
+                                ScreenshotItemView(viewModel: item, cornerRadius: 4) {
+                                    HStack(spacing: 4) {
+                                        ForEach(item.tags, id: \.self) { tag in
+                                            Text(tag)
+                                                .CFont(.caption01Semibold)
+                                                .padding(.horizontal, 7.5)
+                                                .padding(.vertical, 4.5)
+                                                .background(Color.overlayDim)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(4)
+                                        }
+                                    }
+                                    .padding(6)
+                                }
                             }
                         }
                     }
                     .padding()
                 }
+            }
+        }
+        .task {
+            viewModel.loadScreenshotFromLocal()
+            //            // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
+            for itemVM in viewModel.itemVMs {
+                await itemVM.loadFullImage()
             }
         }
     }
