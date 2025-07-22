@@ -91,12 +91,13 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         )
         
         do {
-            // 1) 로컬 저장
-            try SwiftDataManager.shared.upsert(item: item)
-            
-            // 2) 서버 업로드 (응답 DTO 무시하거나 처리)
-            let dto = item.toDTO()
-            _ = try await ScreenshotService.shared.upload(dto)
+            if AccountStorage.shared.isGuest ?? true {
+                try SwiftDataManager.shared.upsert(item: item)
+            } else {
+                // 2) 서버 업로드 (응답 DTO 무시하거나 처리)
+                let dto = item.toDTO()
+                _ = try await ScreenshotService.shared.upload(dto)
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -113,12 +114,12 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     // MARK: – DTO Mapping
     func toDTO() -> PhotoDTO {
         PhotoDTO(
-            id:         id,
-            fileName:   fileName,
+            id: id,
+            fileName: fileName,
             createDate: createDate,
-            tags:       tags,
+            tags: tags,
             isFavorite: isFavorite,
-            imageData:  thumbnail?.jpegData(compressionQuality: 0.8)
+            imageData: thumbnail?.jpegData(compressionQuality: 0.8)
         )
     }
 }

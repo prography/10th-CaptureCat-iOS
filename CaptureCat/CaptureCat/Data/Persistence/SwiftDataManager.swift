@@ -67,7 +67,7 @@ final class SwiftDataManager {
         if let screenshot = fetchEntity(id: item.id) {
             screenshot.fileName = item.fileName
             screenshot.createDate = item.createDate
-            screenshot.tags = item.tags.compactMap { Tag(value: $0) }
+            screenshot.tags = item.tags
             screenshot.isFavorite = item.isFavorite
         } else {
             let screenshot = Screenshot(
@@ -94,7 +94,7 @@ final class SwiftDataManager {
 extension SwiftDataManager {
     /// 전체 태그 목록 (중복 제거)
     func fetchAllTags() throws -> [String] {
-        let all = try fetchAllEntities().flatMap { $0.tags.compactMap { $0.value }}
+        let all = try fetchAllEntities().flatMap { $0.tags }
         return Array(Set(all)).sorted()
     }
     
@@ -105,11 +105,12 @@ extension SwiftDataManager {
         }
         
         for item in items {
-            let tags = item.tags.compactMap(\.value)
-            if !tags.contains(tag) {
-                item.tags.append(Tag(value: tag))
+            if !item.tags.contains(tag) {
+                item.tags.append(tag)
             }
         }
+        
+        debugPrint("✅ SwifData 아이템에 태그 추가 성공!")
         try context.save()
     }
     
@@ -117,7 +118,7 @@ extension SwiftDataManager {
     func removeTag(_ tag: String, fromIDs ids: [String]) throws {
         let items = ids.compactMap { fetchEntity(id: $0) }
         for item in items {
-            item.tags.removeAll { $0.value == tag }
+            item.tags.removeAll { $0 == tag }
         }
         try context.save()
     }
@@ -126,9 +127,8 @@ extension SwiftDataManager {
     func renameTag(from oldName: String, to newName: String) throws {
         let items = try fetchAllEntities()
         for item in items {
-            let tags = item.tags.compactMap(\.value)
-            if tags.contains(oldName) {
-                item.tags = tags.map { $0 == oldName ? newName : $0 }.compactMap { Tag(value: $0) }
+            if item.tags.contains(oldName) {
+                item.tags = item.tags.map { $0 == oldName ? newName : $0 }
             }
         }
         try context.save()

@@ -40,7 +40,7 @@ struct ScreenshotItem: Identifiable, Equatable {
         self.imageData = Data()               // 실제 이미지는 PhotoLoader로 비동기 로드
         self.fileName = entity.fileName
         self.createDate = entity.createDate
-        self.tags = entity.tags.compactMap { $0.value }
+        self.tags = entity.tags
         self.isFavorite = entity.isFavorite
     }
 

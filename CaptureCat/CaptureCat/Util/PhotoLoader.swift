@@ -89,3 +89,116 @@ final class PhotoLoader {
         cache.removeObject(forKey: id as NSString)
     }
 }
+
+import Photos
+import UIKit
+
+enum AssetDataError: Error {
+    case noData
+    case cancelled
+}
+
+/// PHAsset → Data 변환
+extension PHAsset {
+    /// 썸네일 크기로 JPEG Data 요청
+    /// - Parameters:
+    ///   - targetSize: 원하는 썸네일 크기
+    ///   - compressionQuality: JPEG 압축 퀄리티 (0.0 ~ 1.0)
+    func requestThumbnailData(
+        targetSize: CGSize,
+        compressionQuality: CGFloat = 0.8
+    ) async throws -> Data {
+        try await withCheckedThrowingContinuation { cont in
+            let options = PHImageRequestOptions()
+            options.isSynchronous = false
+            options.deliveryMode = .highQualityFormat
+            options.resizeMode = .exact
+            options.isNetworkAccessAllowed = true
+            
+            PHImageManager.default().requestImage(
+                for: self,
+                targetSize: targetSize,
+                contentMode: .aspectFill,
+                options: options
+            ) { image, info in
+                if let image = image,
+                   let data = image.jpegData(compressionQuality: compressionQuality) {
+                    cont.resume(returning: data)
+                } else if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                    cont.resume(throwing: AssetDataError.cancelled)
+                } else {
+                    cont.resume(throwing: AssetDataError.noData)
+                }
+            }
+        }
+    }
+    
+    /// 원본(full‑size) 이미지 Data 요청
+    /// - Parameter compressionQuality: (선택) JPEG 압축 퀄리티. nil이면 원본 포맷 그대로 반환
+    func requestFullImageData(
+        compressionQuality: CGFloat? = nil
+    ) async -> Data? {
+            try? await withCheckedThrowingContinuation { cont in
+                let options = PHImageRequestOptions()
+                options.deliveryMode = .highQualityFormat
+                options.isNetworkAccessAllowed = true
+                
+                // iOS 13+ 권장: requestImageDataAndOrientation
+                PHImageManager.default().requestImageDataAndOrientation(
+                    for: self,
+                    options: options
+                ) { data, _, _, info in
+                    if let data = data {
+                        // 압축 퀄리티 지정 시 UIImage로 변환 후 재압축
+                        if let q = compressionQuality,
+                           let uiImage = UIImage(data: data),
+                           let jpeg = uiImage.jpegData(compressionQuality: q) {
+                            cont.resume(returning: jpeg)
+                        } else {
+                            cont.resume(returning: data)
+                        }
+                    } else if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                        cont.resume(throwing: AssetDataError.cancelled)
+                    } else {
+                        cont.resume(throwing: AssetDataError.noData)
+                    }
+                    
+                }
+            
+        }
+    }
+    
+    /// 원본 파일(Byte 그대로) 데이터를 가져오는 더 “로우 레벨” 방법
+    /// (EXIF 등 포함한 원본 파일 그대로)
+    func requestOriginalFileData() async throws -> Data {
+        try await withCheckedThrowingContinuation { cont in
+            // assetResources 중 photo 타입 리소스 선택
+            let resources = PHAssetResource.assetResources(for: self)
+            guard let resource = resources.first(where: {
+                $0.type == .fullSizePhoto || $0.type == .photo
+            }) else {
+                cont.resume(throwing: AssetDataError.noData)
+                return
+            }
+            
+            let options = PHAssetResourceRequestOptions()
+            options.isNetworkAccessAllowed = true
+            
+            var data = Data()
+            PHAssetResourceManager.default().requestData(
+                for: resource,
+                options: options,
+                dataReceivedHandler: { chunk in
+                    data.append(chunk)
+                },
+                completionHandler: { error in
+                    if let err = error {
+                        cont.resume(throwing: err)
+                    } else {
+                        cont.resume(returning: data)
+                    }
+                }
+            )
+        }
+    }
+}
