@@ -112,6 +112,15 @@ extension SwiftDataManager {
         return Array(Set(all)).sorted()
     }
     
+    /// 특정 태그를 포함하는 Screenshot 엔티티들을 가져오기
+    func fetchEntitiesByTag(_ tag: String) throws -> [Screenshot] {
+        let pred = #Predicate<Screenshot> { screenshot in
+            screenshot.tagsJSON.contains("\"\(tag)\"")
+        }
+        let descriptor = FetchDescriptor(predicate: pred)
+        return try context.fetch(descriptor)
+    }
+    
     /// 여러 아이템에 태그 일괄 추가
     func addTag(_ tag: String, toIDs ids: [String]) throws {
         let items = ids.compactMap {

@@ -31,6 +31,22 @@ final class ScreenshotRepository {
         return items.map(viewModel(for:))
     }
     
+    /// 특정 태그를 포함하는 ScreenshotItemViewModel 배열 반환
+    func loadByTag(_ tag: String) throws -> [ScreenshotItemViewModel] {
+        let ents = try SwiftDataManager.shared.fetchEntitiesByTag(tag)
+        let items = ents.map { ent in
+            ScreenshotItem(
+                id: ent.id,
+                imageData: Data(),
+                fileName: ent.fileName,
+                createDate: ent.createDate,
+                tags: ent.tags,
+                isFavorite: ent.isFavorite
+            )
+        }
+        return items.map(viewModel(for:))
+    }
+    
     func fetchViewModels(for ids: [String]) -> [ScreenshotItemViewModel] {
         return ids.compactMap { self.vms[$0] }
     }
