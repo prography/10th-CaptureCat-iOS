@@ -20,9 +20,13 @@ struct DetailView: View {
                 .ignoresSafeArea()
             
             VStack {
-                CustomNavigationBar(title: item.createDate.toString(), onBack: { dismiss() }, color: .white)
+                CustomNavigationBar(
+                    title: item.createDate.toString(format: "yyyy년 MM월 dd일"),
+                    onBack: { dismiss() },
+                    color: .white
+                )
                     .padding(.top, 10)
-                ZStack(alignment:.bottomLeading) {
+                ZStack(alignment: .bottomLeading) {
                     Image(uiImage: item.fullImage ?? UIImage(resource: .apple))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -99,13 +103,5 @@ struct DetailView: View {
             .foregroundStyle(.white)
             Spacer()
         }
-    }
-}
-
-extension Date {
-    func toString(format: String = "yyyy년 MM월 dd일") -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = format
-        return dateFormatter.string(from: self)
     }
 }
