@@ -15,7 +15,14 @@ struct CustomNavigationBar: View {
     let isSaveEnabled: Bool
     let color: Color
     
-    init(title: String, onBack: @escaping () -> Void, actionTitle: String? = nil, onAction: (() -> Void)? = nil, isSaveEnabled: Bool = false, color: Color = .black) {
+    init(
+        title: String,
+        onBack: @escaping () -> Void,
+        actionTitle: String? = nil,
+        onAction: (() -> Void)? = nil,
+        isSaveEnabled: Bool = false,
+        color: Color = .black
+    ) {
         self.title = title
         self.onBack = onBack
         self.actionTitle = actionTitle
