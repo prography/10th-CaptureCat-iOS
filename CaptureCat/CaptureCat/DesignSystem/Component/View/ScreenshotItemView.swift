@@ -10,14 +10,14 @@ import SwiftUI
 struct ScreenshotItemView<Overlay: View>: View {
     @ObservedObject var viewModel: ScreenshotItemViewModel
     var cornerRadius: CGFloat
-    let overlay: Overlay
+    private let overlay: () -> Overlay
     
     init(viewModel: ScreenshotItemViewModel,
          cornerRadius: CGFloat = 12,
-         @ViewBuilder overlay: () -> Overlay) {
+         @ViewBuilder overlay: @escaping () -> Overlay) {
         self.viewModel = viewModel
         self.cornerRadius = cornerRadius
-        self.overlay = overlay()
+        self.overlay = overlay
     }
     
     var body: some View {
@@ -34,7 +34,7 @@ struct ScreenshotItemView<Overlay: View>: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .border(.overlayDim, width: 1)
             
-            overlay
+            overlay()
                 .padding(6)
         }
     }

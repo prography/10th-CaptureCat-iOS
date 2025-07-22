@@ -93,6 +93,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         do {
             if AccountStorage.shared.isGuest ?? true {
                 try SwiftDataManager.shared.upsert(item: item)
+                debugPrint("✅ SwiftData 저장 완료!")
             } else {
                 // 2) 서버 업로드 (응답 DTO 무시하거나 처리)
                 let dto = item.toDTO()
@@ -100,6 +101,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
             }
         } catch {
             errorMessage = error.localizedDescription
+            debugPrint("❌ SwfitData 저장 실패!", error.localizedDescription)
         }
     }
     

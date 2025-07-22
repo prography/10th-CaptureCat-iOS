@@ -26,8 +26,10 @@ struct TagView: View {
                 onBack: { router.pop() },
                 actionTitle: "저장",
                 onAction: {
-                    viewModel.save()
-                    authViewModel.authenticationState = .signIn
+                    Task {
+                        await viewModel.save()
+                        authViewModel.authenticationState = .signIn
+                    }
                 },
                 isSaveEnabled: viewModel.hasChanges
             )

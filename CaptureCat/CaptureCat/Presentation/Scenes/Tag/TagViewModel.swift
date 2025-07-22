@@ -148,18 +148,17 @@ final class TagViewModel: ObservableObject {
         updateSelectedTags()
     }
     
-    // 로컬에 저장 (batch: all items, single: current)
-    func save() {
+    // 저장 (batch: all items, single: current)
+    func save() async {
         switch mode {
         case .batch:
             for viewModel in itemVMs {
-                Task { await viewModel.saveChanges() }
+                await viewModel.saveChanges()
             }
         case .single:
             if let viewModel = displayVM {
-                Task { await viewModel.saveChanges() }
+                await viewModel.saveChanges()
             }
         }
-        hasChanges = false
     }
 }

@@ -67,7 +67,7 @@ struct HomeView: View {
         }
         .task {
             viewModel.loadScreenshotFromLocal()
-            //            // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
+            
             for itemVM in viewModel.itemVMs {
                 await itemVM.loadFullImage()
             }

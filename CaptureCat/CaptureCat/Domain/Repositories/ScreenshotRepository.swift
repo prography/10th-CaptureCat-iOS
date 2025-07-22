@@ -36,12 +36,20 @@ final class ScreenshotRepository {
     }
     
     func viewModel(for model: ScreenshotItem) -> ScreenshotItemViewModel {
-        if let ex = vms[model.id] {
-            return ex
+        if let existingViewModel = vms[model.id] {
+            syncViewModel(existingViewModel, with: model)
+            return existingViewModel
         }
         let viewModel = ScreenshotItemViewModel(model: model)
         vms[model.id] = viewModel
         return viewModel
+    }
+    
+    private func syncViewModel(_ viewModel: ScreenshotItemViewModel, with model: ScreenshotItem) {
+        viewModel.fileName = model.fileName
+        viewModel.createDate = model.createDate
+        viewModel.tags = model.tags
+        viewModel.isFavorite = model.isFavorite
     }
     
     // MARK: Tag Orchestration
@@ -51,10 +59,11 @@ final class ScreenshotRepository {
     }
     
     func addTag(_ tag: String, toIDs ids: [String]) async throws {
-        // 1) 로컬
-        try SwiftDataManager.shared.addTag(tag, toIDs: ids)
-        // 2) 서버
-        try await ScreenshotService.shared.addTag(tag, toIDs: ids)
+        if AccountStorage.shared.isGuest ?? true {
+            try SwiftDataManager.shared.addTag(tag, toIDs: ids)
+        } else {
+            try await ScreenshotService.shared.addTag(tag, toIDs: ids)
+        }
     }
     
     func removeTag(_ tag: String, fromIDs ids: [String]) async throws {
