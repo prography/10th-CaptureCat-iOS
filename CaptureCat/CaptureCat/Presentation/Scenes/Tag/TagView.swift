@@ -33,23 +33,23 @@ struct TagView: View {
             )
             
             Picker("options", selection: $viewModel.mode) {
-              Text(viewModel.segments[0])
-                .tag(TagViewModel.Mode.batch)   // ⬅️ Mode.batch
-              Text(viewModel.segments[1])
-                .tag(TagViewModel.Mode.single)  // ⬅️ Mode.single
+                Text(viewModel.segments[0])
+                    .tag(TagViewModel.Mode.batch)   // ⬅️ Mode.batch
+                Text(viewModel.segments[1])
+                    .tag(TagViewModel.Mode.single)  // ⬅️ Mode.single
             }
             .pickerStyle(.segmented)
             .frame(width: 200)
             .onChange(of: viewModel.mode) { _, _ in
-//                viewModel.updateSelectedTags()   // 모드별 태그 초기화
+                viewModel.updateSelectedTags()   // 모드별 태그 초기화
                 viewModel.hasChanges = false
             }
             
             if viewModel.mode == .batch {
                 MultiCardView {
-                    Image(uiImage: viewModel.itemVMs[0].fullImage ?? .apple)
-                        .resizable()
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    ScreenshotItemView(viewModel: viewModel.itemVMs[0]) {
+                        EmptyView()
+                    }
                 }
                 .padding(.horizontal, 40)
                 .padding(.top, 12)
@@ -87,6 +87,12 @@ struct TagView: View {
             .padding(.leading, 16)
             
             Spacer()
+        }
+        .task {
+            // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
+            for itemVM in viewModel.itemVMs {
+                await itemVM.loadFullImage()
+            }
         }
         .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
             AddTagSheet(
@@ -127,10 +133,9 @@ struct TagView: View {
         let xOffset = myXOffset(index)
         
         SingleCardView {
-            Image(uiImage: asset.fullImage ?? .apple)
-                .resizable()
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .border(.overlayDim, width: 1)
+            ScreenshotItemView(viewModel: viewModel.itemVMs[viewModel.currentIndex]) {
+                EmptyView()
+            }
         }
         .scaleEffect(scale)
         .opacity(opacity)
@@ -151,27 +156,27 @@ struct TagView: View {
                     draggingItem = round(draggingItem)
                         .remainder(dividingBy: Double(viewModel.itemVMs.count))
                     snappedItem = draggingItem
-
+                    
                     let newIndex = Int(round(snappedItem)
                         .remainder(dividingBy: Double(viewModel.itemVMs.count)))
                     let normalized = newIndex >= 0
-                        ? newIndex
-                        : newIndex + viewModel.itemVMs.count
+                    ? newIndex
+                    : newIndex + viewModel.itemVMs.count
                     viewModel.onAssetChanged(to: normalized)
                 }
             }
     }
-
+    
     private func syncOnAppear() {
         snappedItem = Double(viewModel.currentIndex)
         draggingItem = snappedItem
     }
-
+    
     private func syncOnChange(to newIndex: Int) {
         snappedItem = Double(newIndex)
         draggingItem = snappedItem
     }
-
+    
     func distance(_ item: Int) -> Double {
         return (draggingItem - Double(item)).remainder(dividingBy: Double(viewModel.itemVMs.count))
     }

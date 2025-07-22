@@ -24,20 +24,35 @@ final class TagViewModel: ObservableObject {
     
     @Published var tags: [String] = []
     @Published var selectedTags: Set<String> = []
-
+    var batchSelectedTags: Set<String> = []
+    
     @Published var currentIndex: Int = 0
     
     // MARK: - Dependencies
     private let repository = ScreenshotRepository.shared
-    var itemVMs: [ScreenshotItemViewModel] = []
+    @Published var itemVMs: [ScreenshotItemViewModel] = []
     
-    // MARK: - Init
-    /// PHAsset 배열을 받아서 대응하는 ScreenshotItemViewModel들을 준비
     init(itemsIds: [String]) {
-        self.itemVMs = repository.fetchViewModels(for: itemsIds)
+        createViewModel(from: itemsIds)
         
         loadTags()
         updateSelectedTags()
+    }
+    
+    // 배열을 받아서 대응하는 ScreenshotItemViewModel들을 생성
+    func createViewModel(from ids: [String]) {
+        let results =  PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil)
+        results.enumerateObjects { asset, _, _ in
+            let newItem = ScreenshotItem(
+                id: asset.localIdentifier,
+                imageData: Data(),
+                fileName: asset.localIdentifier + ".jpg",
+                createDate: asset.creationDate ?? Date(),
+                tags: [],
+                isFavorite: false
+            )
+            self.itemVMs.append( (ScreenshotItemViewModel(model: newItem)))
+        }
     }
     
     // MARK: - Computed for UI
@@ -69,20 +84,15 @@ final class TagViewModel: ObservableObject {
         }
     }
     
-    /// mode 변경이나 asset 변경 시 호출해서 selectedTags 초기화
-    private func updateSelectedTags() {
+    // mode 변경이나 asset 변경 시 호출해서 selectedTags 초기화
+    func updateSelectedTags() {
         switch mode {
         case .batch:
-            // 모든 아이템의 공통 태그(교집합)
-            let sets = itemVMs.map { Set($0.tags) }
-            if let first = sets.first {
-                selectedTags = sets.dropFirst().reduce(first) { $0.intersection($1) }
-            } else {
-                selectedTags = []
-            }
+            selectedTags = batchSelectedTags
         case .single:
-            selectedTags = Set(displayVM?.tags ?? [])
+            selectedTags = Set(itemVMs[currentIndex].tags)
         }
+        hasChanges = true
     }
     
     // MARK: - Mode & Navigation
@@ -93,79 +103,65 @@ final class TagViewModel: ObservableObject {
         } else {
             mode = .batch
         }
-//        currentIndex = 0
+        //        currentIndex = 0
         updateSelectedTags()
-        hasChanges = false
     }
     
-    /// Carousel 등에서 index 변경 시 호출
+    // Carousel 등에서 index 변경 시 호출
     func onAssetChanged(to index: Int) {
         currentIndex = index
         updateSelectedTags()
-        hasChanges = false
     }
     
     // MARK: - User Actions
-    
     func addTagButtonTapped() {
         withAnimation {
             self.isShowingAddTagSheet = true
         }
     }
-    /// 태그 선택/해제
+    // 태그 선택/해제
     func toggleTag(_ tag: String) {
         if selectedTags.contains(tag) {
+            switch mode {
+            case .batch:
+                batchSelectedTags.remove(tag)
+                itemVMs.forEach { $0.removeTag(tag) }
+            case .single:
+                itemVMs[currentIndex].removeTag(tag)
+            }
             selectedTags.remove(tag)
         } else if selectedTags.count < 4 {
+            switch mode {
+            case .batch:
+                itemVMs.forEach { $0.addTag(tag) }
+                batchSelectedTags.insert(tag)
+            case .single:
+                itemVMs[currentIndex].addTag(tag)
+            }
             selectedTags.insert(tag)
         }
         hasChanges = true
+        updateSelectedTags()
     }
     
-    /// 새 태그 추가 (로컬+서버 동기화)
+    // 새 태그 추가
     func addNewTag(name: String) {
         guard !tags.contains(name) else { return }
         tags.append(name)
-        Task {
-            do {
-                try await repository.addTag(name, toIDs: itemVMs.map { $0.id })
-            } catch {
-                // 에러 처리
-            }
-        }
+        itemVMs[currentIndex].addTag(name)
+        updateSelectedTags()
     }
     
-    /// 태그 이름 변경 (로컬+서버)
-    func renameTag(from oldName: String, to newName: String) {
-        guard let idx = tags.firstIndex(of: oldName) else { return }
-        tags[idx] = newName
-        Task {
-            do {
-                try await repository.renameTag(from: oldName, to: newName)
-            } catch {
-                // 에러 처리
-            }
-        }
-        // 선택된 태그 업데이트
-        if selectedTags.contains(oldName) {
-            selectedTags.remove(oldName)
-            selectedTags.insert(newName)
-        }
-    }
-    
-    /// 변경된 태그를 저장 (batch: all items, single: current)
+    // 로컬에 저장 (batch: all items, single: current)
     func save() {
-        let newTags = Array(selectedTags)
         switch mode {
         case .batch:
-            for vm in itemVMs {
-                vm.tags = newTags
-                Task { await vm.saveChanges() }
+            for viewModel in itemVMs {
+                Task { await viewModel.saveChanges() }
             }
         case .single:
-            if let vm = displayVM {
-                vm.tags = newTags
-                Task { await vm.saveChanges() }
+            if let viewModel = displayVM {
+                Task { await viewModel.saveChanges() }
             }
         }
         hasChanges = false
