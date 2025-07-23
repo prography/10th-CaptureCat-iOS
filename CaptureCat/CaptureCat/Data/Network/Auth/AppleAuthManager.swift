@@ -28,7 +28,9 @@ final class AppleLoginManager: NSObject {
 }
 
 extension AppleLoginManager: ASAuthorizationControllerDelegate {
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
         case let credential as ASAuthorizationAppleIDCredential:
             if let authorizationCode = credential.authorizationCode,

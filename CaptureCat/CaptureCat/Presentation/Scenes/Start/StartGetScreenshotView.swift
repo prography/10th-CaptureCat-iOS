@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StartGetScreenshotView: View {
-    @StateObject private var viewModel = StartGetScreenshotViewModel()
+    @StateObject var viewModel: StartGetScreenshotViewModel
     @EnvironmentObject private var router: Router
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
@@ -56,6 +56,27 @@ struct StartGetScreenshotView: View {
                     isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
                 )
                 .onTapGesture { viewModel.toggleSelection(of: asset) }
+                .onAppear {
+                    // 마지막 아이템에서 5개 전에 다음 페이지 로드
+                    if viewModel.shouldLoadMore(for: asset) {
+                        viewModel.loadNextPage()
+                    }
+                }
+            }
+            
+            // 더 많은 데이터가 있고 로딩 중일 때 로딩 인디케이터 표시
+            if viewModel.isLoadingMore {
+                GridRow {
+                    VStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("로딩 중...")
+                            .CFont(.caption02Regular)
+                            .foregroundColor(.text03)
+                    }
+                    .padding(.vertical, 20)
+                    .gridCellColumns(3) // 3열 전체 차지
+                }
             }
         }
     }

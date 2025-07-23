@@ -24,6 +24,11 @@ final class HomeViewModel: ObservableObject {
     }()
     
     private var cancellables = Set<AnyCancellable>()
+    private var netwworkManager: NetworkManager
+    
+    init(networkManager: NetworkManager) {
+        self.netwworkManager = networkManager
+    }
     
     func loadScreenshotFromLocal() {
         do {

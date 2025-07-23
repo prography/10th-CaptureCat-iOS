@@ -9,15 +9,11 @@ import SwiftUI
 import Photos
 
 struct TagView: View {
-    @StateObject private var viewModel: TagViewModel
+    @StateObject var viewModel: TagViewModel
     @EnvironmentObject private var authViewModel: AuthViewModel
     @EnvironmentObject private var router: Router
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
-    
-    init(itemsIDs: [String]) {
-        _viewModel = StateObject(wrappedValue: TagViewModel(itemsIds: itemsIDs))
-    }
     
     var body: some View {
         VStack {

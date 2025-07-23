@@ -8,17 +8,23 @@
 import SwiftUI
 
 struct AuthenticatedView: View {
-    @StateObject private var authViewModel: AuthViewModel = AuthViewModel()
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
+    var networkManager: NetworkManager
+    
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
+    }
     
     var body: some View {
         if authViewModel.authenticationState == .start {
-            RouterView {
-                SelectMainTagView()
+            RouterView(networkManager: networkManager) {
+                let viewModel = SelectMainTagViewModel(networkManager: networkManager)
+                SelectMainTagView(viewModel: viewModel)
             }
-            .environmentObject(authViewModel)
         } else {
-            RouterView {
-                TabContainerView()
+            RouterView(networkManager: networkManager) {
+                TabContainerView(networkManager: networkManager)
                     .fullScreenCover(
                         isPresented: $authViewModel.isLogInPresented,
                         onDismiss: {}
@@ -31,8 +37,10 @@ struct AuthenticatedView: View {
                     ) {
                         RecommandLoginView()
                     }
+                    .transaction { transaction in
+                        transaction.disablesAnimations = true
+                    }
             }
-            .environmentObject(authViewModel)
         }
     }
 }
