@@ -66,11 +66,20 @@ struct HomeView: View {
             }
         }
         .task {
-            viewModel.loadScreenshotFromLocal()
+            // 스마트 로딩 (로그인 상태 자동 분기)
+            debugPrint("🏠 HomeView task 시작")
+            await viewModel.loadScreenshots()
             
-            for itemVM in viewModel.itemVMs {
+            // ✅ 업데이트 완료 후 다시 확인
+            debugPrint("🏠 loadScreenshots 완료 후 아이템 개수: \(viewModel.itemVMs.count)")
+            
+            // 썸네일 로드 (fullImage가 아니라 thumbnail)
+            for (index, itemVM) in viewModel.itemVMs.enumerated() {
+                debugPrint("🏠 아이템[\(index)] 썸네일 로드 시작 - ID: \(itemVM.id)")
                 await itemVM.loadFullImage()
+//                await itemVM.loadThumbnail(size: CGSize(width: 150, height: 150))
             }
+            debugPrint("🏠 HomeView task 완료")
         }
     }
 }

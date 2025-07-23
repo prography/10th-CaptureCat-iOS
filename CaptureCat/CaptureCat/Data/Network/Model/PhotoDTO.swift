@@ -10,7 +10,7 @@ import Foundation
 struct PhotoDTO: Codable, Identifiable {
   let id: String
   var fileName: String
-  var createDate: Date
+  var createDate: Date  // ✅ Date 타입 유지 (UploadImageBuilder에서 String으로 변환)
   var tags: [String]
   var isFavorite: Bool
   var imageData: Data?

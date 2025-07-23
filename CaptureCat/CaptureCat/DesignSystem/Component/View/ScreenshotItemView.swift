@@ -23,12 +23,23 @@ struct ScreenshotItemView<Overlay: View>: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             Group {
-                if let img = viewModel.fullImage {
+                // ✅ thumbnail 우선, 없으면 fullImage 사용
+                if let img = viewModel.thumbnail ?? viewModel.fullImage {
                     Image(uiImage: img)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                } else {
+                } else if viewModel.isLoadingImage {
                     ProgressView()
+                        .frame(minHeight: 100)
+                } else {
+                    // 이미지 로드 실패 시 플레이스홀더
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(minHeight: 100)
+                        .overlay(
+                            Image(systemName: "photo")
+                                .foregroundColor(.gray)
+                        )
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))

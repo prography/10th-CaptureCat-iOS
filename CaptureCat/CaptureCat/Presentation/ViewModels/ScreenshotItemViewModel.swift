@@ -12,6 +12,7 @@ import UIKit
 class ScreenshotItemViewModel: ObservableObject, Identifiable {
     // MARK: – Properties
     let id: String
+    let imageURL: String?              // ✅ 서버 이미지 URL
     @Published var fileName: String
     @Published var createDate: Date
     @Published var thumbnail: UIImage?
@@ -24,29 +25,108 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     
     private var saveWorkItem: DispatchWorkItem?
     
+    /// 이미지 소스 타입 구분
+    var isServerImage: Bool {
+        return imageURL != nil
+    }
+    
     // MARK: – Init
     init(model: ScreenshotItem) {
         self.id = model.id
+        self.imageURL = model.imageURL    // ✅ 서버 URL 저장
         self.fileName   = model.fileName
         self.createDate = model.createDate
         self.tags       = model.tags
         self.isFavorite = model.isFavorite
+        
+        // 🔍 디버깅: 초기화 정보 출력
+        debugPrint("🔍 ScreenshotItemViewModel 초기화:")
+        debugPrint("🔍 - ID: \(id)")
+        debugPrint("🔍 - 파일명: \(fileName)")
+        debugPrint("🔍 - 이미지 URL: \(imageURL ?? "없음")")
+        debugPrint("🔍 - 서버 이미지 여부: \(isServerImage)")
     }
     
     // MARK: – Image Loading
     func loadThumbnail(size: CGSize) async {
+        debugPrint("🔍 loadThumbnail 시작 - ID: \(id), 서버이미지: \(isServerImage)")
+        
         isLoadingImage = true
         defer { isLoadingImage = false }
-        thumbnail = await PhotoLoader.shared.requestImage(
-            id: id,
-            targetSize: size
-        )
+        
+        if isServerImage {
+            // 서버 URL에서 이미지 다운로드
+            debugPrint("⭐️ 썸네일 다운로드 시작! URL: \(imageURL ?? "없음")")
+            thumbnail = await downloadImageFromURL(size: size)
+        } else {
+            // 로컬 PHAsset에서 이미지 로드
+            debugPrint("📱 로컬 PHAsset에서 썸네일 로드 시작 - ID: \(id)")
+            thumbnail = await PhotoLoader.shared.requestImage(
+                id: id,
+                targetSize: size
+            )
+        }
+        
+        if thumbnail != nil {
+            debugPrint("✅ 썸네일 로드 성공 - ID: \(id)")
+        } else {
+            debugPrint("❌ 썸네일 로드 실패 - ID: \(id)")
+        }
     }
     
     func loadFullImage() async {
         isLoadingImage = true
         defer { isLoadingImage = false }
-        fullImage = await PhotoLoader.shared.requestFullImage(id: id)
+        
+        if isServerImage {
+            // 서버 URL에서 풀사이즈 이미지 다운로드
+            debugPrint("⭐️ 이미지 다운로드 시작!")
+            fullImage = await downloadImageFromURL(size: nil)
+        } else {
+            // 로컬 PHAsset에서 풀사이즈 이미지 로드
+            fullImage = await PhotoLoader.shared.requestFullImage(id: id)
+        }
+    }
+    
+    /// 서버 URL에서 이미지 다운로드
+    private func downloadImageFromURL(size: CGSize?) async -> UIImage? {
+        guard let imageURL = imageURL,
+              let url = URL(string: imageURL) else {
+            debugPrint("❌ 유효하지 않은 이미지 URL: \(imageURL ?? "nil")")
+            return nil
+        }
+        
+        do {
+            debugPrint("🔄 이미지 다운로드 시작: \(url)")
+            let (data, _) = try await URLSession.shared.data(from: url)
+            
+            guard let image = UIImage(data: data) else {
+                debugPrint("❌ 이미지 데이터 변환 실패")
+                return nil
+            }
+            
+            // 크기 조정이 필요한 경우 (썸네일)
+            if let targetSize = size {
+                let resizedImage = resizeImage(image, to: targetSize)
+                debugPrint("✅ 썸네일 다운로드 완료: \(targetSize)")
+                return resizedImage
+            } else {
+                debugPrint("✅ 풀사이즈 이미지 다운로드 완료")
+                return image
+            }
+            
+        } catch {
+            debugPrint("❌ 이미지 다운로드 실패: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    /// 이미지 크기 조정 헬퍼
+    private func resizeImage(_ image: UIImage, to size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: size))
+        }
     }
     
     // MARK: – User Actions
@@ -84,6 +164,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         let item = ScreenshotItem(
             id: id,
             imageData: Data(), // imageData handled by PhotoLoader
+            imageURL: imageURL, // ✅ 서버 URL 포함
             fileName: fileName,
             createDate: createDate,
             tags: tags,
@@ -120,6 +201,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         let item = ScreenshotItem(
             id: id,
             imageData: Data(),
+            imageURL: imageURL, // ✅ 서버 URL 포함
             fileName: fileName,
             createDate: createDate,
             tags: tags,

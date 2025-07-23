@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 class AuthViewModel: ObservableObject {
     enum Action {
         case kakaoSignIn
@@ -110,12 +111,18 @@ class AuthViewModel: ObservableObject {
         KeyChainModule.delete(key: .accessToken)
         KeyChainModule.delete(key: .refreshToken)
         
+        // 메모리 캐시 클리어
+        ScreenshotRepository.shared.clearMemoryCache()
+        
         self.authenticationState = .initial
     }
     
     func signOut() {
         KeyChainModule.delete(key: .accessToken)
         KeyChainModule.delete(key: .refreshToken)
+        
+        // 메모리 캐시 클리어
+        ScreenshotRepository.shared.clearMemoryCache()
         
         self.authenticationState = .initial
     }

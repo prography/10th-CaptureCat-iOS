@@ -122,9 +122,17 @@ final class ScreenshotRepository {
                     return nil
                 }
                 
+                debugPrint("🔍 서버 아이템 변환:")
+                debugPrint("🔍 - ID: \(serverItem.id)")
+                debugPrint("🔍 - 이름: \(serverItem.name)")
+                debugPrint("🔍 - URL: \(serverItem.url)")
+                debugPrint("🔍 - 캡처일: \(serverItem.captureDate)")
+                debugPrint("🔍 - 태그: \(serverItem.tags.map { $0.name })")
+                
                 return ScreenshotItem(
                     id: String(serverItem.id),
                     imageData: Data(), // 서버 URL에서 별도 로드
+                    imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
                     fileName: serverItem.name,
                     createDate: captureDate,
                     tags: serverItem.tags.map { $0.name },
@@ -134,8 +142,9 @@ final class ScreenshotRepository {
             
             let viewModels = serverItems.map(viewModel(for:))
             
-            // 메모리 캐시에만 저장 (로컬 저장 X)
-            InMemoryScreenshotCache.shared.store(viewModels)
+            // 메모리 캐시에만 저장 (로컬 저장 X) - 임시 주석처리
+            // InMemoryScreenshotCache.shared.store(viewModels)
+            debugPrint("🔍 ViewModel 변환 완료: \(viewModels.count)개")
             
             return viewModels
             
