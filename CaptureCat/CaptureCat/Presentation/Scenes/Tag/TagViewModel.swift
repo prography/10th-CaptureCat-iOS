@@ -214,16 +214,22 @@ final class TagViewModel: ObservableObject {
                  imageDatas.append(imageData)
                  
                  // PhotoDTO 메타데이터 생성
+                 debugPrint("🔧 PhotoDTO 생성 중:")
+                 debugPrint("🔧 - ID: \(viewModel.id)")
+                 debugPrint("🔧 - 파일명: \(viewModel.fileName)")
+                 debugPrint("🔧 - 태그: \(viewModel.tags) (개수: \(viewModel.tags.count))")
+                 
                  let photoDTO = PhotoDTO(
                      id: viewModel.id,
                      fileName: viewModel.fileName,
                      createDate: viewModel.createDate,
-                     tags: viewModel.tags,
+                     tags: viewModel.tags,  // ✅ ViewModel의 태그 전달
                      isFavorite: viewModel.isFavorite,
                      imageData: imageData
                  )
                  imageMetas.append(photoDTO)
                  
+                 debugPrint("✅ PhotoDTO 생성 완료 - 태그: \(photoDTO.tags)")
                  debugPrint("✅ 이미지 데이터 준비 완료: \(viewModel.fileName)")
              } else {
                  debugPrint("❌ 이미지 데이터 가져오기 실패: \(viewModel.fileName)")
@@ -237,6 +243,13 @@ final class TagViewModel: ObservableObject {
         }
         
         // 3. ImageService를 통해 실제 업로드
+        debugPrint("🚀 ImageService 업로드 시작:")
+        debugPrint("🚀 - 이미지 개수: \(imageDatas.count)")
+        debugPrint("🚀 - 메타데이터 개수: \(imageMetas.count)")
+        for (index, meta) in imageMetas.enumerated() {
+            debugPrint("🚀 - Meta[\(index)]: 태그=\(meta.tags)")
+        }
+        
         let result = await ImageService.shared.uploadImages(imageDatas: imageDatas, imageMetas: imageMetas)
         
                  switch result {

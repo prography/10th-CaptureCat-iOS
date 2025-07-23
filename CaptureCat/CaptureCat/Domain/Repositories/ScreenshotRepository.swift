@@ -122,22 +122,27 @@ final class ScreenshotRepository {
                     return nil
                 }
                 
+                let mappedTags = serverItem.tags.map { $0.name }
                 debugPrint("🔍 서버 아이템 변환:")
                 debugPrint("🔍 - ID: \(serverItem.id)")
                 debugPrint("🔍 - 이름: \(serverItem.name)")
                 debugPrint("🔍 - URL: \(serverItem.url)")
                 debugPrint("🔍 - 캡처일: \(serverItem.captureDate)")
-                debugPrint("🔍 - 태그: \(serverItem.tags.map { $0.name })")
+                debugPrint("🔍 - 원본 태그: \(serverItem.tags)")
+                debugPrint("🔍 - 매핑된 태그: \(mappedTags)")
                 
-                return ScreenshotItem(
+                let screenshotItem = ScreenshotItem(
                     id: String(serverItem.id),
                     imageData: Data(), // 서버 URL에서 별도 로드
                     imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
                     fileName: serverItem.name,
                     createDate: captureDate,
-                    tags: serverItem.tags.map { $0.name },
+                    tags: mappedTags, // ✅ 매핑된 태그 사용
                     isFavorite: serverItem.isBookmarked
                 )
+                
+                debugPrint("🔍 생성된 ScreenshotItem 태그: \(screenshotItem.tags)")
+                return screenshotItem
             }
             
             let viewModels = serverItems.map(viewModel(for:))

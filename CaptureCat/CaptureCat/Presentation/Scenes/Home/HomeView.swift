@@ -77,7 +77,6 @@ struct HomeView: View {
             for (index, itemVM) in viewModel.itemVMs.enumerated() {
                 debugPrint("🏠 아이템[\(index)] 썸네일 로드 시작 - ID: \(itemVM.id)")
                 await itemVM.loadFullImage()
-//                await itemVM.loadThumbnail(size: CGSize(width: 150, height: 150))
             }
             debugPrint("🏠 HomeView task 완료")
         }

@@ -45,6 +45,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         debugPrint("🔍 - 파일명: \(fileName)")
         debugPrint("🔍 - 이미지 URL: \(imageURL ?? "없음")")
         debugPrint("🔍 - 서버 이미지 여부: \(isServerImage)")
+        debugPrint("🔍 - 태그: \(tags) (개수: \(tags.count)개)")
     }
     
     // MARK: – Image Loading

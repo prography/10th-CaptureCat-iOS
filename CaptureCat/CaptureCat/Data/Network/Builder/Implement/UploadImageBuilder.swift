@@ -55,17 +55,15 @@ struct UploadImageBuilder: BuilderProtocol {
             return finalFileName
         }
         
-        // 1) 메타데이터 처리 - 안전성 강화 (태그 정보 제외, 파일명 일치)
+        // 1) 메타데이터 처리 - 안전성 강화 (태그 정보 포함, 파일명 일치)
         let metaArray = imageMetas.enumerated().map { index, meta in
             let sanitizedFileName = sanitizeFileName(meta.fileName)
-            debugPrint("🔧 메타데이터[\(index)] 파일명 변환: '\(meta.fileName)' -> '\(sanitizedFileName)'")
             
             return [
                 "fileName": sanitizedFileName,  // ✅ 변환된 파일명 사용
                 "captureDate": dateFormatter.string(from: meta.createDate),
                 "isBookmarked": meta.isFavorite,
-                // 🚫 서버 태그 전송 임시 비활성화
-                "tagNames": [] // meta.tags
+                "tagNames": meta.tags  // ✅ 실제 태그 전송 활성화!
             ]
         }
         
