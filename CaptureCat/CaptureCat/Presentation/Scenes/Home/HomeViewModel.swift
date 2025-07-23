@@ -15,8 +15,10 @@ final class HomeViewModel: ObservableObject {
     private let repository = ScreenshotRepository.shared
     @Published var itemVMs: [ScreenshotItemViewModel] = []
     @Published var isLoadingPage = false
+    @Published var isInitialLoading = false
     private var canLoadMorePages = true
     private var page: Int = 0
+    private var hasLoadedInitialData = false
     
     private var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -31,8 +33,13 @@ final class HomeViewModel: ObservableObject {
         self.netwworkManager = networkManager
     }
     
-    /// 스마트 로딩 (로그인 상태에 따라 자동 분기)
+    /// 스마트 로딩 (로그인 상태에 따라 자동 분기) - 초기 로딩용
     func loadScreenshots() async {
+        guard !hasLoadedInitialData else { return }
+        
+        isInitialLoading = true
+        defer { isInitialLoading = false }
+        
         let isGuest = AccountStorage.shared.isGuest ?? true
         debugPrint("🔍 - 최종 게스트 여부: \(isGuest)")
         
@@ -43,6 +50,17 @@ final class HomeViewModel: ObservableObject {
             // 로그인 모드: 서버에서만 로드
             await loadFromServerOnly()
         }
+        
+        hasLoadedInitialData = true
+    }
+    
+    /// 강제 새로고침 (삭제 후 등에 사용)
+    func refreshScreenshots() async {
+        hasLoadedInitialData = false
+        page = 0
+        canLoadMorePages = true
+        itemVMs = []
+        await loadScreenshots()
     }
     
     func loadNextPageServer() async {
@@ -86,11 +104,21 @@ final class HomeViewModel: ObservableObject {
         }
         page += 1
     }
+    
     /// 메모리 캐시 클리어 (로그아웃 시 사용)
     func clearCache() {
         repository.clearMemoryCache()
+        hasLoadedInitialData = false
         DispatchQueue.main.async {
             self.itemVMs = []
+        }
+    }
+    
+    /// 아이템 삭제 (UI에서 즉시 제거)
+    func removeItem(with id: String) {
+        if let index = itemVMs.firstIndex(where: { $0.id == id }) {
+            itemVMs.remove(at: index)
+            debugPrint("✅ HomeView에서 아이템 제거 완료: \(id)")
         }
     }
     
@@ -99,9 +127,7 @@ final class HomeViewModel: ObservableObject {
         Task {
             try? await viewModel.delete()
             // 2) 리스트에서 제거
-            if let idx = itemVMs.firstIndex(where: { $0.id == viewModel.id }) {
-                itemVMs.remove(at: idx)
-            }
+            removeItem(with: viewModel.id)
         }
     }
     

@@ -239,11 +239,10 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     
     // MARK: – Delete
     func delete() async throws {
-        // 1) 서버에서 삭제
-//        try await ScreenshotService.shared.delete(id: id)
-        // 2) 로컬에서 삭제
         if AccountStorage.shared.isGuest ?? true {
             try SwiftDataManager.shared.delete(id: id)
+        } else {
+            _ = await ImageService.shared.deleteImage(id: id)
         }
     }
     

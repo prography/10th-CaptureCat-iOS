@@ -18,10 +18,18 @@ struct CheckImageListBuilder: BuilderProtocol {
 
     var useAuthorization: Bool { true }
     
-    init(page: Int, size: Int) {
-        self.queries = [
-            URLQueryItem(name: "page", value: String(page)),
-            URLQueryItem(name: "size", value: String(size))
-        ]
+    init(page: Int, size: Int, hasTags: Bool? = nil) {
+        if let hasTags {
+            self.queries = [
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "size", value: String(size)),
+                URLQueryItem(name: "hasTags", value: String(hasTags))
+            ]
+        } else {
+            self.queries = [
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "size", value: String(size))
+            ]
+        }
     }
 }

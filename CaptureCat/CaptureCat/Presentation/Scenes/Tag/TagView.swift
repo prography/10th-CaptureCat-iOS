@@ -25,6 +25,7 @@ struct TagView: View {
                     Task {
                         await viewModel.save()
                         authViewModel.authenticationState = .signIn
+                        router.popToRoot()
                     }
                 },
                 isSaveEnabled: viewModel.hasChanges

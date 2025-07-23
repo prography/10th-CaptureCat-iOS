@@ -55,4 +55,16 @@ final class ImageService {
             return .failure(error)
         }
     }
+    
+    func deleteImage(id: String) async -> Result<ResponseDTO, Error> {
+        let builder = DeleteImageBuilder(imageId: id)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(id) 이미지 삭제 성공!")
+            return Result<ResponseDTO, Error>.success(response)
+        } catch(let error) {
+            return .failure(error)
+        }
+    }
 }

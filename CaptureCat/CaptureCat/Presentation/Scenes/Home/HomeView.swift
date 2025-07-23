@@ -31,7 +31,10 @@ struct HomeView: View {
             
             Spacer()
             
-            if viewModel.itemVMs.isEmpty {
+            if viewModel.isInitialLoading {
+                ProgressView("로딩 중...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.itemVMs.isEmpty {
                 Text("저장된 스크린샷이 없습니다.")
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -41,6 +44,7 @@ struct HomeView: View {
                         ForEach(Array(viewModel.itemVMs.enumerated()), id: \.element.id) { index, item in
                             NavigationLink {
                                 DetailView(item: item)
+                                    .environmentObject(viewModel)
                                     .navigationBarBackButtonHidden()
                                     .toolbar(.hidden, for: .navigationBar)
                             } label: {
@@ -60,14 +64,15 @@ struct HomeView: View {
                                 }
                             }
                             .onAppear {
-                                let thresholdIndex = viewModel.itemVMs.count - 5
-                                if index >= thresholdIndex {
+                                let thresholdIndex = max(0, viewModel.itemVMs.count - 5)
+                                if index >= thresholdIndex && !viewModel.isLoadingPage {
                                     Task {
                                         await viewModel.loadNextPageServer()
-                                        for (index, itemVM) in viewModel.itemVMs.enumerated() {
-                                            if index > thresholdIndex + 5 {
-                                                await itemVM.loadFullImage()
-                                            }
+                                        
+                                        // 새로 로드된 아이템들의 이미지 로드
+                                        let startIndex = max(0, thresholdIndex)
+                                        for i in startIndex..<viewModel.itemVMs.count {
+                                            await viewModel.itemVMs[i].loadFullImage()
                                         }
                                     }
                                 }
@@ -79,12 +84,17 @@ struct HomeView: View {
             }
         }
         .task {
-            // 스마트 로딩 (로그인 상태 자동 분기)
+            // 초기 데이터 로딩 (중복 방지)
             await viewModel.loadScreenshots()
             
-            for (_, itemVM) in viewModel.itemVMs.enumerated() {
+            // 모든 아이템의 이미지 로드
+            for itemVM in viewModel.itemVMs {
                 await itemVM.loadFullImage()
             }
+        }
+        .refreshable {
+            // Pull to refresh
+            await viewModel.refreshScreenshots()
         }
     }
 }
