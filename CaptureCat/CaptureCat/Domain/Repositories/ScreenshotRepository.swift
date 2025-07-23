@@ -112,8 +112,8 @@ final class ScreenshotRepository {
     // MARK: - Server Only Operations (로그인 모드)
     
     /// 서버에서만 로드 (로컬 저장 X)
-    func loadFromServerOnly(page: Int = 0, size: Int = 50) async throws -> [ScreenshotItemViewModel] {
-        let result = await ImageService.shared.checkImageList(page: page, size: size)
+    func loadFromServerOnly(page: Int = 0, size: Int = 20) async throws -> [ScreenshotItemViewModel] {
+        let result = await ImageService.shared.checkImageList(page: page, size: size, hasTags: nil)
         
         switch result {
         case .success(let response):
@@ -123,13 +123,6 @@ final class ScreenshotRepository {
                 }
                 
                 let mappedTags = serverItem.tags.map { $0.name }
-                debugPrint("🔍 서버 아이템 변환:")
-                debugPrint("🔍 - ID: \(serverItem.id)")
-                debugPrint("🔍 - 이름: \(serverItem.name)")
-                debugPrint("🔍 - URL: \(serverItem.url)")
-                debugPrint("🔍 - 캡처일: \(serverItem.captureDate)")
-                debugPrint("🔍 - 원본 태그: \(serverItem.tags)")
-                debugPrint("🔍 - 매핑된 태그: \(mappedTags)")
                 
                 let screenshotItem = ScreenshotItem(
                     id: String(serverItem.id),
@@ -141,20 +134,17 @@ final class ScreenshotRepository {
                     isFavorite: serverItem.isBookmarked
                 )
                 
-                debugPrint("🔍 생성된 ScreenshotItem 태그: \(screenshotItem.tags)")
                 return screenshotItem
             }
             
             let viewModels = serverItems.map(viewModel(for:))
             
             // 메모리 캐시에만 저장 (로컬 저장 X) - 임시 주석처리
-            // InMemoryScreenshotCache.shared.store(viewModels)
-            debugPrint("🔍 ViewModel 변환 완료: \(viewModels.count)개")
+             InMemoryScreenshotCache.shared.store(viewModels)
             
             return viewModels
             
         case .failure(let error):
-            debugPrint("❌ 서버에서 이미지 목록 가져오기 실패: \(error)")
             throw error
         }
     }
@@ -250,9 +240,9 @@ final class ScreenshotRepository {
         debugPrint("🗑️ 메모리 캐시 클리어 완료")
     }
     
-    // MARK: - Private Helper Methods
+    // MARK: - Helper Methods
     
-    private func parseServerDate(_ dateString: String) -> Date? {
+    func parseServerDate(_ dateString: String) -> Date? {
         let formatter = ISO8601DateFormatter()
         return formatter.date(from: dateString) ?? Date()
     }

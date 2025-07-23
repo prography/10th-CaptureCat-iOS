@@ -44,8 +44,8 @@ final class ImageService {
     }
     */
     
-    func checkImageList(page: Int, size: Int) async -> Result<ImagListDTO, Error> {
-        let builder = CheckImageListBuilder(page: page, size: size)
+    func checkImageList(page: Int, size: Int, hasTags: Bool? = nil) async -> Result<ImagListDTO, Error> {
+        let builder = CheckImageListBuilder(page: page, size: size, hasTags: hasTags)
         
         do {
             let response = try await networkManager.fetchData(builder)

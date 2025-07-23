@@ -38,7 +38,7 @@ struct HomeView: View {
             } else {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(viewModel.itemVMs) { item in
+                        ForEach(Array(viewModel.itemVMs.enumerated()), id: \.element.id) { index, item in
                             NavigationLink {
                                 DetailView(item: item)
                                     .navigationBarBackButtonHidden()
@@ -59,6 +59,19 @@ struct HomeView: View {
                                     .padding(6)
                                 }
                             }
+                            .onAppear {
+                                let thresholdIndex = viewModel.itemVMs.count - 5
+                                if index >= thresholdIndex {
+                                    Task {
+                                        await viewModel.loadNextPageServer()
+                                        for (index, itemVM) in viewModel.itemVMs.enumerated() {
+                                            if index > thresholdIndex + 5 {
+                                                await itemVM.loadFullImage()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     .padding()
@@ -67,18 +80,11 @@ struct HomeView: View {
         }
         .task {
             // 스마트 로딩 (로그인 상태 자동 분기)
-            debugPrint("🏠 HomeView task 시작")
             await viewModel.loadScreenshots()
             
-            // ✅ 업데이트 완료 후 다시 확인
-            debugPrint("🏠 loadScreenshots 완료 후 아이템 개수: \(viewModel.itemVMs.count)")
-            
-            // 썸네일 로드 (fullImage가 아니라 thumbnail)
-            for (index, itemVM) in viewModel.itemVMs.enumerated() {
-                debugPrint("🏠 아이템[\(index)] 썸네일 로드 시작 - ID: \(itemVM.id)")
+            for (_, itemVM) in viewModel.itemVMs.enumerated() {
                 await itemVM.loadFullImage()
             }
-            debugPrint("🏠 HomeView task 완료")
         }
     }
 }
