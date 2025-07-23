@@ -13,6 +13,7 @@ struct LogInResponseDTO: Decodable {
 }
 
 struct User: Codable {
-    let email, nickname: String
+    let email: String
+    let nickname: String
     let tutorialCompleted: Bool
 }
