@@ -9,4 +9,10 @@ import Foundation
 
 struct LogInResponseDTO: Decodable {
     let result: String
+    let data: User
+}
+
+struct User: Codable {
+    let email, nickname: String
+    let tutorialCompleted: Bool
 }

@@ -24,11 +24,11 @@ final class StartGetScreenshotViewModel: ObservableObject {
     // MARK: - Dependencies
     private let manager = ScreenshotManager()
     private var cancellables = Set<AnyCancellable>()
-    private var networkManager: NetworkManager
+    private var service: TutorialService
     
     // MARK: - Init
-    init(networkManager: NetworkManager) {
-        self.networkManager = networkManager
+    init(service: TutorialService) {
+        self.service = service
         
         // 초기 데이터
         assets = manager.assets
@@ -63,8 +63,13 @@ final class StartGetScreenshotViewModel: ObservableObject {
     
     func tutorialCompleted() {
         Task {
-            do {
-                try await NetworkManager.
+            let result = await service.turorialComplete()
+            
+            switch result {
+            case .success:
+                debugPrint("✅ 튜토리얼 완료!")
+            case .failure(let error):
+                debugPrint("error: \(error)")
             }
         }
     }

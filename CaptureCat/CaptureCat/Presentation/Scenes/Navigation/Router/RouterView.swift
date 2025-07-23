@@ -26,7 +26,8 @@ struct RouterView<Content: View>: View {
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
                     case .startGetScreenshot:
-                        let viewModel = StartGetScreenshotViewModel(networkManager: networkManager)
+                        let service = TutorialService(networkManager: networkManager)
+                        let viewModel = StartGetScreenshotViewModel(service: service)
                         StartGetScreenshotView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
