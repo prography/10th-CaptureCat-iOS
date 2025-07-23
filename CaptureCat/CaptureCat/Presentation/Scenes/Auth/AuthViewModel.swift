@@ -14,7 +14,7 @@ class AuthViewModel: ObservableObject {
     }
     
     private let socialManager: SocialManager = SocialManager()
-    private let authService: AuthService = AuthService(networkManager: NetworkManager(baseURL: BaseURLType.production.url!))
+    private let authService: AuthService
     
     @Published var authenticationState: AuthenticationState = .initial {
         didSet {
@@ -37,6 +37,10 @@ class AuthViewModel: ObservableObject {
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
     
+    init(networkManager: NetworkManager) {
+        self.authService = AuthService(networkManager: networkManager)
+    }
+    
     @MainActor
     func send(action: Action) {
         switch action {
@@ -50,8 +54,7 @@ class AuthViewModel: ObservableObject {
                     
                     switch kakaoSignIn {
                     case .success(let success):
-//                        if let isMember = success.isMember {
-                        if KeyChainModule.read(key: .didStarted) == "true" {
+                        if success.data.tutorialCompleted {
                             debugPrint("🟡 로그인 성공 > 시작하기 완료한 회원 🟡")
                             self.authenticationState = .signIn
                             return
@@ -80,8 +83,9 @@ class AuthViewModel: ObservableObject {
                     
                     switch appleSignIn {
                     case .success(let success):
-                        if KeyChainModule.read(key: .didStarted) == "true" {
+                        if success.data.tutorialCompleted {
                             debugPrint("🍏 로그인 성공 > 시작하기 완료한 회원 🍏")
+                            debugPrint("닉네임: \(success.data.nickname)")
                             self.authenticationState = .signIn
                             return
                         } else {

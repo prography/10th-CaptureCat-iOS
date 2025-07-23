@@ -31,8 +31,10 @@ final class TagViewModel: ObservableObject {
     // MARK: - Dependencies
     private let repository = ScreenshotRepository.shared
     @Published var itemVMs: [ScreenshotItemViewModel] = []
+    private var networkManager: NetworkManager
     
-    init(itemsIds: [String]) {
+    init(itemsIds: [String], networkManager: NetworkManager) {
+        self.networkManager = networkManager
         createViewModel(from: itemsIds)
         
         loadTags()

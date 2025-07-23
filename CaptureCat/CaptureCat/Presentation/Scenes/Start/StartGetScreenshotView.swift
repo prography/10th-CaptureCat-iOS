@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StartGetScreenshotView: View {
-    @StateObject private var viewModel = StartGetScreenshotViewModel()
+    @StateObject var viewModel: StartGetScreenshotViewModel
     @EnvironmentObject private var router: Router
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)

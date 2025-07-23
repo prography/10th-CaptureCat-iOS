@@ -10,7 +10,7 @@ import Photos
 
 struct HomeView: View {
     @EnvironmentObject var router: Router
-    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
+    @StateObject var viewModel: HomeViewModel
     
     // Grid 레이아웃
     private let columns = [

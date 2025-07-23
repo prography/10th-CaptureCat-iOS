@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SelectMainTagView: View {
-    @StateObject private var viewModel = SelectMainTagViewModel()
+    @StateObject var viewModel: SelectMainTagViewModel
     @EnvironmentObject private var router: Router
     
     var body: some View {

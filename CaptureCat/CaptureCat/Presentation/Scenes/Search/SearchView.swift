@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchView: View {
-    @StateObject private var viewModel = SearchViewModel()
+    @StateObject var viewModel: SearchViewModel
     
     var body: some View {
         VStack(spacing: 0) {

@@ -21,8 +21,10 @@ final class SearchViewModel: ObservableObject {
     
     private let repository = ScreenshotRepository.shared
     private var cancellables = Set<AnyCancellable>()
+    private var networkManager: NetworkManager
     
-    init() {
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
         // 검색어 변경 시 필터링 (태그가 선택되지 않은 경우에만)
         $searchText
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)

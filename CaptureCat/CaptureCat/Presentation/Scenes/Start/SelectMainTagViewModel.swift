@@ -29,6 +29,13 @@ final class SelectMainTagViewModel: ObservableObject {
     // 선택된 토픽 집합
     @Published private(set) var selected: Set<Topic> = []
     
+    private var networkManager: NetworkManager
+    
+    // MARK: - Init
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
+    }
+    
     // 최대 선택 개수
     let maxSelection = 5
     

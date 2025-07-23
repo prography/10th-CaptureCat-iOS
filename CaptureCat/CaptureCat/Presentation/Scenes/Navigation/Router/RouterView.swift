@@ -11,10 +11,12 @@ struct RouterView<Content: View>: View {
     @StateObject var router: Router = Router()
     
     private let content: Content
+    private let networkManager: NetworkManager
     
-    init(
+    init(networkManager: NetworkManager,
         @ViewBuilder content: @escaping () -> Content
     ) {
+        self.networkManager = networkManager
         self.content = content()
     }
     
@@ -24,11 +26,13 @@ struct RouterView<Content: View>: View {
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
                     case .startGetScreenshot:
-                        StartGetScreenshotView()
+                        let viewModel = StartGetScreenshotViewModel(networkManager: networkManager)
+                        StartGetScreenshotView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .tag(let ids):
-                        TagView(itemsIDs: ids)
+                        let viewModel = TagViewModel(itemsIds: ids, networkManager: networkManager)
+                        TagView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .setting:

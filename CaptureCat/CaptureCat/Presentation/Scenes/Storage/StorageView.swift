@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StorageView: View {
-    @StateObject private var viewModel = StorageViewModel()
+    @StateObject var viewModel: StorageViewModel
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
 

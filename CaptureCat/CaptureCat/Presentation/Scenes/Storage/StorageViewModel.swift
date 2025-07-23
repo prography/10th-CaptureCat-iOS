@@ -25,9 +25,11 @@ final class StorageViewModel: ObservableObject {
     // MARK: - Dependencies
     private let manager = ScreenshotManager()
     private var cancellables = Set<AnyCancellable>()
+    private var networkManager: NetworkManager
     
     // MARK: - Init
-    init() {
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
         // 초기 데이터
         assets = manager.assets
 

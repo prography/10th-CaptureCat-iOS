@@ -9,6 +9,12 @@ import SwiftUI
 
 struct TabContainerView: View {
     @State private var selectedTab: Tab = .home
+    
+    private var networkManager: NetworkManager
+    
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
+    }
 
     var body: some View {
         ZStack {
@@ -16,11 +22,14 @@ struct TabContainerView: View {
 //            Group {
                 switch selectedTab {
                 case .temporaryStorage:
-                    StorageView()
+                    let viewModel = StorageViewModel(networkManager: networkManager)
+                    StorageView(viewModel: viewModel)
                 case .home:
-                    HomeView()
+                    let viewModel = HomeViewModel(networkManager: networkManager)
+                    HomeView(viewModel: viewModel)
                 case .search:
-                    SearchView()
+                    let viewModel = SearchViewModel(networkManager: networkManager)
+                    SearchView(viewModel: viewModel)
                 }
 //            }
 

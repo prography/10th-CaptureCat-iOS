@@ -13,6 +13,13 @@ import KakaoSDKAuth
 @main
 struct CaptureCatApp: App {
     @State var onBoardingViewModel: OnBoardingViewModel = OnBoardingViewModel()
+    private var networkManager: NetworkManager {
+        guard let url = BaseURLType.production.url else {
+            fatalError("Invalid base URL")
+        }
+        
+        return NetworkManager(baseURL: url)
+    }
     
     init() {
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
@@ -23,7 +30,8 @@ struct CaptureCatApp: App {
             if onBoardingViewModel.isOnBoarding {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
-                AuthenticatedView()
+                AuthenticatedView(networkManager: networkManager)
+                    .environmentObject(AuthViewModel(networkManager: networkManager))
                     .modelContainer(SwiftDataManager.shared.modelContainer)
                     .onOpenURL { url in
                         if (AuthApi.isKakaoTalkLoginUrl(url)) {
