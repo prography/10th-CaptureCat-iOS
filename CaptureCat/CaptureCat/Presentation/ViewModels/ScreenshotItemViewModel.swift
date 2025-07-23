@@ -92,25 +92,76 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         
         do {
             if AccountStorage.shared.isGuest ?? true {
+                // 게스트 모드: 로컬 전용 저장
                 try SwiftDataManager.shared.upsert(item: item)
-                debugPrint("✅ SwiftData 저장 완료!")
+                debugPrint("✅ 로컬 전용 저장 완료: \(fileName)")
             } else {
-                // 2) 서버 업로드 (응답 DTO 무시하거나 처리)
-                let dto = item.toDTO()
-                _ = try await ScreenshotService.shared.upload(dto)
+                // 로그인 모드: 서버 전용 저장 (로컬 저장 X)
+                try await ScreenshotRepository.shared.saveToServerOnly(self)
+                debugPrint("✅ 서버 전용 저장 완료: \(fileName)")
             }
+            
         } catch {
             errorMessage = error.localizedDescription
-            debugPrint("❌ SwfitData 저장 실패!", error.localizedDescription)
+            debugPrint("❌ 저장 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 로컬에만 저장 (게스트 모드 전용)
+    func saveToLocal() async {
+        guard AccountStorage.shared.isGuest ?? true else {
+            debugPrint("⚠️ 로그인 모드에서는 로컬 저장을 사용할 수 없습니다.")
+            return
+        }
+        
+        isSaving = true
+        defer { isSaving = false }
+        
+        let item = ScreenshotItem(
+            id: id,
+            imageData: Data(),
+            fileName: fileName,
+            createDate: createDate,
+            tags: tags,
+            isFavorite: isFavorite
+        )
+        
+        do {
+            try SwiftDataManager.shared.upsert(item: item)
+            debugPrint("✅ 로컬 저장 완료: \(fileName)")
+        } catch {
+            errorMessage = error.localizedDescription
+            debugPrint("❌ 로컬 저장 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 서버에만 저장 (로그인 모드 전용)
+    func saveToServer() async {
+        guard !(AccountStorage.shared.isGuest ?? true) else {
+            debugPrint("⚠️ 게스트 모드에서는 서버 저장을 사용할 수 없습니다.")
+            return
+        }
+        
+        isSaving = true
+        defer { isSaving = false }
+        
+        do {
+            try await ScreenshotRepository.shared.saveToServerOnly(self)
+            debugPrint("✅ 서버 저장 완료: \(fileName)")
+        } catch {
+            errorMessage = error.localizedDescription
+            debugPrint("❌ 서버 저장 실패: \(error.localizedDescription)")
         }
     }
     
     // MARK: – Delete
     func delete() async throws {
         // 1) 서버에서 삭제
-        try await ScreenshotService.shared.delete(id: id)
+//        try await ScreenshotService.shared.delete(id: id)
         // 2) 로컬에서 삭제
-        try SwiftDataManager.shared.delete(id: id)
+        if AccountStorage.shared.isGuest ?? true {
+            try SwiftDataManager.shared.delete(id: id)
+        }
     }
     
     // MARK: – DTO Mapping

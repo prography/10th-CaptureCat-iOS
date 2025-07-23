@@ -14,7 +14,7 @@ struct JSONNetworkSerializer: NetworkSerializable {
     
     init() {}
     
-    func serialize(_ parameters: [String: Any]) throws -> Data {
+    func serialize(_ parameters: [String: Any]) async throws -> Data {
         try JSONSerialization.data(withJSONObject: parameters)
     }
 }

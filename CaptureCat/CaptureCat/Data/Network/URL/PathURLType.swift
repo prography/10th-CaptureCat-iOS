@@ -9,6 +9,12 @@ enum PathURLType {
     case auth
     case uploadImage
     case turorial
+    case imagePages
+    case searchByTag
+    case oneImage
+    case getTags
+    case relatedTags
+    case mostUsedTags
     
     func path() -> String {
         
@@ -19,6 +25,18 @@ enum PathURLType {
             return "/v1/images/upload"
         case .turorial:
             return "/v1/user/turotialComplete"
+        case .imagePages:
+            return "/v1/images"
+        case .searchByTag:
+            return "/v1/images/search"
+        case .oneImage:
+            return "/v1/images"
+        case .getTags:
+            return "/v1/tags"
+        case .relatedTags:
+            return "/v1/tags/related"
+        case .mostUsedTags:
+            return "/v1/tags/most-used"
         }
     }
 }
