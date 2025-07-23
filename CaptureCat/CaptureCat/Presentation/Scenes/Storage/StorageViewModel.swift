@@ -41,6 +41,20 @@ final class StorageViewModel: ObservableObject {
     
     // MARK: - Derived
     var totalCount: Int { manager.totalCount }
+    var loadedCount: Int { manager.loadedCount }
+    var isLoadingMore: Bool { manager.isLoadingMore }
+    var hasMoreAssets: Bool { manager.hasMoreAssets }
+    
+    // MARK: - Pagination
+    func loadNextPage() {
+        manager.loadNextPage()
+    }
+    
+    func shouldLoadMore(for asset: PHAsset) -> Bool {
+        // 현재 asset이 끝에서 5번째 전이면 다음 페이지 로드
+        guard let index = assets.firstIndex(of: asset) else { return false }
+        return index >= assets.count - 5 && hasMoreAssets && !isLoadingMore
+    }
     
     // MARK: - User intent
     func toggleSelection(of asset: PHAsset) {

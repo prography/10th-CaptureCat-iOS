@@ -60,6 +60,6 @@ struct SelectMainTagView: View {
     }
 }
 
-#Preview {
-    SelectMainTagView()
-}
+//#Preview {
+//    SelectMainTagView()
+//}

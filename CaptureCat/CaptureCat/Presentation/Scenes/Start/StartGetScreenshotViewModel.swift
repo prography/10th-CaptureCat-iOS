@@ -42,7 +42,23 @@ final class StartGetScreenshotViewModel: ObservableObject {
     // MARK: - Computed
     /// 전체 아이템 수
     var totalCount: Int { manager.totalCount }
-    /// 선택된 아이템 ViewModel 배열
+    /// 현재 로드된 아이템 수
+    var loadedCount: Int { manager.loadedCount }
+    /// 더 많은 데이터 로딩 상태
+    var isLoadingMore: Bool { manager.isLoadingMore }
+    /// 더 많은 데이터 존재 여부
+    var hasMoreAssets: Bool { manager.hasMoreAssets }
+    
+    // MARK: - Pagination
+    func loadNextPage() {
+        manager.loadNextPage()
+    }
+    
+    func shouldLoadMore(for asset: PHAsset) -> Bool {
+        // 현재 asset이 끝에서 5번째 전이면 다음 페이지 로드
+        guard let index = assets.firstIndex(of: asset) else { return false }
+        return index >= assets.count - 5 && hasMoreAssets && !isLoadingMore
+    }
     
     func toggleSelection(of asset: PHAsset) {
         let id = asset.localIdentifier

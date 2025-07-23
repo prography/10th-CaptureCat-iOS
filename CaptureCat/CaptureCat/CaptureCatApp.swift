@@ -30,8 +30,10 @@ struct CaptureCatApp: App {
             if onBoardingViewModel.isOnBoarding {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
+                let service = AuthService(networkManager: networkManager)
+                
                 AuthenticatedView(networkManager: networkManager)
-                    .environmentObject(AuthViewModel(networkManager: networkManager))
+                    .environmentObject(AuthViewModel(service: service))
                     .modelContainer(SwiftDataManager.shared.modelContainer)
                     .onOpenURL { url in
                         if (AuthApi.isKakaoTalkLoginUrl(url)) {

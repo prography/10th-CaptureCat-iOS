@@ -38,7 +38,7 @@ class AuthViewModel: ObservableObject {
     @Published var isSignOutPresented: Bool = false
     
     init(service: AuthService) {
-        self.authService = AuthService(networkManager: networkManager)
+        self.authService = service
     }
     
     @MainActor
