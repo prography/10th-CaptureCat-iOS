@@ -49,18 +49,8 @@ struct HomeView: View {
                                     .toolbar(.hidden, for: .navigationBar)
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
-                                    HStack(spacing: 4) {
-                                        ForEach(item.tags, id: \.self) { tag in
-                                            Text(tag)
-                                                .CFont(.caption01Semibold)
-                                                .padding(.horizontal, 7.5)
-                                                .padding(.vertical, 4.5)
-                                                .background(Color.overlayDim)
-                                                .foregroundColor(.white)
-                                                .cornerRadius(4)
-                                        }
-                                    }
-                                    .padding(6)
+                                    TagFlowLayout(tags: item.tags, maxLines: 2)
+                                        .padding(6)
                                 }
                             }
                             .onAppear {

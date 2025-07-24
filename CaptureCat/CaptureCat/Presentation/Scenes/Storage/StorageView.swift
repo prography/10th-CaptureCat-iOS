@@ -88,6 +88,7 @@ struct StorageView: View {
             
             Button {
                 router.push(.tag(ids: Array(viewModel.selectedIDs)))
+                viewModel.selectedIDs.removeAll()
             } label: {
                 Text("다음")
             }
