@@ -11,7 +11,7 @@ struct PopularTagBuilder: BuilderProtocol {
     typealias Response = TagDTO
     
     var path: String = PathURLType.mostUsedTags.path()
-    var queries: [URLQueryItem]? = nil
+    var queries: [URLQueryItem]?
     var method: HTTPMethod { .get }
     var parameters: [String: Any] = [:]
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())

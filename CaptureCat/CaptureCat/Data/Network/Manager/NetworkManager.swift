@@ -189,7 +189,6 @@ class NetworkManager {
         
         debugPrint("🔧 최종 URL 생성 성공: \(url)")
         
-        
         var request = URLRequest(url: url)
         builder.headers.forEach { (key, value) in
             request.setValue(value, forHTTPHeaderField: key)
@@ -218,18 +217,18 @@ class NetworkManager {
         debugPrint("📤 Headers: \(request.allHTTPHeaderFields ?? [:])")
         debugPrint("📤 Query Items: \(components?.queryItems?.map { "\($0.name)=\($0.value ?? "nil")" }.joined(separator: "&") ?? "none")")
         
-        if let body = request.httpBody {
-            if let bodyString = String(data: body, encoding: .utf8) {
-                debugPrint("📤 Body (String): \(bodyString)")
-            } else {
-                debugPrint("📤 Body (Binary): \(body.count) bytes")
-                // 이미지 데이터인 경우 첫 100바이트만 헥스로 표시
-                let preview = body.prefix(100).map { String(format: "%02x", $0) }.joined()
-                debugPrint("📤 Body Preview (Hex): \(preview)...")
-            }
-        } else {
-            debugPrint("📤 Body: none")
-        }
+//        if let body = request.httpBody {
+//            if let bodyString = String(data: body, encoding: .utf8) {
+//                debugPrint("📤 Body (String): \(bodyString)")
+//            } else {
+//                debugPrint("📤 Body (Binary): \(body.count) bytes")
+//                // 이미지 데이터인 경우 첫 100바이트만 헥스로 표시
+//                let preview = body.prefix(100).map { String(format: "%02x", $0) }.joined()
+//                debugPrint("📤 Body Preview (Hex): \(preview)...")
+//            }
+//        } else {
+//            debugPrint("📤 Body: none")
+//        }
         
         debugPrint("📤 Builder Type: \(type(of: builder))")
         debugPrint("📤 Use Authorization: \(builder.useAuthorization)")

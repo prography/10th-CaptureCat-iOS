@@ -21,7 +21,7 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<TagDTO, Error>.success(result)
-        } catch(let error) {
+        } catch {
             return .failure(error)
         }
     }
@@ -32,7 +32,7 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<TagDTO, Error>.success(result)
-        } catch(let error){
+        } catch {
             return .failure(error)
         }
     }
@@ -43,7 +43,7 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<ResponseDTO, Error>.success(result)
-        } catch(let error) {
+        } catch {
             return .failure(error)
         }
     }
@@ -54,7 +54,7 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<ResponseDTO, Error>.success(result)
-        } catch(let error) {
+        } catch {
             return .failure(error)
         }
     }

@@ -22,7 +22,7 @@ final class ImageService {
             let response = try await networkManager.fetchData(builder)
             debugPrint("✅ Success: 이미지 파일들 업로드 성공!")
             return Result<ResponseDTO, Error>.success(response)
-        } catch (let error) {
+        } catch {
             debugPrint("🔥 Error:\(error)")
             return .failure(error)
         }
@@ -50,7 +50,7 @@ final class ImageService {
             let response = try await networkManager.fetchData(builder)
             debugPrint("✅ Success: \(page) 이미지 목록 불러오기 성공!")
             return Result<ImagListDTO, Error>.success(response)
-        } catch (let error) {
+        } catch {
             return .failure(error)
         }
     }
@@ -62,7 +62,7 @@ final class ImageService {
             let response = try await networkManager.fetchData(builder)
             debugPrint("✅ Success: \(page) 이미지 목록 불러오기 성공!")
             return Result<ImagListDTO, Error>.success(response)
-        } catch (let error) {
+        } catch {
             return .failure(error)
         }
     }
@@ -74,7 +74,7 @@ final class ImageService {
             let response = try await networkManager.fetchData(builder)
             debugPrint("✅ Success: \(id) 이미지 삭제 성공!")
             return Result<ResponseDTO, Error>.success(response)
-        } catch (let error) {
+        } catch  {
             return .failure(error)
         }
     }

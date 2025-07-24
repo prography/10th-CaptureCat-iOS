@@ -15,20 +15,11 @@ final class MultipartFormDataSerializer: NetworkSerializable {
     func serialize(_ parameters: [String: Any]) async throws -> Data {
         var body = Data()
         
-        debugPrint("🔍 MultipartFormDataSerializer 시작")
-        debugPrint("🔍 - Boundary: \(boundary)")
-        debugPrint("🔍 - Parameters 개수: \(parameters.count)")
-        
         for (key, value) in parameters {
-            debugPrint("🔍 - Processing key: '\(key)'")
-            
             // 3-1) [MultipartFile] 배열인 경우
             if let files = value as? [MultipartFile] {
-                debugPrint("🔍   - Type: [MultipartFile] 배열, 개수: \(files.count)")
                 for (index, file) in files.enumerated() {
                     let partHeader = "--\(boundary)\r\nContent-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\nContent-Type: \(file.mimeType)\r\n\r\n"
-                    debugPrint("🔍   - File[\(index)]: filename='\(file.filename)', size=\(file.data.count) bytes")
-                    debugPrint("🔍   - Header: \(partHeader.replacingOccurrences(of: "\r\n", with: "\\r\\n"))")
                     
                     body.appendString("--\(boundary)\r\n")
                     body.appendString("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\n")
@@ -41,12 +32,6 @@ final class MultipartFormDataSerializer: NetworkSerializable {
             
             // 3-2) 단일 MultipartFile
             if let file = value as? MultipartFile {
-                debugPrint("🔍   - Type: 단일 MultipartFile")
-                debugPrint("🔍   - filename: '\(file.filename)', size: \(file.data.count) bytes")
-                if file.mimeType == "application/json", let jsonString = String(data: file.data, encoding: .utf8) {
-                    debugPrint("🔍   - JSON 내용: \(jsonString)")
-                }
-                
                 body.appendString("--\(boundary)\r\n")
                 body.appendString("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\n")
                 body.appendString("Content-Type: \(file.mimeType)\r\n\r\n")
@@ -56,7 +41,6 @@ final class MultipartFormDataSerializer: NetworkSerializable {
             }
             
             // 3-3) 텍스트 파라미터
-            debugPrint("🔍   - Type: 텍스트 파라미터, value: \(value)")
             body.appendString("--\(boundary)\r\n")
             body.appendString("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
             body.appendString("\(value)\r\n")
@@ -64,9 +48,6 @@ final class MultipartFormDataSerializer: NetworkSerializable {
         
         // 4) 마무리 boundary
         body.appendString("--\(boundary)--\r\n")
-        
-        debugPrint("🔍 MultipartFormDataSerializer 완료")
-        debugPrint("🔍 - 총 Body 크기: \(body.count) bytes")
         
         return body
     }

@@ -20,10 +20,9 @@ struct UploadImageBuilder: BuilderProtocol {
     var serializer: NetworkSerializable = MultipartFormDataSerializer()
     var deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())
     
-    init(
-        imageDatas: [Data],
-        imageMetas: [PhotoDTO],
-        jpegQuality: CGFloat = 0.8) {
+    init(imageDatas: [Data],
+         imageMetas: [PhotoDTO],
+         jpegQuality: CGFloat = 0.8) {
         var params = [String: Any]()
         let dateFormatter: DateFormatter = {
             let formatter = DateFormatter()

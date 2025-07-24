@@ -127,8 +127,8 @@ final class ScreenshotManager: ObservableObject {
     }
     
     //토글 단위가 ScreenshotItemViewModel
-    func toggleSelection(of vm: ScreenshotItemViewModel) {
-        let id = vm.id
+    func toggleSelection(of viewModel: ScreenshotItemViewModel) {
+        let id = viewModel.id
         if selectedIDs.contains(id) {
             selectedIDs.remove(id)
         } else {

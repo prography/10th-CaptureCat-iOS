@@ -58,7 +58,7 @@ extension SocialManager {
             let (token, nickname) = try await appleLoginManager.login()
             debugPrint("🟢🍏🟢 애플 로그인 시도 성공 🟢🍏🟢")
             return .success((token, nickname))
-        } catch (let error) {
+        } catch {
             debugPrint("🔴🍎🔴 애플 로그인 시도 실패 \(error.localizedDescription) 🔴🍎🔴")
             return .failure(NetworkError.badRequest)
         }

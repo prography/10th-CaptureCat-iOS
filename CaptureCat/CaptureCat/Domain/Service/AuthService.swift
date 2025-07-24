@@ -20,7 +20,7 @@ final class AuthService {
         do {
             let response = try await networkManager.fetchLoginData(builder)
             return Result<LogInResponseDTO, NetworkError>.success(response)
-        } catch (let error) {
+        } catch {
             debugPrint("🔥 Error:\(error)")
             return .failure(NetworkError.unauthorized)
         }
@@ -32,7 +32,7 @@ final class AuthService {
         do {
             let response = try await networkManager.fetchData(builder)
             return Result<ResponseDTO, Error>.success(response)
-        } catch (let error) {
+        } catch {
             debugPrint("🔥 Withdraw Error:\(error)")
             return .failure(error)
         }

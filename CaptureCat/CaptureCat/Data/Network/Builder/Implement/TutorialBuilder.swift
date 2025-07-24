@@ -11,7 +11,7 @@ struct TutorialBuilder: BuilderProtocol {
     typealias Response = ResponseDTO
     
     var path: String = PathURLType.turorial.path()
-    var queries: [URLQueryItem]? = nil
+    var queries: [URLQueryItem]?
     var method: HTTPMethod { .post }
     var parameters: [String: Any] = [:]
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())
