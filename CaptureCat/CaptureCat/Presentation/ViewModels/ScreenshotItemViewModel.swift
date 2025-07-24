@@ -14,7 +14,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     let id: String
     let imageURL: String?              // ✅ 서버 이미지 URL
     @Published var fileName: String
-    @Published var createDate: Date
+    @Published var createDate: String
     @Published var thumbnail: UIImage?
     @Published var fullImage: UIImage?
     @Published var isLoadingImage = false

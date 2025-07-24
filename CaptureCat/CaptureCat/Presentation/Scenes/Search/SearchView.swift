@@ -187,4 +187,4 @@ struct SearchView: View {
     private let gridColumns = [
         GridItem(.adaptive(minimum: 150), spacing: 12)
     ]
-}
+} 

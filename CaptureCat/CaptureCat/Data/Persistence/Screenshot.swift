@@ -12,7 +12,7 @@ import SwiftData
 final class Screenshot {
     @Attribute(.unique) var id: String = UUID().uuidString
     var fileName: String = ""
-    var createDate: Date = Date()
+    var createDate: String = ""
     // 실제 저장되는 컬럼
       var tagsJSON: String = "[]"
 
@@ -29,7 +29,7 @@ final class Screenshot {
     
     init(id: String,
          fileName: String,
-         createDate: Date,
+         createDate: String,
          tags: [String] = [],
          isFavorite: Bool = false) {
         self.id = id

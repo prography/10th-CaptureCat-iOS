@@ -35,6 +35,12 @@ final class TagViewModel: ObservableObject {
     private var networkManager: NetworkManager
     var router: Router?
     
+    private var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+    
     /// UI 업데이트를 강제하기 위한 더미 프로퍼티 (Extension에서 사용)
     @Published var updateTrigger = false
     
@@ -76,7 +82,7 @@ final class TagViewModel: ObservableObject {
                 id: asset.localIdentifier,
                 imageData: Data(),
                 fileName: asset.localIdentifier + ".jpg",
-                createDate: asset.creationDate ?? Date(),
+                createDate: self.dateFormatter.string(from: asset.creationDate ?? Date()),
                 tags: [],
                 isFavorite: asset.isFavorite
             )

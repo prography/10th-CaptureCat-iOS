@@ -24,12 +24,6 @@ struct UploadImageBuilder: BuilderProtocol {
          imageMetas: [PhotoDTO],
          jpegQuality: CGFloat = 0.8) {
         var params = [String: Any]()
-        let dateFormatter: DateFormatter = {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd"
-            
-            return formatter
-        }()
         
         guard imageDatas.count == imageMetas.count else {
             debugPrint("🔴 치명적 오류: 개수 불일치 - 이미지:\(imageDatas.count), 메타:\(imageMetas.count)")
@@ -57,7 +51,7 @@ struct UploadImageBuilder: BuilderProtocol {
             
             return [
                 "fileName": sanitizedFileName,  // ✅ 변환된 파일명 사용
-                "captureDate": dateFormatter.string(from: meta.createDate),
+                "captureDate": meta.createDate,
                 "isBookmarked": meta.isFavorite,
                 "tagNames": meta.tags  // ✅ 실제 태그 전송 활성화!
             ]

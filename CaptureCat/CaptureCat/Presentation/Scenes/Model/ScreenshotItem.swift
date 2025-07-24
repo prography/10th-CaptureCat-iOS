@@ -14,7 +14,7 @@ struct ScreenshotItem: Identifiable, Equatable {
     var imageData: Data            // UI에서 바로 쓰기 위한 Data (썸네일/풀사이즈)
     var imageURL: String?          // 서버 이미지 URL (서버 데이터인 경우)
     var fileName: String
-    var createDate: Date
+    var createDate: String
     var tags: [String]
     var isFavorite: Bool
 
@@ -24,7 +24,7 @@ struct ScreenshotItem: Identifiable, Equatable {
         imageData: Data = Data(),
         imageURL: String? = nil,
         fileName: String,
-        createDate: Date,
+        createDate: String,
         tags: [String] = [],
         isFavorite: Bool = false
     ) {
@@ -75,9 +75,14 @@ struct ScreenshotItem: Identifiable, Equatable {
 extension ScreenshotItem {
     /// PHAsset → ScreenshotItem 변환
     init(asset: PHAsset) {
+        var dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            return formatter
+        }()
         // 1) ID, 생성일
         let id = asset.localIdentifier
-        let createDate = asset.creationDate ?? Date()
+        let createDate = dateFormatter.string(from: asset.creationDate ?? Date())
         // 2) 파일명 (원본 리소스에서 가져오기)
         let resources = PHAssetResource.assetResources(for: asset)
         let fileName = resources.first?.originalFilename ?? "Unknown.jpg"
