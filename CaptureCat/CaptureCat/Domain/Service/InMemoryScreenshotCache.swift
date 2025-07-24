@@ -77,4 +77,4 @@ final class InMemoryScreenshotCache {
         let otherTags = matchingItems.flatMap { $0.tags }.filter { !baseTags.contains($0) }
         return Array(Set(otherTags)).sorted()
     }
-} 
+}

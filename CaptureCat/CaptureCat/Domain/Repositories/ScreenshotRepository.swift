@@ -45,11 +45,25 @@ final class ScreenshotRepository {
     }
     
     /// 연관 태그 가져오기 (로그인 상태 자동 분기)
-    func fetchOtherTagsFromScreenshotsContaining(_ tags: [String]) throws -> [String] {
+    func fetchOtherTagsFromScreenshotsContaining(_ tags: [String]) async throws -> [String] {
         if AccountStorage.shared.isGuest ?? true {
             return try SwiftDataManager.shared.fetchOtherTagsFromScreenshotsContaining(tags)
         } else {
-            return InMemoryScreenshotCache.shared.getOtherTags(for: tags)
+            // TagService를 사용하여 서버에서 연관 태그 가져오기
+            let result = await TagService.shared.fetchRelatedTagList(page: 0, size: 100, tags: tags)
+            
+            switch result {
+            case .success(let tagDTO):
+                // TagDTO에서 태그 이름들을 추출
+                let tagNames = tagDTO.data.items.map { $0.name }
+                debugPrint("✅ 서버에서 연관 태그 로드 성공: \(tagNames)")
+                return tagNames
+            case .failure(let error):
+                debugPrint("❌ 서버에서 연관 태그 로드 실패: \(error.localizedDescription)")
+                // 실패 시 빈 배열 반환
+                return InMemoryScreenshotCache.shared.getOtherTags(for: tags)
+
+            }
         }
     }
     

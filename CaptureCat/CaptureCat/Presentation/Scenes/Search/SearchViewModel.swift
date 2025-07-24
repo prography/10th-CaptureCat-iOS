@@ -65,7 +65,9 @@ final class SearchViewModel: ObservableObject {
         selectedTags.append(tag)
         searchText = ""
         loadScreenshotsByTags()
-        loadRelatedTags()
+        Task {
+            await loadRelatedTags()
+        }
     }
     
     func removeTag(_ tag: String) {
@@ -75,7 +77,9 @@ final class SearchViewModel: ObservableObject {
             clearAllSelections()
         } else {
             loadScreenshotsByTags()
-            loadRelatedTags()
+            Task {
+                await loadRelatedTags()
+            }
         }
     }
     
@@ -94,14 +98,14 @@ final class SearchViewModel: ObservableObject {
         isLoadingScreenshots = false
     }
     
-    private func loadRelatedTags() {
+    private func loadRelatedTags() async {
         guard !selectedTags.isEmpty else {
             relatedTags = []
             return
         }
         
         do {
-            let otherTags = try repository.fetchOtherTagsFromScreenshotsContaining(selectedTags)
+            let otherTags = try await repository.fetchOtherTagsFromScreenshotsContaining(selectedTags)
             relatedTags = otherTags
         } catch {
             print("연관 태그 로딩 실패: \(error)")
