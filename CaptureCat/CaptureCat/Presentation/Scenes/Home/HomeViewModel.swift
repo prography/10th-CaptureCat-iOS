@@ -36,6 +36,7 @@ final class HomeViewModel: ObservableObject {
     
     init(networkManager: NetworkManager) {
         self.netwworkManager = networkManager
+        setupNotificationObservers()
     }
     
     /// 스마트 로딩 (로그인 상태에 따라 자동 분기) - 초기 로딩용
@@ -225,6 +226,54 @@ final class HomeViewModel: ObservableObject {
         if index >= threshold && !isLoadingFavoritePage && canLoadMoreFavoritePages {
             Task {
                 await loadNextFavoritePage()
+            }
+        }
+    }
+    
+    // MARK: - Notification Handling
+    
+    private func setupNotificationObservers() {
+        NotificationCenter.default.publisher(for: .favoriteStatusChanged)
+            .compactMap { notification in
+                notification.userInfo?["favoriteInfo"] as? FavoriteStatusInfo
+            }
+            .sink { [weak self] favoriteInfo in
+                self?.updateFavoriteStatus(favoriteInfo)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateFavoriteStatus(_ favoriteInfo: FavoriteStatusInfo) {
+        // itemVMs에서 해당 아이템 찾아서 즐겨찾기 상태 업데이트
+        if let itemIndex = itemVMs.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
+            itemVMs[itemIndex].isFavorite = favoriteInfo.isFavorite
+            debugPrint("✅ HomeView - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
+        }
+        
+        // favoriteItemVMs에서 해당 아이템 처리
+        if let favoriteIndex = favoriteItemVMs.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
+            if favoriteInfo.isFavorite {
+                // 즐겨찾기로 설정됨 - 상태만 업데이트
+                favoriteItemVMs[favoriteIndex].isFavorite = true
+                debugPrint("✅ HomeView Carousel - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId)")
+            } else {
+                // 즐겨찾기 해제됨 - carousel에서 제거
+                favoriteItemVMs.remove(at: favoriteIndex)
+                
+                // currentFavoriteIndex 조정
+                if currentFavoriteIndex >= favoriteItemVMs.count && !favoriteItemVMs.isEmpty {
+                    currentFavoriteIndex = favoriteItemVMs.count - 1
+                } else if favoriteItemVMs.isEmpty {
+                    currentFavoriteIndex = 0
+                }
+                
+                debugPrint("✅ HomeView Carousel - 즐겨찾기 아이템 제거: \(favoriteInfo.imageId)")
+            }
+        } else if favoriteInfo.isFavorite {
+            // 새로 즐겨찾기로 추가된 아이템 - favoriteItemVMs에 추가할 수도 있지만,
+            // 실제로는 서버에서 최신 즐겨찾기 목록을 다시 로드하는 것이 더 안전함
+            Task {
+                await loadFavorite()
             }
         }
     }

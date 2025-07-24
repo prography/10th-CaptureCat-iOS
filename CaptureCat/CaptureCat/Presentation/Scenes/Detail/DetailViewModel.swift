@@ -16,6 +16,7 @@ class DetailViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var item: ScreenshotItemViewModel?
+    @Published var isFavorite: Bool = false
     
     private let imageId: String
     private let repository = ScreenshotRepository.shared
@@ -62,6 +63,7 @@ class DetailViewModel: ObservableObject {
             }
             
             self.item = loadedItem
+            self.isFavorite = loadedItem.isFavorite // 즐겨찾기 상태 동기화
             setupInitialTags()
             
             // 풀 이미지 로드
@@ -177,6 +179,7 @@ class DetailViewModel: ObservableObject {
         // 1. UI 상태 즉시 업데이트 (낙관적 업데이트)
         let originalState = item.isFavorite
         item.isFavorite.toggle()
+        isFavorite.toggle() // DetailView의 UI 즉시 업데이트
         
         Task {
             do {
@@ -189,9 +192,19 @@ class DetailViewModel: ObservableObject {
                     try await ScreenshotRepository.shared.uploadFavorite(id: item.id)
                     debugPrint("✅ 즐겨찾기 추가 완료: \(item.fileName)")
                 }
+                
+                // 3. 성공 시 다른 뷰들에게 상태 변경 알림
+                let favoriteInfo = FavoriteStatusInfo(imageId: item.id, isFavorite: item.isFavorite)
+                NotificationCenter.default.post(
+                    name: .favoriteStatusChanged,
+                    object: nil,
+                    userInfo: ["favoriteInfo": favoriteInfo]
+                )
+                
             } catch {
                 // 2. 실패 시 UI 상태 원복
                 item.isFavorite = originalState
+                isFavorite = originalState // DetailView의 UI도 원복
                 errorMessage = "즐겨찾기 변경 중 오류가 발생했습니다: \(error.localizedDescription)"
                 debugPrint("❌ 즐겨찾기 토글 실패: \(error.localizedDescription)")
             }

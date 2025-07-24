@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 @MainActor
 class FavoriteViewModel: ObservableObject {
@@ -24,8 +25,13 @@ class FavoriteViewModel: ObservableObject {
     private var hasLoadedInitialData = false
     private let pageSize = 20
     
+    // MARK: - Private Properties
+    private var cancellables = Set<AnyCancellable>()
+    
     // MARK: - Initialization
-    init() {}
+    init() {
+        setupNotificationObservers()
+    }
     
     // MARK: - Public Methods
     
@@ -127,6 +133,15 @@ class FavoriteViewModel: ObservableObject {
             do {
                 try await viewModel.toggleFavorite()
                 debugPrint("✅ 즐겨찾기에서 제거 완료: \(viewModel.id)")
+                
+                // 성공 시 다른 뷰들에게 상태 변경 알림
+                let favoriteInfo = FavoriteStatusInfo(imageId: viewModel.id, isFavorite: false)
+                NotificationCenter.default.post(
+                    name: .favoriteStatusChanged,
+                    object: nil,
+                    userInfo: ["favoriteInfo": favoriteInfo]
+                )
+                
             } catch {
                 debugPrint("❌ 즐겨찾기 토글 실패: \(error.localizedDescription)")
                 self.errorMessage = error.localizedDescription
@@ -147,5 +162,39 @@ class FavoriteViewModel: ObservableObject {
     /// 에러 메시지 초기화
     func clearErrorMessage() {
         errorMessage = nil
+    }
+    
+    // MARK: - Notification Handling
+    
+    private func setupNotificationObservers() {
+        NotificationCenter.default.publisher(for: .favoriteStatusChanged)
+            .compactMap { notification in
+                notification.userInfo?["favoriteInfo"] as? FavoriteStatusInfo
+            }
+            .sink { [weak self] favoriteInfo in
+                self?.updateFavoriteStatus(favoriteInfo)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateFavoriteStatus(_ favoriteInfo: FavoriteStatusInfo) {
+        if favoriteInfo.isFavorite {
+            // 즐겨찾기로 추가됨 - 상태만 업데이트 (이미 즐겨찾기 페이지에 있다면)
+            if let itemIndex = favoriteItems.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
+                favoriteItems[itemIndex].isFavorite = true
+                debugPrint("✅ FavoriteView - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId)")
+            }
+            // 새로 추가된 아이템은 다음 로드 시에 포함될 것이므로 별도 처리 안함
+        } else {
+            // 즐겨찾기 해제됨 - 즐겨찾기 목록에서 제거
+            if let itemIndex = favoriteItems.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
+                favoriteItems.remove(at: itemIndex)
+                debugPrint("✅ FavoriteView - 즐겨찾기 아이템 제거: \(favoriteInfo.imageId)")
+            }
+        }
+    }
+    
+    deinit {
+        cancellables.forEach { $0.cancel() }
     }
 }
