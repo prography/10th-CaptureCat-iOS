@@ -132,7 +132,7 @@ struct TagView: View {
         let xOffset = myXOffset(index)
         
         SingleCardView {
-            ScreenshotItemView(viewModel: viewModel.itemVMs[viewModel.currentIndex]) {
+            ScreenshotItemView(viewModel: asset) {
                 EmptyView()
             }
         }
