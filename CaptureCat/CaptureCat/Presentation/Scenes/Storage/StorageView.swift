@@ -97,6 +97,7 @@ struct StorageView: View {
                 Text("다음")
             }
             .primaryTextStyle(isEnabled: viewModel.selectedIDs.count > 0 && viewModel.selectedIDs.count <= 20)
+            .disabled(viewModel.selectedIDs.count <= 0 || viewModel.selectedIDs.count > 20)
         }
     }
     
