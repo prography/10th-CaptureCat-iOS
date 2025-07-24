@@ -78,7 +78,8 @@ struct HomeView: View {
                             }
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 100) // 탭바를 고려한 하단 여백 추가
                 }
             }
         }

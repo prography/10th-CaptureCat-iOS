@@ -178,6 +178,7 @@ struct SearchView: View {
                         }
                     }
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 100)
                 }
             }
         }
