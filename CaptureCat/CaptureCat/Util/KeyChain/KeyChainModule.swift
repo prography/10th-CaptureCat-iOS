@@ -85,6 +85,13 @@ final class KeyChainModule {
         
         let status = SecItemDelete(query as CFDictionary)
         
-        assert(status == noErr, "❌ keychain delete failure")
+        switch status {
+        case errSecSuccess:
+            print("✅ keychain delete success")
+        case errSecItemNotFound:
+            print("⚠️ keychain delete: item not found (already deleted)")
+        default:
+            print("⚠️ keychain delete warning: status \(status)")
+        }
     }
 }
