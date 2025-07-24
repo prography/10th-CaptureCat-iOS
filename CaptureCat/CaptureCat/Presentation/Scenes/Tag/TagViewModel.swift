@@ -87,6 +87,12 @@ final class TagViewModel: ObservableObject {
         tags = UserDefaults.standard.stringArray(forKey: LocalUserKeys.selectedTopics.rawValue) ?? []
     }
     
+    /// 전체 태그 목록을 UserDefaults에 저장
+    func saveTags() {
+        UserDefaults.standard.set(tags, forKey: LocalUserKeys.selectedTopics.rawValue)
+        debugPrint("💾 태그 목록 저장 완료: \(tags)")
+    }
+    
     // mode 변경이나 asset 변경 시 호출해서 selectedTags 초기화
     func updateSelectedTags() {
         switch mode {
@@ -151,8 +157,26 @@ final class TagViewModel: ObservableObject {
     func addNewTag(name: String) {
         guard !tags.contains(name) else { return }
         tags.append(name)
-        itemVMs[currentIndex].addTag(name)
+        
+        // mode에 따라 다르게 처리
+        switch mode {
+        case .batch:
+            // 배치 모드: 모든 아이템에 태그 추가
+            itemVMs.forEach { $0.addTag(name) }
+            batchSelectedTags.insert(name)
+        case .single:
+            // 단일 모드: 현재 아이템에만 태그 추가
+            itemVMs[currentIndex].addTag(name)
+        }
+        
+        selectedTags.insert(name)
         updateSelectedTags()
+        hasChanges = true
+        
+        // UserDefaults에 태그 목록 저장 (영구 저장)
+        saveTags()
+        
+        debugPrint("✅ 새 태그 추가: \(name), 모드: \(mode)")
     }
     
     /// Favorite 상태 토글 (UI 업데이트 보장)

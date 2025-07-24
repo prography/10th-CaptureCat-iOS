@@ -98,7 +98,13 @@ struct TagView: View {
             AddTagSheet(
                 tags: $viewModel.tags,
                 selectedTags: $viewModel.selectedTags,
-                isPresented: $viewModel.isShowingAddTagSheet
+                isPresented: $viewModel.isShowingAddTagSheet,
+                onAddNewTag: { newTag in
+                    viewModel.addNewTag(name: newTag)
+                },
+                onDeleteTag: { tag in
+                    viewModel.toggleTag(tag) // 기존 toggleTag 로직으로 태그 제거
+                }
             )
         }
     }

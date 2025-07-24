@@ -329,6 +329,34 @@ class AuthViewModel: ObservableObject {
             AccountStorage.shared.safeReset()
         }
         
-        debugPrint("🧹 모든 토큰 안전 정리 완료")
+        // UserDefaults도 안전하게 정리
+        do {
+            debugPrint("🧹 UserDefaults 정리 시도")
+            safelyCleanupUserDefaults()
+        }
+        
+        debugPrint("🧹 모든 토큰 및 데이터 안전 정리 완료")
+    }
+    
+    /// UserDefaults를 안전하게 정리 (에러 무시)
+    private func safelyCleanupUserDefaults() {
+        debugPrint("🧹 UserDefaults 안전 정리 시작")
+        
+        // selectedTopics (사용자 선택 태그) 삭제
+        do {
+            debugPrint("🧹 selectedTopics 삭제 시도")
+            UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
+        }
+        
+        // 다른 UserDefaults 키가 추가될 경우를 대비한 일괄 정리
+        // 앱별 도메인 전체를 정리하는 방법도 있지만, 신중하게 접근
+        
+        // UserDefaults 동기화 (변경사항 즉시 반영)
+        do {
+            debugPrint("🧹 UserDefaults 동기화 시도")
+            UserDefaults.standard.synchronize()
+        }
+        
+        debugPrint("🧹 UserDefaults 안전 정리 완료")
     }
 }
