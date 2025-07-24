@@ -67,6 +67,19 @@ final class ImageService {
         }
     }
     
+    func checkImageDetail(id: String) async -> Result<ImageDTO, Error> {
+        let builder = CheckOneImageBuilder(id: id)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(id) 이미지 상세 조회 성공!")
+            return Result<ImageDTO, Error>.success(response)
+        } catch {
+            debugPrint("🔥 Error: \(id) 이미지 상세 조회 실패 - \(error)")
+            return .failure(error)
+        }
+    }
+    
     func deleteImage(id: String) async -> Result<ResponseDTO, Error> {
         let builder = DeleteImageBuilder(imageId: id)
         

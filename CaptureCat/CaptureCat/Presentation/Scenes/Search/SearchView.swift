@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SearchView: View {
+    @EnvironmentObject var router: Router
     @StateObject var viewModel: SearchViewModel
     
     var body: some View {
@@ -166,10 +167,8 @@ struct SearchView: View {
                 ScrollView {
                     LazyVGrid(columns: gridColumns, spacing: 12) {
                         ForEach(viewModel.filteredScreenshots) { item in
-                            NavigationLink {
-                                DetailView(item: item)
-                                    .navigationBarBackButtonHidden()
-                                    .toolbar(.hidden, for: .navigationBar)
+                            Button {
+                                router.push(.detail(id: item.id))
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
                                     TagFlowLayout(tags: item.tags, maxLines: 2)

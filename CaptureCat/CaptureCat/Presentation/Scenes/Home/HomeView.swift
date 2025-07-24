@@ -10,7 +10,7 @@ import Photos
 
 struct HomeView: View {
     @EnvironmentObject var router: Router
-    @StateObject var viewModel: HomeViewModel
+    @EnvironmentObject var viewModel: HomeViewModel
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
     @State private var isDragging = false
@@ -48,11 +48,8 @@ struct HomeView: View {
                         .frame(height: 400)
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(Array(viewModel.itemVMs.enumerated()), id: \.offset) { index, item in
-                            NavigationLink {
-                                DetailView(item: item)
-                                    .environmentObject(viewModel)
-                                    .navigationBarBackButtonHidden()
-                                    .toolbar(.hidden, for: .navigationBar)
+                            Button {
+                                router.push(.detail(id: item.id))
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
                                     TagFlowLayout(tags: item.tags, maxLines: 2)
@@ -151,7 +148,6 @@ struct HomeView: View {
             }
             .overlay(
                 Button {
-                    //TODO: 즐겨찾기 페이지로 이동
                     router.push(.favorite)
                 } label: {
                     Image(.selectedFavorite)

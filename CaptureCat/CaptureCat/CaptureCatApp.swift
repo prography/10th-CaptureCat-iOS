@@ -34,6 +34,7 @@ struct CaptureCatApp: App {
                 
                 AuthenticatedView(networkManager: networkManager)
                     .environmentObject(AuthViewModel(service: service))
+                    .environmentObject(HomeViewModel(networkManager: networkManager))
                     .modelContainer(SwiftDataManager.shared.modelContainer)
                     .onOpenURL { url in
                         if (AuthApi.isKakaoTalkLoginUrl(url)) {

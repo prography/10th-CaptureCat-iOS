@@ -30,10 +30,8 @@ struct FavoriteView: View {
                 ScrollView {
                     LazyVGrid(columns: gridColumns, spacing: 12) {
                         ForEach(Array(viewModel.favoriteItems.enumerated()), id: \.offset) { index, item in
-                            NavigationLink {
-                                DetailView(item: item)
-                                    .navigationBarBackButtonHidden()
-                                    .toolbar(.hidden, for: .navigationBar)
+                            Button {
+                                router.push(.detail(id: item.id))
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
                                     EmptyView()

@@ -15,46 +15,62 @@ class DetailViewModel: ObservableObject {
     @Published var isDeleted: Bool = false
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var item: ScreenshotItemViewModel?
     
-    private let item: ScreenshotItemViewModel
+    private let imageId: String
+    private let repository = ScreenshotRepository.shared
     
     // MARK: - Init
-    init(item: ScreenshotItemViewModel) {
-        self.item = item
-        setupInitialTags()
+    init(imageId: String) {
+        self.imageId = imageId
     }
     
     // MARK: - Computed Properties
     var formattedDate: String {
-        item.createDate.toString(format: "yyyy년 MM월 dd일")
+        item?.createDate.toString(format: "yyyy년 MM월 dd일") ?? ""
     }
     
     var displayImage: UIImage {
-        item.fullImage ?? UIImage(resource: .apple)
+        item?.fullImage ?? UIImage(resource: .apple)
     }
     
     @Published var tags: [String] = []
     
     // MARK: - Setup Methods
     private func setupInitialTags() {
+        guard let item = item else { return }
         tags = item.tags
         tempSelectedTags = Set(item.tags)
     }
     
     func onAppear() {
-        tempSelectedTags = Set(item.tags)
         Task {
-            await loadFullImageIfNeeded()
+            await loadItemData()
         }
     }
     
-    // MARK: - Image Loading
-    private func loadFullImageIfNeeded() async {
-        guard item.fullImage == nil else { return }
-        
+    /// imageId로 아이템 데이터 로드
+    private func loadItemData() async {
         isLoading = true
-        await item.loadFullImage()
-        isLoading = false
+        defer { isLoading = false }
+        
+        do {
+            let loadedItem = try await repository.fetchItem(by: imageId)
+            guard let loadedItem = loadedItem else {
+                errorMessage = "해당 이미지를 찾을 수 없습니다."
+                return
+            }
+            
+            self.item = loadedItem
+            setupInitialTags()
+            
+            // 풀 이미지 로드
+            await loadedItem.loadFullImage()
+            
+        } catch {
+            errorMessage = "이미지 로드 중 오류가 발생했습니다: \(error.localizedDescription)"
+            debugPrint("❌ 아이템 로드 실패: \(error.localizedDescription)")
+        }
     }
     
     // MARK: - Tag Management
@@ -67,6 +83,8 @@ class DetailViewModel: ObservableObject {
     }
     
     func addNewTag(_ newTag: String) {
+        guard let item = item else { return }
+        
         // 빈 문자열이나 이미 존재하는 태그는 추가하지 않음
         guard !newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               !item.tags.contains(newTag) else { return }
@@ -88,6 +106,7 @@ class DetailViewModel: ObservableObject {
     }
     
     func deleteTag(_ tag: String) {
+        guard let item = item else { return }
         guard let tagIndex = item.tags.firstIndex(of: tag) else {
             debugPrint("⚠️ 삭제하려는 태그를 찾을 수 없음: \(tag)")
             return
@@ -115,6 +134,7 @@ class DetailViewModel: ObservableObject {
     }
     
     func saveTags(_ newTag: String) {
+        guard let item = item else { return }
         Task {
             do {
                 try await ScreenshotRepository.shared.updateTag(id: item.id, tags: [newTag])
@@ -136,6 +156,8 @@ class DetailViewModel: ObservableObject {
     }
     
     func deleteScreenshot() async {
+        guard let item = item else { return }
+        
         isLoading = true
         defer { isLoading = false }
         
@@ -150,6 +172,8 @@ class DetailViewModel: ObservableObject {
     
     // MARK: - Favorite Management
     func toggleFavorite() {
+        guard let item = item else { return }
+        
         // 1. UI 상태 즉시 업데이트 (낙관적 업데이트)
         let originalState = item.isFavorite
         item.isFavorite.toggle()
@@ -179,3 +203,4 @@ class DetailViewModel: ObservableObject {
         errorMessage = nil
     }
 }
+

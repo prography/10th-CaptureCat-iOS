@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct DetailView: View {
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var router: Router
     @EnvironmentObject var homeViewModel: HomeViewModel
-    @ObservedObject var item: ScreenshotItemViewModel
     @StateObject private var viewModel: DetailViewModel
     
-    init(item: ScreenshotItemViewModel) {
-        self.item = item
-        self._viewModel = StateObject(wrappedValue: DetailViewModel(item: item))
+    private let imageId: String
+    
+    init(imageId: String) {
+        self.imageId = imageId
+        self._viewModel = StateObject(wrappedValue: DetailViewModel(imageId: imageId))
     }
     
     var body: some View {
@@ -25,8 +26,10 @@ struct DetailView: View {
             
             if viewModel.isLoading {
                 loadingView
-            } else {
+            } else if viewModel.item != nil {
                 contentView
+            } else {
+                errorView
             }
         }
         .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
@@ -73,8 +76,8 @@ struct DetailView: View {
         
         // 삭제 성공 시 HomeView에서 아이템 제거하고 dismiss
         if viewModel.errorMessage == nil {
-            homeViewModel.removeItem(with: item.id)
-            dismiss()
+            homeViewModel.removeItem(with: imageId)
+            router.pop()
         }
     }
     
@@ -83,7 +86,7 @@ struct DetailView: View {
             CustomNavigationBar(
                 title: viewModel.formattedDate,
                 onBack: {
-                    dismiss()
+                    router.pop()
                 },
                 color: .white
             )
@@ -113,7 +116,7 @@ struct DetailView: View {
             Button {
                 viewModel.toggleFavorite()
             } label: {
-                Image(item.isFavorite ? .selectedFavorite : .unselectedFavorite)
+                Image((viewModel.item?.isFavorite ?? false) ? .selectedFavorite : .unselectedFavorite)
                     .resizable()
                     .frame(width: 24, height: 24)
                     .padding(3)
@@ -180,7 +183,7 @@ struct DetailView: View {
         VStack {
             CustomNavigationBar(
                 title: viewModel.formattedDate,
-                onBack: { dismiss() },
+                onBack: { router.pop() },
                 color: .white
             )
             .padding(.top, 10)
@@ -190,6 +193,52 @@ struct DetailView: View {
             ProgressView("로딩 중...")
                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 .foregroundColor(.white)
+            
+            Spacer()
+        }
+    }
+    
+    private var errorView: some View {
+        VStack {
+            CustomNavigationBar(
+                title: "오류",
+                onBack: { router.pop() },
+                color: .white
+            )
+            .padding(.top, 10)
+            
+            Spacer()
+            
+            VStack(spacing: 16) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: 48))
+                    .foregroundColor(.white)
+                
+                Text("이미지를 불러올 수 없습니다")
+                    .CFont(.headline01Bold)
+                    .foregroundColor(.white)
+                
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .CFont(.body02Regular)
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                }
+                
+                Button {
+                    router.pop()
+                } label: {
+                    Text("돌아가기")
+                        .CFont(.body01Regular)
+                        .foregroundColor(.secondary01)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(.white)
+                        .cornerRadius(8)
+                }
+                .padding(.top, 16)
+            }
             
             Spacer()
         }

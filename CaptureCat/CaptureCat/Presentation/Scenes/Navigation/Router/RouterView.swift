@@ -45,8 +45,10 @@ struct RouterView<Content: View>: View {
                         FavoriteView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
-//                    case .detail(let id):
-//                        DetailView(id: id)
+                    case .detail(let id):
+                        DetailView(imageId: id)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }

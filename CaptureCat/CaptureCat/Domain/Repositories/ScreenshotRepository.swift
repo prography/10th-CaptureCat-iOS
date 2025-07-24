@@ -309,6 +309,74 @@ final class ScreenshotRepository {
         return ids.compactMap { self.vms[$0] }
     }
     
+    /// 특정 ID로 ScreenshotItemViewModel 가져오기 (로그인 상태 자동 분기)
+    func fetchItem(by id: String) async throws -> ScreenshotItemViewModel? {
+        if AccountStorage.shared.isGuest ?? true {
+            // 게스트 모드: 로컬에서 찾기
+            return try fetchItemFromLocal(id: id)
+        } else {
+            // 로그인 모드: 메모리 캐시에서 먼저 찾고, 없으면 서버에서 로드
+            if let cachedItem = InMemoryScreenshotCache.shared.retrieve(id: id) {
+                return cachedItem
+            } else {
+                return try await fetchItemFromServer(id: id)
+            }
+        }
+    }
+    
+    /// 로컬에서 특정 ID로 아이템 찾기
+    private func fetchItemFromLocal(id: String) throws -> ScreenshotItemViewModel? {
+        let entities = try SwiftDataManager.shared.fetchAllEntities()
+        guard let entity = entities.first(where: { $0.id == id }) else {
+            return nil
+        }
+        
+        let item = ScreenshotItem(
+            id: entity.id,
+            imageData: Data(),
+            fileName: entity.fileName,
+            createDate: entity.createDate,
+            tags: entity.tags,
+            isFavorite: entity.isFavorite
+        )
+        
+        return viewModel(for: item)
+    }
+    
+    /// 서버에서 특정 ID로 아이템 찾기
+    private func fetchItemFromServer(id: String) async throws -> ScreenshotItemViewModel? {
+        let result = await ImageService.shared.checkImageDetail(id: id)
+        
+        switch result {
+        case .success(let response):
+            guard let captureDate = parseServerDate(response.data.captureDate) else {
+                throw NetworkError.badRequest
+            }
+            
+            let mappedTags = response.data.tags.map { $0.name }
+            
+            let screenshotItem = ScreenshotItem(
+                id: String(response.data.id),
+                imageData: Data(), // 서버 URL에서 별도 로드
+                imageURL: response.data.url, // ✅ 서버 이미지 URL 포함
+                fileName: response.data.name,
+                createDate: captureDate,
+                tags: mappedTags,
+                isFavorite: response.data.isBookmarked
+            )
+            
+            let viewModel = viewModel(for: screenshotItem)
+            
+            // 메모리 캐시에 저장
+            InMemoryScreenshotCache.shared.store(viewModel)
+            
+            return viewModel
+            
+        case .failure(let error):
+            throw error
+        }
+    }
+    
     // MARK: - Cache Management
     
     /// 로그아웃 시 메모리 캐시 클리어
