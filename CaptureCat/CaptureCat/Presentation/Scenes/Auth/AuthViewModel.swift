@@ -223,8 +223,8 @@ class AuthViewModel: ObservableObject {
     }
     
     func logOut() {
-        KeyChainModule.delete(key: .accessToken)
-        KeyChainModule.delete(key: .refreshToken)
+        // 안전한 토큰 정리
+        safelyCleanupAllTokens()
         
         // 메모리 캐시 클리어
         ScreenshotRepository.shared.clearMemoryCache()
@@ -238,9 +238,8 @@ class AuthViewModel: ObservableObject {
             
             switch result {
             case .success (_):
-                KeyChainModule.delete(key: .accessToken)
-                KeyChainModule.delete(key: .refreshToken)
-                KeyChainModule.delete(key: .appleToken)
+                // 안전한 토큰 정리 (회원탈퇴 성공 시)
+                safelyCleanupAllTokens()
                 ScreenshotRepository.shared.clearMemoryCache()
                 self.authenticationState = .initial
             case .failure (let error):
@@ -297,5 +296,39 @@ class AuthViewModel: ObservableObject {
             debugPrint("❌ 로컬 데이터 확인 실패: \(error)")
             return false
         }
+    }
+    
+    /// 모든 토큰을 안전하게 정리 (연쇄 삭제 방지)
+    private func safelyCleanupAllTokens() {
+        debugPrint("🧹 모든 토큰 안전 정리 시작")
+        
+        // 각 토큰을 개별적으로 삭제하고 에러 무시
+        do {
+            debugPrint("🧹 AccessToken 삭제 시도")
+            KeyChainModule.delete(key: .accessToken)
+        }
+        
+        do {
+            debugPrint("🧹 RefreshToken 삭제 시도")
+            KeyChainModule.delete(key: .refreshToken)
+        }
+        
+        do {
+            debugPrint("🧹 AppleToken 삭제 시도")
+            KeyChainModule.delete(key: .appleToken)
+        }
+        
+        do {
+            debugPrint("🧹 KakaoToken 삭제 시도")
+            KeyChainModule.delete(key: .kakaoToken)
+        }
+        
+        // AccountStorage도 안전하게 리셋
+        do {
+            debugPrint("🧹 AccountStorage 안전 리셋 시도")
+            AccountStorage.shared.safeReset()
+        }
+        
+        debugPrint("🧹 모든 토큰 안전 정리 완료")
     }
 }
