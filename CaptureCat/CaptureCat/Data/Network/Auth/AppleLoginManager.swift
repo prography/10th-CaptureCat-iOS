@@ -1,5 +1,5 @@
 //
-//  AppleAuthManager.swift
+//  AppleLoginManager.swift
 //  CaptureCat
 //
 //  Created by minsong kim on 7/14/25.
@@ -33,11 +33,26 @@ extension AppleLoginManager: ASAuthorizationControllerDelegate {
         didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
         case let credential as ASAuthorizationAppleIDCredential:
-            if let authorizationCode = credential.authorizationCode,
-               let code = String(data: authorizationCode, encoding: .utf8),
+            // 🍏 Apple 로그인 정보 출력
+            debugPrint("🍏 ===== Apple Login Info =====")
+            
+            // idToken 출력
+            if let token = credential.identityToken,
+               let tokenString = String(data: token, encoding: .utf8) {
+                debugPrint("🍏 idToken: \(token)")
+                debugPrint("🍏 idTokenString: \(tokenString)")
+            }
+            
+            let userID = credential.user
+            KeyChainModule.create(key: .appleToken, data: userID)
+            
+            if let fullName = credential.fullName,
                let token = credential.identityToken,
                let tokenString = String(data: token, encoding: .utf8) {
-                completion?(tokenString, code)
+                let firstName = fullName.givenName ?? ""
+                let lastName = fullName.familyName ?? ""
+                let fullNameString = "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces)
+                completion?(tokenString, fullNameString)
             }
         default:
             break
@@ -45,7 +60,7 @@ extension AppleLoginManager: ASAuthorizationControllerDelegate {
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        debugPrint("Apple Login Error: \(error.localizedDescription)")
+        debugPrint("🍏❌ Apple Login Error: \(error.localizedDescription)")
         completion?("", "")
     }
 }

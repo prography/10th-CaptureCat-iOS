@@ -12,3 +12,14 @@ extension Bundle {
         object(forInfoDictionaryKey: "KAKAO_API_KEY") as? String
     }
 }
+
+extension Bundle {
+    /// CFBundleShortVersionString
+    var appVersion: String {
+        infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    }
+    /// CFBundleVersion
+    var appBuild: String {
+        infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    }
+}

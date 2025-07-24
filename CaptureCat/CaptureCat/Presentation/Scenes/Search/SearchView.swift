@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SearchView: View {
+    @EnvironmentObject var router: Router
     @StateObject var viewModel: SearchViewModel
     
     var body: some View {
@@ -25,7 +26,7 @@ struct SearchView: View {
         }
         .background(Color(.systemBackground))
         .task {
-            viewModel.loadTags()
+            await viewModel.loadTags()
         }
     }
     
@@ -166,29 +167,18 @@ struct SearchView: View {
                 ScrollView {
                     LazyVGrid(columns: gridColumns, spacing: 12) {
                         ForEach(viewModel.filteredScreenshots) { item in
-                            NavigationLink {
-                                DetailView(item: item)
-                                    .navigationBarBackButtonHidden()
-                                    .toolbar(.hidden, for: .navigationBar)
+                            Button {
+                                router.push(.detail(id: item.id))
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
-                                    HStack(spacing: 4) {
-                                        ForEach(item.tags, id: \.self) { tag in
-                                            Text(tag)
-                                                .CFont(.caption01Semibold)
-                                                .padding(.horizontal, 7.5)
-                                                .padding(.vertical, 4.5)
-                                                .background(Color.overlayDim)
-                                                .foregroundColor(.white)
-                                                .cornerRadius(4)
-                                        }
-                                    }
-                                    .padding(6)
+                                    TagFlowLayout(tags: item.tags, maxLines: 2)
+                                        .padding(6)
                                 }
                             }
                         }
                     }
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 100)
                 }
             }
         }

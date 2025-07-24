@@ -14,6 +14,7 @@ struct TagView: View {
     @EnvironmentObject private var router: Router
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
+    @State private var isDragging = false
     
     var body: some View {
         VStack {
@@ -25,6 +26,7 @@ struct TagView: View {
                     Task {
                         await viewModel.save()
                         authViewModel.authenticationState = .signIn
+                        router.popToRoot()
                     }
                 },
                 isSaveEnabled: viewModel.hasChanges
@@ -90,7 +92,7 @@ struct TagView: View {
             // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
             for itemVM in viewModel.itemVMs {
                 await itemVM.loadFullImage()
-            }
+                        }
         }
         .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
             AddTagSheet(
@@ -114,9 +116,16 @@ struct TagView: View {
             }
         }
         .simultaneousGesture(dragGesture)
-        .onAppear { syncOnAppear() }
+        .onAppear { 
+            syncOnAppear() 
+        }
         .onChange(of: viewModel.currentIndex) { _, newIndex in
-            syncOnChange(to: newIndex)
+            // 드래그 중이 아닐 때만 동기화
+            if !isDragging {
+                DispatchQueue.main.async {
+                    syncOnChange(to: newIndex)
+                }
+            }
         }
     }
     
@@ -125,61 +134,105 @@ struct TagView: View {
     private func carouselCard(at index: Int) -> some View {
         let asset = viewModel.itemVMs[index]
         let distance = distance(index)
-        let scale = 1.0 - abs(distance) * 0.2
-        let opacity = 1.0 - abs(distance) * 0.3
+        let scale = max(0.8, 1.0 - abs(distance) * 0.2)
+        let opacity = max(0.3, 1.0 - abs(distance) * 0.3)
         let zIndex = 1.0 - abs(distance) * 0.1
         let xOffset = myXOffset(index)
         
-        SingleCardView {
-            ScreenshotItemView(viewModel: viewModel.itemVMs[viewModel.currentIndex]) {
+        SingleCardView(
+            onDelete: {
+                viewModel.deleteItem(at: index)
+            }
+        ) {
+            ScreenshotItemView(viewModel: asset) {
                 EmptyView()
             }
+            .overlay(
+                Button {
+                    viewModel.toggleFavorite(at: index)
+                } label: {
+                    Image(viewModel.itemVMs[index].isFavorite ? .selectedFavorite : .unselectedFavorite)
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .padding(3)
+                        .background(.overlayDim)
+                        .clipShape(Circle())
+                }
+                    .padding(16),
+                alignment: .bottomTrailing
+            )
         }
         .scaleEffect(scale)
         .opacity(opacity)
         .offset(x: xOffset, y: 0)
         .zIndex(zIndex)
+        .animation(.none, value: draggingItem) // 드래그 중 애니메이션 비활성화
     }
     
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
                 guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                draggingItem = snappedItem + value.translation.width / 100
+                
+                // 드래그 시작 표시
+                if !isDragging {
+                    isDragging = true
+                }
+                
+                // 드래그 중에는 애니메이션 없이 직접 값 변경
+                let newDraggingItem = snappedItem - value.translation.width / 100
+                draggingItem = newDraggingItem
             }
             .onEnded { value in
-                withAnimation {
-                    let pred = value.predictedEndTranslation.width / 100
-                    draggingItem = snappedItem + pred
-                    draggingItem = round(draggingItem)
-                        .remainder(dividingBy: Double(viewModel.itemVMs.count))
-                    snappedItem = draggingItem
-                    
-                    let newIndex = Int(round(snappedItem)
-                        .remainder(dividingBy: Double(viewModel.itemVMs.count)))
-                    let normalized = newIndex >= 0
-                    ? newIndex
-                    : newIndex + viewModel.itemVMs.count
-                    viewModel.onAssetChanged(to: normalized)
+                isDragging = false
+                
+                // 드래그 완료 시에만 애니메이션 적용
+                let pred = value.predictedEndTranslation.width / 100
+                let targetDragging = snappedItem - pred
+                
+                // 인덱스 계산
+                let rawIndex = Int(round(targetDragging))
+                let itemCount = viewModel.itemVMs.count
+                let normalizedIndex = ((rawIndex % itemCount) + itemCount) % itemCount
+                
+                // 애니메이션과 함께 최종 위치로 이동
+                withAnimation(.easeOut(duration: 0.3)) {
+                    snappedItem = Double(normalizedIndex)
+                    draggingItem = Double(normalizedIndex)
+                }
+                
+                // 뷰모델 업데이트는 애니메이션 완료 후에 수행
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    viewModel.onAssetChanged(to: normalizedIndex)
                 }
             }
     }
     
     private func syncOnAppear() {
-        snappedItem = Double(viewModel.currentIndex)
-        draggingItem = snappedItem
+        let targetValue = Double(viewModel.currentIndex)
+        snappedItem = targetValue
+        draggingItem = targetValue
     }
     
     private func syncOnChange(to newIndex: Int) {
-        snappedItem = Double(newIndex)
-        draggingItem = snappedItem
+        let targetValue = Double(newIndex)
+        // 애니메이션 없이 즉시 동기화
+        snappedItem = targetValue
+        draggingItem = targetValue
     }
     
     func distance(_ item: Int) -> Double {
-        return (draggingItem - Double(item)).remainder(dividingBy: Double(viewModel.itemVMs.count))
+        let rawDistance = draggingItem - Double(item)
+        let itemCount = Double(viewModel.itemVMs.count)
+        
+        // 개선된 거리 계산 (순환 거리)
+        let normalizedDistance = ((rawDistance.remainder(dividingBy: itemCount)) + itemCount).remainder(dividingBy: itemCount)
+        
+        // 가장 가까운 거리 선택 (앞으로 가거나 뒤로 가거나)
+        return normalizedDistance > itemCount / 2 ? normalizedDistance - itemCount : normalizedDistance
     }
     
     func myXOffset(_ item: Int) -> Double {
-        return distance(item) * 280
+        return -distance(item) * 280  // 부호 반전으로 애니메이션 방향 수정
     }
 }

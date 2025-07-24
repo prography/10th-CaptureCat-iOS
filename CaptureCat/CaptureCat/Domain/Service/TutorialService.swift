@@ -20,7 +20,7 @@ final class TutorialService {
         do {
             let response = try await networkManager.fetchData(builder)
             return Result<ResponseDTO, Error>.success(response)
-        } catch(let error) {
+        } catch (let error) {
             debugPrint("🔥 Error:\(error)")
             return .failure(error)
         }

@@ -8,118 +8,87 @@
 import Foundation
 
 final class ImageService {
+    static let shared: ImageService = ImageService()
     private let networkManager: NetworkManager
     
-    init(networkManager: NetworkManager) {
-        self.networkManager = networkManager
+    private init() {
+        self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
     }
     
-    func uploadImages(imageDatas: [Data], imageMetas: [ImageMetaDTO]) async -> Result<ResponseDTO, NetworkError> {
+    func uploadImages(imageDatas: [Data], imageMetas: [PhotoDTO]) async -> Result<ResponseDTO, Error> {
         let builder = UploadImageBuilder(imageDatas: imageDatas, imageMetas: imageMetas)
         
         do {
             let response = try await networkManager.fetchData(builder)
             debugPrint("✅ Success: 이미지 파일들 업로드 성공!")
-            return Result<ResponseDTO, NetworkError>.success(response)
-        } catch(let error) {
+            return Result<ResponseDTO, Error>.success(response)
+        } catch {
             debugPrint("🔥 Error:\(error)")
-            return .failure(NetworkError.unauthorized)
+            return .failure(error)
         }
     }
-}
-
-// Service/ScreenshotService.swift
-
-import Foundation
-
-struct PhotoDTO: Codable, Identifiable {
-  let id: String
-  var fileName: String
-  var createDate: Date
-  var tags: [String]
-  var isFavorite: Bool
-  var imageData: Data?
-}
-
-final class ScreenshotService {
-  static let shared = ScreenshotService()
-  private let base = URL(string: "https://api.capture-cat.com/v1")!
-  private let decoder = JSONDecoder()
-  private let encoder = JSONEncoder()
-
-  private init() {
-    decoder.dateDecodingStrategy = .iso8601
-    encoder.dateEncodingStrategy = .iso8601
-  }
-
-  // MARK: Screenshot CRUD
-
-  func fetchAll() async throws -> [PhotoDTO] {
-    let url = base.appendingPathComponent("images")
-    var req = URLRequest(url: url)
-    req.httpMethod = "GET"
-    let (data, _) = try await URLSession.shared.data(for: req)
-    return try decoder.decode([PhotoDTO].self, from: data)
-  }
-
-  func upload(_ dto: PhotoDTO) async throws -> PhotoDTO {
-    let url = base.appendingPathComponent("images")
-    var req = URLRequest(url: url)
-    req.httpMethod = "POST"
-    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    req.httpBody = try encoder.encode(dto)
-    let (data, _) = try await URLSession.shared.data(for: req)
-    return try decoder.decode(PhotoDTO.self, from: data)
-  }
-
-  func delete(id: String) async throws {
-    let url = base.appendingPathComponent("images/\(id)")
-    var req = URLRequest(url: url)
-    req.httpMethod = "DELETE"
-    _ = try await URLSession.shared.data(for: req)
-  }
-
-  // MARK: Tag Endpoints
-
-  /// 전체 태그 조회
-  func fetchAllTags() async throws -> [String] {
-    let url = base.appendingPathComponent("tags")
-    var req = URLRequest(url: url)
-    req.httpMethod = "GET"
-    let (data, _) = try await URLSession.shared.data(for: req)
-    return try decoder.decode([String].self, from: data)
-  }
-
-  /// 일괄 태그 추가
-  func addTag(_ tag: String, toIDs ids: [String]) async throws {
-    let url = base.appendingPathComponent("tags/add")
-    var req = URLRequest(url: url)
-    req.httpMethod = "POST"
-    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    let body = ["tag": tag, "ids": ids] as [String: Any]
-    req.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-    _ = try await URLSession.shared.data(for: req)
-  }
-
-  /// 일괄 태그 삭제
-  func removeTag(_ tag: String, fromIDs ids: [String]) async throws {
-    let url = base.appendingPathComponent("tags/remove")
-    var req = URLRequest(url: url)
-    req.httpMethod = "POST"
-    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    let body = ["tag": tag, "ids": ids] as [String: Any]
-    req.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-    _ = try await URLSession.shared.data(for: req)
-  }
-
-  /// 태그 이름 변경
-  func renameTag(from oldName: String, to newName: String) async throws {
-    let url = base.appendingPathComponent("tags/rename")
-    var req = URLRequest(url: url)
-    req.httpMethod = "PUT"
-    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    let body = ["oldName": oldName, "newName": newName]
-    req.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-    _ = try await URLSession.shared.data(for: req)
-  }
+    
+    // 🚫 서버 태그 추가 기능 임시 비활성화
+    /*
+    func addImage(tags: [String], id: String) async -> Result<ResponseDTO, Error> {
+        let builder = AddOneImageTagBuilder(id: id, tags: tags)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(tags) 태그 추가 성공!")
+            return Result<ResponseDTO, Error>.success(response)
+        } catch(let error) {
+            return .failure(error)
+        }
+    }
+    */
+    
+    func checkImageList(page: Int, size: Int, hasTags: Bool? = nil) async -> Result<ImagListDTO, Error> {
+        let builder = CheckImageListBuilder(page: page, size: size, hasTags: hasTags)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(page) 이미지 목록 불러오기 성공!")
+            return Result<ImagListDTO, Error>.success(response)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func checkImageList(by tags: [String], page: Int, size: Int) async -> Result<ImagListDTO, Error> {
+        let builder = CheckImageListWithTagBuilder(page: page, size: size, tagNames: tags)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(page) 이미지 목록 불러오기 성공!")
+            return Result<ImagListDTO, Error>.success(response)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func checkImageDetail(id: String) async -> Result<ImageDTO, Error> {
+        let builder = CheckOneImageBuilder(id: id)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(id) 이미지 상세 조회 성공!")
+            return Result<ImageDTO, Error>.success(response)
+        } catch {
+            debugPrint("🔥 Error: \(id) 이미지 상세 조회 실패 - \(error)")
+            return .failure(error)
+        }
+    }
+    
+    func deleteImage(id: String) async -> Result<ResponseDTO, Error> {
+        let builder = DeleteImageBuilder(imageId: id)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(id) 이미지 삭제 성공!")
+            return Result<ResponseDTO, Error>.success(response)
+        } catch  {
+            return .failure(error)
+        }
+    }
 }

@@ -15,13 +15,16 @@ struct SingleCardView<Content: View>: View {
     let threshold: CGFloat = -150  // 이 값 이상으로 위로 밀면 사라짐
     let content: Content
     let cornerRadius: CGFloat
+    let onDelete: (() -> Void)?  // 삭제 콜백 추가
     
     init(
         cornerRadius: CGFloat = 24,
+        onDelete: (() -> Void)? = nil,  // 삭제 콜백 매개변수 추가
         @ViewBuilder content: () -> Content
     ) {
         self.content = content()
         self.cornerRadius = cornerRadius
+        self.onDelete = onDelete
     }
     
     var body: some View {
@@ -71,6 +74,10 @@ struct SingleCardView<Content: View>: View {
                     if dragOffset.height < threshold {
                         // 충분히 밀었다면 사라짐
                         isDismissed = true
+                        // 삭제 콜백 호출
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            onDelete?()
+                        }
                     } else {
                         // 아니면 원위치
                         withAnimation(.spring()) {

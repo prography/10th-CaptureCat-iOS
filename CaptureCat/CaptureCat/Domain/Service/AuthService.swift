@@ -14,15 +14,27 @@ final class AuthService {
         self.networkManager = networkManager
     }
     
-    func login(social: String, idToken: String) async -> Result<LogInResponseDTO, NetworkError> {
-        let builder = AuthBuilder(social: social, idToken: idToken)
+    func login(social: String, idToken: String, nickname: String?) async -> Result<LogInResponseDTO, NetworkError> {
+        let builder = AuthBuilder(social: social, idToken: idToken, nickname: nickname)
         
         do {
             let response = try await networkManager.fetchLoginData(builder)
             return Result<LogInResponseDTO, NetworkError>.success(response)
-        } catch(let error) {
+        } catch {
             debugPrint("🔥 Error:\(error)")
             return .failure(NetworkError.unauthorized)
+        }
+    }
+    
+    func withdraw() async -> Result<ResponseDTO, Error> {
+        let builder = WithdrawBuilder()
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            return Result<ResponseDTO, Error>.success(response)
+        } catch {
+            debugPrint("🔥 Withdraw Error:\(error)")
+            return .failure(error)
         }
     }
 }

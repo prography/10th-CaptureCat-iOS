@@ -12,6 +12,7 @@ import Photos
 struct ScreenshotItem: Identifiable, Equatable {
     let id: String                 // PHAsset.localIdentifier 또는 서버 ID
     var imageData: Data            // UI에서 바로 쓰기 위한 Data (썸네일/풀사이즈)
+    var imageURL: String?          // 서버 이미지 URL (서버 데이터인 경우)
     var fileName: String
     var createDate: Date
     var tags: [String]
@@ -21,6 +22,7 @@ struct ScreenshotItem: Identifiable, Equatable {
     init(
         id: String,
         imageData: Data = Data(),
+        imageURL: String? = nil,
         fileName: String,
         createDate: Date,
         tags: [String] = [],
@@ -28,6 +30,7 @@ struct ScreenshotItem: Identifiable, Equatable {
     ) {
         self.id = id
         self.imageData = imageData
+        self.imageURL = imageURL
         self.fileName = fileName
         self.createDate = createDate
         self.tags = tags
@@ -38,6 +41,7 @@ struct ScreenshotItem: Identifiable, Equatable {
     init(entity: Screenshot) {
         self.id = entity.id
         self.imageData = Data()               // 실제 이미지는 PhotoLoader로 비동기 로드
+        self.imageURL = nil                   // 로컬 데이터는 URL 없음
         self.fileName = entity.fileName
         self.createDate = entity.createDate
         self.tags = entity.tags
@@ -48,6 +52,7 @@ struct ScreenshotItem: Identifiable, Equatable {
     init(dto: PhotoDTO) {
         self.id = dto.id
         self.imageData = dto.imageData ?? Data()
+        self.imageURL = nil                   // PhotoDTO는 로컬 업로드용
         self.fileName = dto.fileName
         self.createDate = dto.createDate
         self.tags = dto.tags
@@ -80,6 +85,7 @@ extension ScreenshotItem {
         self.init(
             id: id,
             imageData: Data(),        // 이미지 데이터는 PhotoLoader로 비동기 로드
+            imageURL: nil,            // 로컬 PHAsset은 URL 없음
             fileName: fileName,
             createDate: createDate,
             tags: [],

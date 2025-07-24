@@ -25,8 +25,7 @@ struct TabContainerView: View {
                     let viewModel = StorageViewModel(networkManager: networkManager)
                     StorageView(viewModel: viewModel)
                 case .home:
-                    let viewModel = HomeViewModel(networkManager: networkManager)
-                    HomeView(viewModel: viewModel)
+                    HomeView()
                 case .search:
                     let viewModel = SearchViewModel(networkManager: networkManager)
                     SearchView(viewModel: viewModel)

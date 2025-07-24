@@ -83,6 +83,7 @@ struct StartGetScreenshotView: View {
 
     private var actionButton: some View {
         Button("정리하기 \(viewModel.selectedIDs.count)/10") {
+            viewModel.tutorialCompleted()
             router.push(.tag(ids: Array(viewModel.selectedIDs)))
         }
         .primaryStyle()

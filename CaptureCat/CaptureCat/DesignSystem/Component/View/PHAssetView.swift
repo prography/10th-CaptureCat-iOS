@@ -9,7 +9,7 @@ import SwiftUI
 import Photos
 
 struct PHAssetView: View {
-    @State private var image: UIImage? = nil
+    @State private var image: UIImage?
     
     let asset: PHAsset
     let isSelected: Bool

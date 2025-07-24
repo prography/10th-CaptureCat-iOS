@@ -10,8 +10,8 @@ import Foundation
 struct TutorialBuilder: BuilderProtocol {
     typealias Response = ResponseDTO
     
-    var path: String = PathURLType.auth.path()
-    var queries: [URLQueryItem]? = nil
+    var path: String = PathURLType.turorial.path()
+    var queries: [URLQueryItem]?
     var method: HTTPMethod { .post }
     var parameters: [String: Any] = [:]
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())

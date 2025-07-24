@@ -18,7 +18,9 @@ final class MultipartFormDataSerializer: NetworkSerializable {
         for (key, value) in parameters {
             // 3-1) [MultipartFile] 배열인 경우
             if let files = value as? [MultipartFile] {
-                for file in files {
+                for (index, file) in files.enumerated() {
+                    let partHeader = "--\(boundary)\r\nContent-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\nContent-Type: \(file.mimeType)\r\n\r\n"
+                    
                     body.appendString("--\(boundary)\r\n")
                     body.appendString("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\n")
                     body.appendString("Content-Type: \(file.mimeType)\r\n\r\n")
@@ -46,12 +48,13 @@ final class MultipartFormDataSerializer: NetworkSerializable {
         
         // 4) 마무리 boundary
         body.appendString("--\(boundary)--\r\n")
+        
         return body
     }
     
     func serialize(request: URLRequest, parameters: [String: Any]) throws -> URLRequest {
         var request = request
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        // Content-Type은 이미 BuilderProtocol에서 설정되므로 중복 설정 제거
         
         var body = Data()
         

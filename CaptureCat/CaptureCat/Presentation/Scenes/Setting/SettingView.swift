@@ -11,6 +11,8 @@ struct SettingsView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var showInitPopUp: Bool = false
+    @State private var showTerms: Bool = false
+    @State private var showPersonal: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -70,7 +72,20 @@ struct SettingsView: View {
             confirmTitle: "회원탈퇴"
         ) {
             //TODO: - signOutView 화면으로 이동
-            authViewModel.logOut()
+            authViewModel.withdraw()
+        }
+        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
+        .fullScreenCover(
+            isPresented: $showPersonal,
+            onDismiss: {}
+        ) {
+            WebView(webLink: .personal)
+        }
+        .fullScreenCover(
+            isPresented: $showTerms,
+            onDismiss: {}
+        ) {
+            WebView(webLink: .terms)
         }
     }
     
@@ -93,7 +108,7 @@ struct SettingsView: View {
     
     private var idCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("캐치님")
+            Text(authViewModel.nickname)
                 .CFont(.subhead01Bold)
                 .foregroundColor(.text01)
                 .padding(24)
@@ -116,7 +131,7 @@ struct SettingsView: View {
             .background(Color.gray02)
             
             Button {
-                debugPrint("정보")
+                showPersonal = true
             } label: {
                 Text("개인정보 처리 방침")
                     .CFont(.body01Regular)
@@ -126,7 +141,7 @@ struct SettingsView: View {
             }
             
             Button {
-                debugPrint("정보")
+                showTerms = true
             } label: {
                 Text("서비스 이용약관")
                     .CFont(.body01Regular)
@@ -138,7 +153,7 @@ struct SettingsView: View {
             Button {
                 debugPrint("버전 정보")
             } label: {
-                Text("버전 정보")
+                Text("버전 정보 \(Bundle.main.appVersion).\(Bundle.main.appBuild)")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
                     .padding(.vertical, 8)
@@ -201,9 +216,3 @@ struct SettingsView: View {
         }
     }
 }
-
-//struct SettingsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        SettingsView()
-//    }
-//}

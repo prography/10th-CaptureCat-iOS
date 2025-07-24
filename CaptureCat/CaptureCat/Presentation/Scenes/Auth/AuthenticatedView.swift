@@ -17,12 +17,39 @@ struct AuthenticatedView: View {
     }
     
     var body: some View {
-        if authViewModel.authenticationState == .start {
+        switch authViewModel.authenticationState {
+        case .start:
             RouterView(networkManager: networkManager) {
                 let viewModel = SelectMainTagViewModel(networkManager: networkManager)
                 SelectMainTagView(viewModel: viewModel)
             }
-        } else {
+            
+        case .syncing:  // 🆕 동기화 진행 화면
+            SyncProgressView()
+                .environmentObject(authViewModel)
+            
+        case .syncCompleted:  // 🆕 동기화 완료 화면
+            if let result = authViewModel.syncResult {
+                SyncCompletedView(syncResult: result)
+                    .environmentObject(authViewModel)
+            } else {
+                // fallback - 결과가 없는 경우
+                VStack {
+                    Text("동기화 결과를 불러올 수 없습니다")
+                        .CFont(.body01Regular)
+                        .foregroundStyle(.text02)
+                    
+                    Button("계속하기") {
+                        authViewModel.authenticationState = .signIn
+                    }
+                    .primaryStyle()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 20)
+                }
+                .padding()
+            }
+            
+        default:  // 기존 로직 (signIn, guest, initial 등)
             RouterView(networkManager: networkManager) {
                 TabContainerView(networkManager: networkManager)
                     .fullScreenCover(
@@ -40,6 +67,9 @@ struct AuthenticatedView: View {
                     .transaction { transaction in
                         transaction.disablesAnimations = true
                     }
+            }
+            .task {
+                authViewModel.checkAutoLogin()
             }
         }
     }

@@ -32,9 +32,14 @@ final class TagViewModel: ObservableObject {
     private let repository = ScreenshotRepository.shared
     @Published var itemVMs: [ScreenshotItemViewModel] = []
     private var networkManager: NetworkManager
+    private var router: Router?
     
-    init(itemsIds: [String], networkManager: NetworkManager) {
+    /// UI 업데이트를 강제하기 위한 더미 프로퍼티
+    @Published private var updateTrigger = false
+    
+    init(itemsIds: [String], networkManager: NetworkManager, router: Router? = nil) {
         self.networkManager = networkManager
+        self.router = router
         createViewModel(from: itemsIds)
         
         loadTags()
@@ -51,7 +56,7 @@ final class TagViewModel: ObservableObject {
                 fileName: asset.localIdentifier + ".jpg",
                 createDate: asset.creationDate ?? Date(),
                 tags: [],
-                isFavorite: false
+                isFavorite: asset.isFavorite
             )
             self.itemVMs.append( (ScreenshotItemViewModel(model: newItem)))
         }
@@ -150,17 +155,180 @@ final class TagViewModel: ObservableObject {
         updateSelectedTags()
     }
     
+    /// Favorite 상태 토글 (UI 업데이트 보장)
+    func toggleFavorite(at index: Int) {
+        guard index < itemVMs.count else { return }
+        
+        let itemVM = itemVMs[index]
+        itemVM.isFavorite.toggle()
+        
+        // 게스트 모드일 때만 즉시 로컬 저장
+        if AccountStorage.shared.isGuest ?? true {
+            Task {
+                do {
+                    try SwiftDataManager.shared.setFavorite(
+                        imageId: itemVM.id, 
+                        isFavorite: itemVM.isFavorite
+                    )
+                    debugPrint("✅ 즐겨찾기 상태 로컬 저장 완료: \(itemVM.id)")
+                } catch {
+                    debugPrint("❌ 즐겨찾기 상태 로컬 저장 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+        
+        // UI 업데이트 강제 트리거
+        updateTrigger.toggle()
+        hasChanges = true
+    }
+    
     // 저장 (batch: all items, single: current)
     func save() async {
+        if AccountStorage.shared.isGuest ?? true {
+            // 게스트 모드: 로컬 전용 저장
+            await saveToLocal()
+        } else {
+            // 로그인 모드: 서버 전용 저장
+            await saveToServer()
+        }
+    }
+    
+    // MARK: - Delete Management
+    /// 특정 인덱스의 아이템 삭제 (로컬 전용, 서버 연결 없음)
+    func deleteItem(at index: Int) {
+        guard index < itemVMs.count else { return }
+        
+        let itemVM = itemVMs[index]
+        
+        // 로컬 전용 삭제 로직 실행 (서버 연결 없음)
+        Task {
+            do {
+                // 게스트 모드든 로그인 모드든 상관없이 로컬에서만 삭제
+                try SwiftDataManager.shared.delete(id: itemVM.id)
+                debugPrint("✅ 로컬 아이템 삭제 완료: \(itemVM.fileName)")
+                
+                // UI에서 아이템 제거
+                await MainActor.run {
+                    itemVMs.remove(at: index)
+                    
+                    // 현재 인덱스 조정
+                    if itemVMs.isEmpty {
+                        // 모든 아이템이 삭제된 경우 이전 페이지로 이동
+                        debugPrint("⚠️ 모든 아이템이 삭제되었습니다. 이전 페이지로 이동합니다.")
+                        router?.pop()
+                    } else if currentIndex >= itemVMs.count {
+                        currentIndex = itemVMs.count - 1
+                    }
+                    
+                    updateTrigger.toggle()  // UI 업데이트
+                }
+            } catch {
+                debugPrint("❌ 로컬 아이템 삭제 실패: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    /// 로컬 전용 저장 (게스트 모드)
+    private func saveToLocal() async {
         switch mode {
         case .batch:
             for viewModel in itemVMs {
-                await viewModel.saveChanges()
+                await viewModel.saveToLocal()
             }
+            debugPrint("✅ 배치 모드 로컬 저장 완료: \(itemVMs.count)개")
+            
         case .single:
             if let viewModel = displayVM {
-                await viewModel.saveChanges()
+                await viewModel.saveToLocal()
+                debugPrint("✅ 단일 모드 로컬 저장 완료")
             }
         }
+    }
+    
+    /// 서버 전용 저장 (로그인 모드) - ImageService 직접 사용
+    private func saveToServer() async {
+        switch mode {
+        case .batch:
+            // 배치 모드: 모든 아이템을 한번에 업로드
+            await uploadToServerWithImageService(viewModels: itemVMs)
+            
+        case .single:
+            // 단일 모드에서도 편집된 모든 아이템 업로드
+            await uploadToServerWithImageService(viewModels: itemVMs)
+        }
+    }
+    
+    /// ImageService를 사용한 실제 서버 업로드
+    private func uploadToServerWithImageService(viewModels: [ScreenshotItemViewModel]) async {
+        var imageDatas: [Data] = []
+        var imageMetas: [PhotoDTO] = []
+        
+        debugPrint("🔄 서버 업로드 시작: \(viewModels.count)개 아이템")
+        
+        // 1. 각 viewModel에서 이미지 데이터와 메타데이터 수집
+        for viewModel in viewModels {
+            // PHAsset에서 실제 이미지 데이터 가져오기
+            let assets = PHAsset.fetchAssets(withLocalIdentifiers: [viewModel.id], options: nil)
+            guard let asset = assets.firstObject else {
+                debugPrint("⚠️ PHAsset을 찾을 수 없음: \(viewModel.id)")
+                continue
+            }
+            
+                         // 원본 이미지 데이터 가져오기
+             if let imageData = await asset.requestFullImageData(compressionQuality: 0.8) {
+                 imageDatas.append(imageData)
+                 
+                 // PhotoDTO 메타데이터 생성
+                 debugPrint("🔧 PhotoDTO 생성 중:")
+                 debugPrint("🔧 - ID: \(viewModel.id)")
+                 debugPrint("🔧 - 파일명: \(viewModel.fileName)")
+                 debugPrint("🔧 - 태그: \(viewModel.tags) (개수: \(viewModel.tags.count))")
+                 
+                 let photoDTO = PhotoDTO(
+                     id: viewModel.id,
+                     fileName: viewModel.fileName,
+                     createDate: viewModel.createDate,
+                     tags: viewModel.tags,  // ✅ ViewModel의 태그 전달
+                     isFavorite: viewModel.isFavorite,
+                     imageData: imageData
+                 )
+                 imageMetas.append(photoDTO)
+                 
+                 debugPrint("✅ PhotoDTO 생성 완료 - 태그: \(photoDTO.tags)")
+                 debugPrint("✅ 이미지 데이터 준비 완료: \(viewModel.fileName)")
+             } else {
+                 debugPrint("❌ 이미지 데이터 가져오기 실패: \(viewModel.fileName)")
+             }
+        }
+        
+        // 2. 수집된 데이터가 있으면 서버에 업로드
+        guard !imageDatas.isEmpty && !imageMetas.isEmpty else {
+            debugPrint("⚠️ 업로드할 이미지 데이터가 없습니다.")
+            return
+        }
+        
+        // 3. ImageService를 통해 실제 업로드
+        debugPrint("🚀 ImageService 업로드 시작:")
+        debugPrint("🚀 - 이미지 개수: \(imageDatas.count)")
+        debugPrint("🚀 - 메타데이터 개수: \(imageMetas.count)")
+        for (index, meta) in imageMetas.enumerated() {
+            debugPrint("🚀 - Meta[\(index)]: 태그=\(meta.tags)")
+        }
+        
+        let result = await ImageService.shared.uploadImages(imageDatas: imageDatas, imageMetas: imageMetas)
+        
+                 switch result {
+         case .success:
+             debugPrint("✅ ImageService 서버 업로드 성공: \(imageDatas.count)개 이미지")
+             
+             // 4. 성공시 메모리 캐시에 저장 (InMemoryScreenshotCache 없이 처리)
+             for viewModel in viewModels {
+                 // 로컬 저장은 하지 않고 업로드만 성공했다고 로그
+                 debugPrint("✅ 업로드 완료: \(viewModel.fileName)")
+             }
+             
+         case .failure(let error):
+             debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
+         }
     }
 }

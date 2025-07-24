@@ -10,7 +10,7 @@ import Photos
 
 struct PHAssetImageModifier: ViewModifier {
     let asset: PHAsset
-    @State private var image: UIImage? = nil
+    @State private var image: UIImage?
 
     func body(content: Content) -> some View {
         ZStack {

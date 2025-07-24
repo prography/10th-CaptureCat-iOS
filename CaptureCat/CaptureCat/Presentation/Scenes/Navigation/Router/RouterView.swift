@@ -32,12 +32,21 @@ struct RouterView<Content: View>: View {
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .tag(let ids):
-                        let viewModel = TagViewModel(itemsIds: ids, networkManager: networkManager)
+                        let viewModel = TagViewModel(itemsIds: ids, networkManager: networkManager, router: router)
                         TagView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .setting:
                         SettingsView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+                    case .favorite:
+                        let viewModel = FavoriteViewModel()
+                        FavoriteView(viewModel: viewModel)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+                    case .detail(let id):
+                        DetailView(imageId: id)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     }

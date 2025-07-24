@@ -11,6 +11,8 @@ struct AddTagSheet: View {
     @Binding var tags: [String]
     @Binding var selectedTags: Set<String>
     @Binding var isPresented: Bool
+    var onAddNewTag: ((String) -> Void)?
+    var onDeleteTag: ((String) -> Void)?
     
     @State private var newTag: String = ""
     
@@ -54,7 +56,10 @@ struct AddTagSheet: View {
                     ForEach(tags, id: \.self) { tag in
                         if selectedTags.contains(tag) {
                             Button {
+                                // selectedTags에서 제거
                                 selectedTags.remove(tag)
+                                // 실제 태그 삭제 콜백 호출
+                                onDeleteTag?(tag)
                             } label: {
                                 Text(tag)
                             }
@@ -70,15 +75,19 @@ struct AddTagSheet: View {
         .toolbar(content: {
             ToolbarItemGroup(placement: .keyboard) {
                 Button("완료") {
-                    tags.append(newTag)
-                    if tags.count > 5 {
-                        tags.removeFirst()
+                    let trimmedTag = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    // 새 태그 추가 콜백 호출
+                    if !trimmedTag.isEmpty {
+                        onAddNewTag?(trimmedTag)
                     }
-                    selectedTags.insert(newTag)
+                    
+                    // 입력 필드 초기화 및 키보드 숨김
+                    newTag = ""
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
                 .primaryStyle(cornerRadius: 0)
-                .disabled(newTag == "")
+                .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
             }

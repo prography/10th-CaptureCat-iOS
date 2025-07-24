@@ -16,17 +16,20 @@ struct StorageView: View {
 
     var body: some View {
         ZStack {
-            ScrollView {
+            VStack {
                 header
-                selectionBar
-                screenshotGrid
+                ScrollView {
+                    selectionBar
+                    screenshotGrid
+                }
+                .disabled(AccountStorage.shared.isGuest == true)
+                
             }
-            .disabled(AccountStorage.shared.isGuest == true) // ✅ 스크롤 자체를 막음
-
+            
             if AccountStorage.shared.isGuest == true {
                 VStack {
                     Spacer()
-
+                    
                     Button {
                         authViewModel.authenticationState = .initial
                     } label: {
@@ -35,12 +38,13 @@ struct StorageView: View {
                     .primaryStyle(fillWidth: false)
                     .padding(.horizontal, 32)
                     .padding(.bottom, 80)
-
+                    
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.overlayDim.opacity(0.3))
             }
+
         }
         .toast(
             isShowing: $viewModel.showOverlimitToast,
@@ -88,6 +92,7 @@ struct StorageView: View {
             
             Button {
                 router.push(.tag(ids: Array(viewModel.selectedIDs)))
+                viewModel.selectedIDs.removeAll()
             } label: {
                 Text("다음")
             }

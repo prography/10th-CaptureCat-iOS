@@ -13,7 +13,7 @@ struct ScreenshotItemView<Overlay: View>: View {
     private let overlay: () -> Overlay
     
     init(viewModel: ScreenshotItemViewModel,
-         cornerRadius: CGFloat = 12,
+         cornerRadius: CGFloat = 8,
          @ViewBuilder overlay: @escaping () -> Overlay) {
         self.viewModel = viewModel
         self.cornerRadius = cornerRadius
@@ -23,16 +23,30 @@ struct ScreenshotItemView<Overlay: View>: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             Group {
-                if let img = viewModel.fullImage {
+                // ✅ thumbnail 우선, 없으면 fullImage 사용
+                if let img = viewModel.thumbnail ?? viewModel.fullImage {
                     Image(uiImage: img)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } else {
+                        .aspectRatio(45/76, contentMode: .fill)
+                } else if viewModel.isLoadingImage {
                     ProgressView()
+                        .aspectRatio(45/76, contentMode: .fill)
+                } else {
+                    // 이미지 로드 실패 시 플레이스홀더
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .aspectRatio(45/76, contentMode: .fill)
+                        .overlay(
+                            Image(systemName: "photo")
+                                .foregroundColor(.gray)
+                        )
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .border(.overlayDim, width: 1)
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(Color.overlayDim, lineWidth: 1)
+            )
             
             overlay()
                 .padding(6)
