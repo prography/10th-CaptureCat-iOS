@@ -14,6 +14,7 @@ struct TagView: View {
     @EnvironmentObject private var router: Router
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
+    @State private var isDragging = false
     
     var body: some View {
         VStack {
@@ -115,9 +116,16 @@ struct TagView: View {
             }
         }
         .simultaneousGesture(dragGesture)
-        .onAppear { syncOnAppear() }
+        .onAppear { 
+            syncOnAppear() 
+        }
         .onChange(of: viewModel.currentIndex) { _, newIndex in
-            syncOnChange(to: newIndex)
+            // 드래그 중이 아닐 때만 동기화
+            if !isDragging {
+                DispatchQueue.main.async {
+                    syncOnChange(to: newIndex)
+                }
+            }
         }
     }
     
@@ -126,8 +134,8 @@ struct TagView: View {
     private func carouselCard(at index: Int) -> some View {
         let asset = viewModel.itemVMs[index]
         let distance = distance(index)
-        let scale = 1.0 - abs(distance) * 0.2
-        let opacity = 1.0 - abs(distance) * 0.3
+        let scale = max(0.8, 1.0 - abs(distance) * 0.2)
+        let opacity = max(0.3, 1.0 - abs(distance) * 0.3)
         let zIndex = 1.0 - abs(distance) * 0.1
         let xOffset = myXOffset(index)
         
@@ -158,42 +166,59 @@ struct TagView: View {
         .opacity(opacity)
         .offset(x: xOffset, y: 0)
         .zIndex(zIndex)
+        .animation(.none, value: draggingItem) // 드래그 중 애니메이션 비활성화
     }
     
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
                 guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                // 옵션 1: 드래그 방향 반전 (오른쪽 드래그 = 인덱스 증가)
-                draggingItem = snappedItem - value.translation.width / 100
+                
+                // 드래그 시작 표시
+                if !isDragging {
+                    isDragging = true
+                }
+                
+                // 드래그 중에는 애니메이션 없이 직접 값 변경
+                let newDraggingItem = snappedItem - value.translation.width / 100
+                draggingItem = newDraggingItem
             }
             .onEnded { value in
-                withAnimation {
-                    // 옵션 1: 드래그 방향 반전
-                    let pred = value.predictedEndTranslation.width / 100
-                    draggingItem = snappedItem - pred
-                    
-                    // 옵션 2: 개선된 인덱스 계산 로직
-                    let rawIndex = Int(round(draggingItem))
-                    let itemCount = viewModel.itemVMs.count
-                    let normalizedIndex = ((rawIndex % itemCount) + itemCount) % itemCount
-                    
+                isDragging = false
+                
+                // 드래그 완료 시에만 애니메이션 적용
+                let pred = value.predictedEndTranslation.width / 100
+                let targetDragging = snappedItem - pred
+                
+                // 인덱스 계산
+                let rawIndex = Int(round(targetDragging))
+                let itemCount = viewModel.itemVMs.count
+                let normalizedIndex = ((rawIndex % itemCount) + itemCount) % itemCount
+                
+                // 애니메이션과 함께 최종 위치로 이동
+                withAnimation(.easeOut(duration: 0.3)) {
                     snappedItem = Double(normalizedIndex)
-                    draggingItem = snappedItem
-                    
+                    draggingItem = Double(normalizedIndex)
+                }
+                
+                // 뷰모델 업데이트는 애니메이션 완료 후에 수행
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                     viewModel.onAssetChanged(to: normalizedIndex)
                 }
             }
     }
     
     private func syncOnAppear() {
-        snappedItem = Double(viewModel.currentIndex)
-        draggingItem = snappedItem
+        let targetValue = Double(viewModel.currentIndex)
+        snappedItem = targetValue
+        draggingItem = targetValue
     }
     
     private func syncOnChange(to newIndex: Int) {
-        snappedItem = Double(newIndex)
-        draggingItem = snappedItem
+        let targetValue = Double(newIndex)
+        // 애니메이션 없이 즉시 동기화
+        snappedItem = targetValue
+        draggingItem = targetValue
     }
     
     func distance(_ item: Int) -> Double {
