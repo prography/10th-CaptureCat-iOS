@@ -32,9 +32,6 @@ struct UploadImageBuilder: BuilderProtocol {
             return formatter
         }()
         
-        // 🔍 개수 일치 검사
-        debugPrint("🔍 UploadImageBuilder 초기화: \(imageDatas.count)개 이미지, \(imageMetas.count)개 메타데이터")
-        
         guard imageDatas.count == imageMetas.count else {
             debugPrint("🔴 치명적 오류: 개수 불일치 - 이미지:\(imageDatas.count), 메타:\(imageMetas.count)")
             self.parameters = [:]

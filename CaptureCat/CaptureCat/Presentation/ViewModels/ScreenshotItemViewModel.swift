@@ -38,14 +38,6 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         self.createDate = model.createDate
         self.tags       = model.tags
         self.isFavorite = model.isFavorite
-        
-        // 🔍 디버깅: 초기화 정보 출력
-        debugPrint("🔍 ScreenshotItemViewModel 초기화:")
-        debugPrint("🔍 - ID: \(id)")
-        debugPrint("🔍 - 파일명: \(fileName)")
-        debugPrint("🔍 - 이미지 URL: \(imageURL ?? "없음")")
-        debugPrint("🔍 - 서버 이미지 여부: \(isServerImage)")
-        debugPrint("🔍 - 태그: \(tags) (개수: \(tags.count)개)")
     }
     
     // MARK: – Image Loading

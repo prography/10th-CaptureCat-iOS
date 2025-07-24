@@ -26,7 +26,7 @@ enum PathURLType {
         case .uploadImage:
             return "/v1/images/upload"
         case .turorial:
-            return "/v1/user/turotialComplete"
+            return "/v1/user/tutorialComplete"
         case .imagePages:
             return "/v1/images"
         case .searchByTag:
