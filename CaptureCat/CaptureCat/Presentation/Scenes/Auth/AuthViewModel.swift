@@ -22,17 +22,35 @@ class AuthViewModel: ObservableObject {
             if authenticationState == .initial {
                 isLogInPresented = true
                 isRecommandLogIn = false
+                isPersonalPresented = false
+                isTermsPresented = false
             } else if authenticationState == .guest {
                 isLogInPresented = false
                 isRecommandLogIn = true
+                isPersonalPresented = false
+                isTermsPresented = false
+            } else if authenticationState == .personal {
+                isPersonalPresented = true
+                isTermsPresented = false
+                isLogInPresented = false
+                isRecommandLogIn = false
+            } else if authenticationState == .terms {
+                isPersonalPresented = false
+                isTermsPresented = true
+                isLogInPresented = false
+                isRecommandLogIn = false
             } else {
                 isLogInPresented = false
                 isRecommandLogIn = false
+                isPersonalPresented = false
+                isTermsPresented = false
             }
         }
     }
     
     @Published var isLogInPresented: Bool = true
+    @Published var isPersonalPresented: Bool = false
+    @Published var isTermsPresented: Bool = false
     @Published var isRecommandLogIn: Bool = false
     @Published var isStartedGetScreenshot: Bool = false
     @Published var isLogOutPresented: Bool = false

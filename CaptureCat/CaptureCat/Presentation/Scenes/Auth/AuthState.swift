@@ -14,4 +14,6 @@ enum AuthenticationState {
     case signIn
     case guest
     case start
+    case personal
+    case terms
 }

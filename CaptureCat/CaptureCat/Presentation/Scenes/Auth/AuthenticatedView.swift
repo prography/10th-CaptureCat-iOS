@@ -37,6 +37,18 @@ struct AuthenticatedView: View {
                     ) {
                         RecommandLoginView()
                     }
+                    .fullScreenCover(
+                        isPresented: $authViewModel.isPersonalPresented,
+                        onDismiss: {}
+                    ) {
+                        WebView(webLink: .personal)
+                    }
+                    .fullScreenCover(
+                        isPresented: $authViewModel.isTermsPresented,
+                        onDismiss: {}
+                    ) {
+                        WebView(webLink: .terms)
+                    }
                     .transaction { transaction in
                         transaction.disablesAnimations = true
                     }
