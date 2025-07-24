@@ -68,6 +68,9 @@ struct AuthenticatedView: View {
                         transaction.disablesAnimations = true
                     }
             }
+            .task {
+                authViewModel.checkAutoLogin()
+            }
         }
     }
 }

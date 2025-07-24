@@ -5,7 +5,10 @@
 //  Created by minsong kim on 7/11/25.
 //
 
+import AuthenticationServices
 import SwiftUI
+import KakaoSDKAuth
+import KakaoSDKUser
 
 @MainActor
 class AuthViewModel: ObservableObject {
@@ -46,6 +49,33 @@ class AuthViewModel: ObservableObject {
         self.authService = service
     }
     
+    func checkAutoLogin() {
+        let appleId = KeyChainModule.read(key: .accessToken) ?? ""
+        
+        ASAuthorizationAppleIDProvider()
+            .getCredentialState(forUserID: appleId) { state, _ in
+                DispatchQueue.main.async {
+                    switch state {
+                    case .authorized:
+                        // 권한 유효 → 자동 로그인 처리
+                        self.authenticationState = .signIn
+                    default:
+                        break
+                    }
+                }
+            }
+        
+        if AuthApi.hasToken() {
+            UserApi.shared.accessTokenInfo { info, error in
+                if error == nil {
+                    // 유효 → 자동 로그인 처리 (예: 사용자 정보 fetch)
+//                    UserApi.shared.me { user, error in … }
+                    self.authenticationState = .signIn
+                }
+            }
+        }
+    }
+    
     @MainActor
     func send(action: Action) {
         switch action {
@@ -73,7 +103,6 @@ class AuthViewModel: ObservableObject {
             }
             
         case .appleSignIn:
-            
             Task {
                 let result = await socialManager.appleLogin()
                 
@@ -118,6 +147,7 @@ class AuthViewModel: ObservableObject {
             case .success (_):
                 KeyChainModule.delete(key: .accessToken)
                 KeyChainModule.delete(key: .refreshToken)
+                KeyChainModule.delete(key: .appleToken)
                 ScreenshotRepository.shared.clearMemoryCache()
                 self.authenticationState = .initial
             case .failure (let error):

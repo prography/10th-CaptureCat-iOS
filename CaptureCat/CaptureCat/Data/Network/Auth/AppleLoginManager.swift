@@ -43,6 +43,9 @@ extension AppleLoginManager: ASAuthorizationControllerDelegate {
                 debugPrint("🍏 idTokenString: \(tokenString)")
             }
             
+            let userID = credential.user
+            KeyChainModule.create(key: .appleToken, data: userID)
+            
             if let fullName = credential.fullName,
                let token = credential.identityToken,
                let tokenString = String(data: token, encoding: .utf8) {
