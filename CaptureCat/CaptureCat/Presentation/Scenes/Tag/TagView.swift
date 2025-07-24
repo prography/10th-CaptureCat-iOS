@@ -146,22 +146,24 @@ struct TagView: View {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
                 guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                draggingItem = snappedItem + value.translation.width / 100
+                // 옵션 1: 드래그 방향 반전 (오른쪽 드래그 = 인덱스 증가)
+                draggingItem = snappedItem - value.translation.width / 100
             }
             .onEnded { value in
                 withAnimation {
+                    // 옵션 1: 드래그 방향 반전
                     let pred = value.predictedEndTranslation.width / 100
-                    draggingItem = snappedItem + pred
-                    draggingItem = round(draggingItem)
-                        .remainder(dividingBy: Double(viewModel.itemVMs.count))
-                    snappedItem = draggingItem
+                    draggingItem = snappedItem - pred
                     
-                    let newIndex = Int(round(snappedItem)
-                        .remainder(dividingBy: Double(viewModel.itemVMs.count)))
-                    let normalized = newIndex >= 0
-                    ? newIndex
-                    : newIndex + viewModel.itemVMs.count
-                    viewModel.onAssetChanged(to: normalized)
+                    // 옵션 2: 개선된 인덱스 계산 로직
+                    let rawIndex = Int(round(draggingItem))
+                    let itemCount = viewModel.itemVMs.count
+                    let normalizedIndex = ((rawIndex % itemCount) + itemCount) % itemCount
+                    
+                    snappedItem = Double(normalizedIndex)
+                    draggingItem = snappedItem
+                    
+                    viewModel.onAssetChanged(to: normalizedIndex)
                 }
             }
     }
@@ -177,10 +179,17 @@ struct TagView: View {
     }
     
     func distance(_ item: Int) -> Double {
-        return (draggingItem - Double(item)).remainder(dividingBy: Double(viewModel.itemVMs.count))
+        let rawDistance = draggingItem - Double(item)
+        let itemCount = Double(viewModel.itemVMs.count)
+        
+        // 개선된 거리 계산 (순환 거리)
+        let normalizedDistance = ((rawDistance.remainder(dividingBy: itemCount)) + itemCount).remainder(dividingBy: itemCount)
+        
+        // 가장 가까운 거리 선택 (앞으로 가거나 뒤로 가거나)
+        return normalizedDistance > itemCount / 2 ? normalizedDistance - itemCount : normalizedDistance
     }
     
     func myXOffset(_ item: Int) -> Double {
-        return distance(item) * 280
+        return -distance(item) * 280  // 부호 반전으로 애니메이션 방향 수정
     }
 }
