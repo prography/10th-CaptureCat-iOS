@@ -27,15 +27,12 @@ struct ScreenshotItemView<Overlay: View>: View {
                 if let img = viewModel.thumbnail ?? viewModel.fullImage {
                     Image(uiImage: img)
                         .resizable()
-                        .aspectRatio(45/76, contentMode: .fill)
                 } else if viewModel.isLoadingImage {
                     ProgressView()
-                        .aspectRatio(45/76, contentMode: .fill)
                 } else {
                     // 이미지 로드 실패 시 플레이스홀더
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
-                        .aspectRatio(45/76, contentMode: .fill)
                         .overlay(
                             Image(systemName: "photo")
                                 .foregroundColor(.gray)
@@ -51,5 +48,7 @@ struct ScreenshotItemView<Overlay: View>: View {
             overlay()
                 .padding(6)
         }
+        .aspectRatio(45/76, contentMode: .fit)
+        .clipped()
     }
 }
