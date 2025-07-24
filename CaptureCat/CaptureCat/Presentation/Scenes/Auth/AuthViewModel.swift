@@ -40,6 +40,7 @@ class AuthViewModel: ObservableObject {
     @Published var isSignOutPresented: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
+    @Published var syncResult: SyncResult? // 동기화 결과 저장
     
     init(service: AuthService) {
         self.authService = service
@@ -59,14 +60,8 @@ class AuthViewModel: ObservableObject {
                     switch kakaoSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
-                        if success.data.tutorialCompleted {
-                            debugPrint("🟡 로그인 성공 > 시작하기 완료한 회원 🟡")
-                            self.authenticationState = .signIn
-                            return
-                        } else {
-                            debugPrint("🟡 로그인 함수만 성공 > 비회원 > 시작하기 필요 🟡")
-                            self.authenticationState = .start
-                        }
+                        // 토큰 저장 완료 후 동기화 시작
+                        await handleLoginSuccess(tutorialCompleted: success.data.tutorialCompleted)
                     case .failure(let failure):
                         debugPrint("🟡🔴 카카오 로그인 완전 실패 \(failure.localizedDescription) 🟡🔴")
                         self.authenticationState = .initial
@@ -89,15 +84,8 @@ class AuthViewModel: ObservableObject {
                     switch appleSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
-                        if success.data.tutorialCompleted {
-                            debugPrint("🍏 로그인 성공 > 시작하기 완료한 회원 🍏")
-                            debugPrint("닉네임: \(success.data.nickname)")
-                            self.authenticationState = .signIn
-                            return
-                        } else {
-                            debugPrint("🍏🔴 로그인 함수만 성공 > 비회원 > 시작하기 진행 🍏🔴")
-                            self.authenticationState = .start
-                        }
+                        // 토큰 저장 완료 후 동기화 시작
+                        await handleLoginSuccess(tutorialCompleted: success.data.tutorialCompleted)
                     case .failure(let failure):
                         debugPrint("🔴🍎 apple sign in 함수 실패 \(failure.localizedDescription)🔴🍎")
                     }
@@ -136,6 +124,55 @@ class AuthViewModel: ObservableObject {
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
                 self.errorToast = true
             }
+        }
+    }
+    
+    // MARK: - 동기화 관련 메서드
+    
+    /// 로그인 성공 시 동기화 로직 처리
+    private func handleLoginSuccess(tutorialCompleted: Bool) async {
+        // 토큰 저장이 완전히 완료될 때까지 잠시 대기
+        await waitForTokenSaved()
+        
+        if tutorialCompleted {
+            // 튜토리얼 완료한 사용자
+            if hasLocalData() {
+                debugPrint("🔄 로그인 성공 + 로컬 데이터 존재 → 동기화 시작")
+                self.authenticationState = .syncing
+            } else {
+                debugPrint("🔄 로그인 성공 + 로컬 데이터 없음 → 바로 메인화면")
+                self.authenticationState = .signIn
+            }
+        } else {
+            // 튜토리얼 미완료 사용자
+            debugPrint("🔄 로그인 성공 + 튜토리얼 미완료 → 시작하기 화면")
+            self.authenticationState = .start
+        }
+    }
+    
+    /// 토큰이 저장될 때까지 대기
+    private func waitForTokenSaved() async {
+        // 최대 3초까지 0.1초 간격으로 토큰 확인
+        for _ in 0..<30 {
+            if let accessToken = AccountStorage.shared.accessToken, !accessToken.isEmpty {
+                debugPrint("✅ 토큰 저장 확인 완료: \(accessToken.prefix(20))...")
+                return
+            }
+            debugPrint("⏳ 토큰 저장 대기 중...")
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
+        }
+        debugPrint("⚠️ 토큰 저장 확인 실패 - 타임아웃")
+    }
+    
+    /// 로컬에 동기화할 데이터가 있는지 확인
+    private func hasLocalData() -> Bool {
+        do {
+            let localCount = try SwiftDataManager.shared.fetchAllEntities().count
+            debugPrint("📱 로컬 스크린샷 개수: \(localCount)개")
+            return localCount > 0
+        } catch {
+            debugPrint("❌ 로컬 데이터 확인 실패: \(error)")
+            return false
         }
     }
 }

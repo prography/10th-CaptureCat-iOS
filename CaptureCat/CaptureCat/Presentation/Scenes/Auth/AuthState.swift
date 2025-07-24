@@ -14,4 +14,6 @@ enum AuthenticationState {
     case signIn
     case guest
     case start
+    case syncing        // 동기화 진행 중
+    case syncCompleted  // 동기화 완료
 }
