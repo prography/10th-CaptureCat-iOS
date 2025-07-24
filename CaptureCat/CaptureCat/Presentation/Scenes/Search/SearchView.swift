@@ -97,10 +97,19 @@ struct SearchView: View {
                 }
                 .padding(.vertical, 20)
             } else if viewModel.filteredTags.isEmpty {
-                HStack {
+                VStack(alignment: .center, spacing: 4) {
                     Spacer()
-                    Text(viewModel.searchText.isEmpty ? "저장된 태그가 없습니다" : "검색 결과가 없습니다")
-                        .CFont(.body02Regular)
+                    if viewModel.searchText.isEmpty {
+                        Text("아직 태그가 없어요.")
+                            .CFont(.headline02Bold)
+                            .foregroundColor(.text01)
+                    } else {
+                        Text("검색결과가 없어요.")
+                            .CFont(.headline02Bold)
+                            .foregroundColor(.text01)
+                    }
+                    Text("스크린샷을 태그해 정리해보세요!")
+                        .CFont(.body01Regular)
                         .foregroundColor(.text03)
                     Spacer()
                 }
@@ -153,16 +162,6 @@ struct SearchView: View {
                     Spacer()
                 }
                 .padding(.vertical, 20)
-            } else if viewModel.filteredScreenshots.isEmpty {
-                VStack(spacing: 8) {
-                    Text("해당 태그들이 모두 포함된 스크린샷이 없습니다")
-                        .CFont(.body02Regular)
-                        .foregroundColor(.text03)
-                    Text("다른 태그를 선택해보세요")
-                        .CFont(.caption02Regular)
-                        .foregroundColor(.text03)
-                }
-                .padding(.vertical, 40)
             } else {
                 ScrollView {
                     LazyVGrid(columns: gridColumns, spacing: 12) {
@@ -189,7 +188,3 @@ struct SearchView: View {
         GridItem(.adaptive(minimum: 150), spacing: 12)
     ]
 }
-
-//#Preview {
-//    SearchView()
-//}
