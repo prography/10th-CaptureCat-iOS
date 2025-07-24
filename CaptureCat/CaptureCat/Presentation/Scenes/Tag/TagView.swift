@@ -91,7 +91,7 @@ struct TagView: View {
             // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
             for itemVM in viewModel.itemVMs {
                 await itemVM.loadFullImage()
-            }
+                        }
         }
         .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
             AddTagSheet(
@@ -131,7 +131,11 @@ struct TagView: View {
         let zIndex = 1.0 - abs(distance) * 0.1
         let xOffset = myXOffset(index)
         
-        SingleCardView {
+        SingleCardView(
+            onDelete: {
+                viewModel.deleteItem(at: index)
+            }
+        ) {
             ScreenshotItemView(viewModel: asset) {
                 EmptyView()
             }

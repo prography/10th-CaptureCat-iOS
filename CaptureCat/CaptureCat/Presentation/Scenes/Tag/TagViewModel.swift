@@ -32,12 +32,14 @@ final class TagViewModel: ObservableObject {
     private let repository = ScreenshotRepository.shared
     @Published var itemVMs: [ScreenshotItemViewModel] = []
     private var networkManager: NetworkManager
+    private var router: Router?
     
     /// UI 업데이트를 강제하기 위한 더미 프로퍼티
     @Published private var updateTrigger = false
     
-    init(itemsIds: [String], networkManager: NetworkManager) {
+    init(itemsIds: [String], networkManager: NetworkManager, router: Router? = nil) {
         self.networkManager = networkManager
+        self.router = router
         createViewModel(from: itemsIds)
         
         loadTags()
@@ -188,6 +190,41 @@ final class TagViewModel: ObservableObject {
         } else {
             // 로그인 모드: 서버 전용 저장
             await saveToServer()
+        }
+    }
+    
+    // MARK: - Delete Management
+    /// 특정 인덱스의 아이템 삭제 (로컬 전용, 서버 연결 없음)
+    func deleteItem(at index: Int) {
+        guard index < itemVMs.count else { return }
+        
+        let itemVM = itemVMs[index]
+        
+        // 로컬 전용 삭제 로직 실행 (서버 연결 없음)
+        Task {
+            do {
+                // 게스트 모드든 로그인 모드든 상관없이 로컬에서만 삭제
+                try SwiftDataManager.shared.delete(id: itemVM.id)
+                debugPrint("✅ 로컬 아이템 삭제 완료: \(itemVM.fileName)")
+                
+                // UI에서 아이템 제거
+                await MainActor.run {
+                    itemVMs.remove(at: index)
+                    
+                    // 현재 인덱스 조정
+                    if itemVMs.isEmpty {
+                        // 모든 아이템이 삭제된 경우 이전 페이지로 이동
+                        debugPrint("⚠️ 모든 아이템이 삭제되었습니다. 이전 페이지로 이동합니다.")
+                        router?.pop()
+                    } else if currentIndex >= itemVMs.count {
+                        currentIndex = itemVMs.count - 1
+                    }
+                    
+                    updateTrigger.toggle()  // UI 업데이트
+                }
+            } catch {
+                debugPrint("❌ 로컬 아이템 삭제 실패: \(error.localizedDescription)")
+            }
         }
     }
     
