@@ -153,7 +153,7 @@ struct SettingsView: View {
             Button {
                 debugPrint("버전 정보")
             } label: {
-                Text("버전 정보")
+                Text("버전 정보 \(Bundle.main.appVersion).\(Bundle.main.appBuild)")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
                     .padding(.vertical, 8)
