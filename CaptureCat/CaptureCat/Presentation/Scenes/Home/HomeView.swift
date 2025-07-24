@@ -34,8 +34,8 @@ struct HomeView: View {
             
             Spacer()
             
-            if viewModel.isInitialLoading {
-                ProgressView("로딩 중...")
+            if viewModel.isInitialLoading || viewModel.isRefreshing {
+                ProgressView(viewModel.isRefreshing ? "새로고침 중..." : "로딩 중...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.itemVMs.isEmpty {
                 Text("저장된 스크린샷이 없습니다.")
@@ -94,7 +94,7 @@ struct HomeView: View {
             }
         }
         .refreshable {
-            // Pull to refresh
+            // Pull to refresh (중복 실행 방지 적용)
             await viewModel.refreshScreenshots()
         }
     }
