@@ -49,18 +49,8 @@ class NetworkManager {
             debugPrint("🔴 현재 토큰: \(KeyChainModule.read(key: .accessToken) ?? "없음")")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
             
-            // 토큰 갱신 시도 (재시도가 아닌 경우에만)
-            if !isRetry && builder.useAuthorization {
-                debugPrint("🔄 토큰 갱신 시도")
-                if await refreshTokenIfNeeded() {
-                    debugPrint("✅ 토큰 갱신 성공, 원래 요청 재시도")
-                    return try await fetchData(builder, isRetry: true)
-                } else {
-                    debugPrint("❌ 토큰 갱신 실패")
-                }
-            }
-            
-            throw NetworkError.unauthorized
+            // 자동 토큰 갱신 및 재시도 로직
+            return try await handleUnauthorizedError(builder: builder, isRetry: isRetry)
         case 403:
             debugPrint("🔴 403 Forbidden - 권한 없음")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
@@ -243,6 +233,44 @@ class NetworkManager {
 
 extension NetworkManager {
     // MARK: - 토큰 갱신 관련 메서드
+    
+    /// 401 Unauthorized 에러 처리 (자동 토큰 갱신 및 재시도)
+    private func handleUnauthorizedError<Builder: BuilderProtocol>(
+        builder: Builder, 
+        isRetry: Bool
+    ) async throws -> Builder.Response {
+        
+        // 재시도가 아니고 Authorization이 필요한 요청인 경우에만 토큰 갱신 시도
+        guard !isRetry && builder.useAuthorization else {
+            debugPrint("🔴 재시도 불가: isRetry=\(isRetry), useAuthorization=\(builder.useAuthorization)")
+            throw NetworkError.unauthorized
+        }
+        
+        // RefreshToken 존재 여부 확인
+        guard let refreshToken = KeyChainModule.read(key: .refreshToken),
+              !refreshToken.isEmpty else {
+            debugPrint("🔴 RefreshToken이 없어서 자동 갱신 불가")
+            throw NetworkError.unauthorized
+        }
+        
+        debugPrint("🔄 자동 토큰 갱신 시작...")
+        debugPrint("🔄 - 기존 AccessToken: \(KeyChainModule.read(key: .accessToken)?.prefix(20) ?? "없음")...")
+        debugPrint("🔄 - RefreshToken: \(refreshToken.prefix(20))...")
+        
+        // 토큰 갱신 시도
+        let refreshSuccess = await refreshTokenIfNeeded()
+        
+        if refreshSuccess {
+            debugPrint("✅ 토큰 갱신 성공! 원래 요청 재시도")
+            debugPrint("✅ - 새 AccessToken: \(KeyChainModule.read(key: .accessToken)?.prefix(20) ?? "없음")...")
+            
+            // 원래 요청을 새 토큰으로 재시도
+            return try await fetchData(builder, isRetry: true)
+        } else {
+            debugPrint("❌ 토큰 갱신 실패 - 로그인이 필요합니다")
+            throw NetworkError.unauthorized
+        }
+    }
     
     /// 필요 시 토큰 갱신 시도
     private func refreshTokenIfNeeded() async -> Bool {
