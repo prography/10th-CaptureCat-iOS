@@ -40,6 +40,13 @@ struct RouterView<Content: View>: View {
                         SettingsView()
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .favorite:
+                        let viewModel = FavoriteViewModel()
+                        FavoriteView(viewModel: viewModel)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+//                    case .detail(let id):
+//                        DetailView(id: id)
                     }
                 }
         }

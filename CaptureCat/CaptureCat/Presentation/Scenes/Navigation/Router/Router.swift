@@ -13,6 +13,8 @@ final class Router: ObservableObject {
         case startGetScreenshot
         case tag(ids: [String])
         case setting
+        case favorite
+//        case detail(id: String)
     }
 
     @Published var path = NavigationPath()

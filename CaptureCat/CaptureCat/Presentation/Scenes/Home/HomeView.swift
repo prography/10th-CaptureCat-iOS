@@ -32,7 +32,6 @@ struct HomeView: View {
             }
             .padding(.horizontal, 16)
             
-            
             Spacer()
             
             if viewModel.isInitialLoading {
@@ -153,6 +152,7 @@ struct HomeView: View {
             .overlay(
                 Button {
                     //TODO: 즐겨찾기 페이지로 이동
+                    router.push(.favorite)
                 } label: {
                     Image(.selectedFavorite)
                         .resizable()
