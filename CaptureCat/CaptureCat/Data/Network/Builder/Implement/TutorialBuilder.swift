@@ -10,7 +10,7 @@ import Foundation
 struct TutorialBuilder: BuilderProtocol {
     typealias Response = ResponseDTO
     
-    var path: String = PathURLType.auth.path()
+    var path: String = PathURLType.turorial.path()
     var queries: [URLQueryItem]? = nil
     var method: HTTPMethod { .post }
     var parameters: [String: Any] = [:]

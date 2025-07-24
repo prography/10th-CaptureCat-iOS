@@ -85,17 +85,18 @@ final class SearchViewModel: ObservableObject {
     
     private func loadScreenshotsByTags() {
         isLoadingScreenshots = true
-        do {
-            filteredScreenshots = try repository.loadByTags(selectedTags)
+        Task {
             // 썸네일 로드
-            Task {
+            do {
+                print("selectedTags: \(selectedTags)")
+                filteredScreenshots = try await repository.loadByTags(selectedTags)
                 await loadThumbnailsForFilteredScreenshots()
+            } catch {
+                print("태그별 스크린샷 로딩 실패: \(error)")
+                filteredScreenshots = []
             }
-        } catch {
-            print("태그별 스크린샷 로딩 실패: \(error)")
-            filteredScreenshots = []
+            isLoadingScreenshots = false
         }
-        isLoadingScreenshots = false
     }
     
     private func loadRelatedTags() async {
@@ -115,7 +116,7 @@ final class SearchViewModel: ObservableObject {
     
     private func loadThumbnailsForFilteredScreenshots() async {
         for itemVM in filteredScreenshots {
-            await itemVM.loadThumbnail(size: CGSize(width: 150, height: 150))
+            await itemVM.loadFullImage()
         }
     }
     

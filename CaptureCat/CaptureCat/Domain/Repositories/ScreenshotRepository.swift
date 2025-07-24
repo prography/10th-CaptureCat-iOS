@@ -36,11 +36,11 @@ final class ScreenshotRepository {
     }
     
     /// 여러 태그로 필터링 (로그인 상태 자동 분기)
-    func loadByTags(_ tags: [String]) throws -> [ScreenshotItemViewModel] {
+    func loadByTags(_ tags: [String]) async throws -> [ScreenshotItemViewModel] {
         if AccountStorage.shared.isGuest ?? true {
             return try loadByTagsFromLocal(tags)
         } else {
-            return InMemoryScreenshotCache.shared.getItemsByTags(tags)
+            return try await loadByTagsFromServer(tags)
         }
     }
     
@@ -136,6 +136,43 @@ final class ScreenshotRepository {
     /// 서버에서만 로드 (로컬 저장 X)
     func loadFromServerOnly(page: Int = 0, size: Int = 20) async throws -> [ScreenshotItemViewModel] {
         let result = await ImageService.shared.checkImageList(page: page, size: size, hasTags: nil)
+        
+        switch result {
+        case .success(let response):
+            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
+                guard let captureDate = parseServerDate(serverItem.captureDate) else {
+                    return nil
+                }
+                
+                let mappedTags = serverItem.tags.map { $0.name }
+                
+                let screenshotItem = ScreenshotItem(
+                    id: String(serverItem.id),
+                    imageData: Data(), // 서버 URL에서 별도 로드
+                    imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
+                    fileName: serverItem.name,
+                    createDate: captureDate,
+                    tags: mappedTags, // ✅ 매핑된 태그 사용
+                    isFavorite: serverItem.isBookmarked
+                )
+                
+                return screenshotItem
+            }
+            
+            let viewModels = serverItems.map(viewModel(for:))
+            
+            // 메모리 캐시에만 저장 (로컬 저장 X) - 임시 주석처리
+            InMemoryScreenshotCache.shared.store(viewModels)
+            
+            return viewModels
+            
+        case .failure(let error):
+            throw error
+        }
+    }
+    
+    private func loadByTagsFromServer(_ tags: [String], page: Int = 0, size: Int = 20) async throws -> [ScreenshotItemViewModel] {
+        let result = await ImageService.shared.checkImageList(by: tags, page: page, size: size)
         
         switch result {
         case .success(let response):

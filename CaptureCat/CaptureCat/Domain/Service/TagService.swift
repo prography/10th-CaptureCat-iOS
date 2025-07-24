@@ -32,7 +32,7 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<TagDTO, Error>.success(result)
-        } catch (let error) {
+        } catch (let error){
             return .failure(error)
         }
     }

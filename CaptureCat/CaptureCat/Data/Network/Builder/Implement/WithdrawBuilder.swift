@@ -11,7 +11,7 @@ struct WithdrawBuilder: BuilderProtocol {
     typealias Response = ResponseDTO
     
     var path: String = PathURLType.withdraw.path()
-    var queries: [URLQueryItem]? = nil
+    var queries: [URLQueryItem]?
     var method: HTTPMethod { .delete }
     var parameters: [String: Any] = [:]
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())

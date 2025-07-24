@@ -56,6 +56,18 @@ final class ImageService {
         }
     }
     
+    func checkImageList(by tags: [String], page: Int, size: Int) async -> Result<ImagListDTO, Error> {
+        let builder = CheckImageListWithTagBuilder(page: page, size: size, tagNames: tags)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(page) 이미지 목록 불러오기 성공!")
+            return Result<ImagListDTO, Error>.success(response)
+        } catch (let error) {
+            return .failure(error)
+        }
+    }
+    
     func deleteImage(id: String) async -> Result<ResponseDTO, Error> {
         let builder = DeleteImageBuilder(imageId: id)
         
