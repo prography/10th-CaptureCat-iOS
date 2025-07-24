@@ -18,8 +18,11 @@ final class HomeViewModel: ObservableObject {
     @Published var currentFavoriteIndex: Int = 0
     @Published var isLoadingPage = false
     @Published var isInitialLoading = false
+    @Published var isLoadingFavoritePage = false
     private var canLoadMorePages = true
+    private var canLoadMoreFavoritePages = true
     private var page: Int = 0
+    private var favoritePage: Int = 0
     private var hasLoadedInitialData = false
     
     private var dateFormatter: DateFormatter = {
@@ -133,7 +136,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadFavorite() async {
         do {
-            let serverItems = try await repository.loadFavoriteFromServerOnly()
+            let serverItems = try await repository.loadFavoriteFromServerOnly(page: 0, size: 20)
             
             // 중복 제거: 고유한 ID만 유지
             var uniqueItems: [ScreenshotItemViewModel] = []
@@ -147,9 +150,40 @@ final class HomeViewModel: ObservableObject {
             }
             
             self.favoriteItemVMs = uniqueItems
+            self.favoritePage = 1 // 초기 로드 후 페이지 설정
+            self.canLoadMoreFavoritePages = !serverItems.isEmpty
             debugPrint("✅ 즐겨찾기 로드 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
         } catch {
             debugPrint("❌ 즐겨찾기 서버 로드 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 즐겨찾기 다음 페이지 로드
+    func loadNextFavoritePage() async {
+        guard !isLoadingFavoritePage, canLoadMoreFavoritePages else { return }
+        isLoadingFavoritePage = true
+        defer { isLoadingFavoritePage = false }
+        
+        do {
+            let serverItems = try await repository.loadFavoriteFromServerOnly(page: favoritePage, size: 20)
+            if serverItems.isEmpty {
+                canLoadMoreFavoritePages = false
+            } else {
+                // 중복 제거: 기존 ID와 겹치지 않는 아이템만 추가
+                let existingIDs = Set(self.favoriteItemVMs.map { $0.id })
+                let newItems = serverItems.filter { !existingIDs.contains($0.id) }
+                
+                if !newItems.isEmpty {
+                    self.favoriteItemVMs += newItems
+                    debugPrint("✅ 새로운 즐겨찾기 아이템 \(newItems.count)개 추가 (중복 \(serverItems.count - newItems.count)개 제외)")
+                } else {
+                    debugPrint("⚠️ 모든 즐겨찾기 아이템이 중복이므로 추가하지 않음")
+                }
+                
+                favoritePage += 1
+            }
+        } catch {
+            debugPrint("❌ 즐겨찾기 다음 페이지 로드 실패: \(error.localizedDescription)")
         }
     }
     
@@ -181,7 +215,18 @@ final class HomeViewModel: ObservableObject {
     
     // Carousel 등에서 index 변경 시 호출
     func onAssetChanged(to index: Int) {
+        // index 범위 체크
+        guard index >= 0 && index < favoriteItemVMs.count else { return }
+        
         currentFavoriteIndex = index
+        
+        // pagination 체크: currentFavoriteIndex가 favoriteItemVMs.count보다 3 적으면 다음 페이지 로드
+        let threshold = favoriteItemVMs.count - 3
+        if index >= threshold && !isLoadingFavoritePage && canLoadMoreFavoritePages {
+            Task {
+                await loadNextFavoritePage()
+            }
+        }
     }
     
     deinit {

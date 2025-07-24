@@ -103,20 +103,34 @@ struct HomeView: View {
     }
     
     private var carouselView: some View {
-        ZStack {
-            ForEach(viewModel.favoriteItemVMs.indices, id: \.self) { idx in
-                carouselCard(at: idx)
-            }
-        }
-        .simultaneousGesture(dragGesture)
-        .onAppear {
-            syncOnAppear()
-        }
-        .onChange(of: viewModel.currentFavoriteIndex) { _, newIndex in
-            // 드래그 중이 아닐 때만 동기화
-            if !isDragging {
-                DispatchQueue.main.async {
-                    syncOnChange(to: newIndex)
+        Group {
+            if viewModel.favoriteItemVMs.isEmpty {
+                Text("즐겨찾기한 스크린샷이 없습니다.")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ZStack {
+                    ForEach(viewModel.favoriteItemVMs.indices, id: \.self) { idx in
+                        carouselCard(at: idx)
+                    }
+                }
+                .simultaneousGesture(dragGesture)
+                .onAppear {
+                    syncOnAppear()
+                }
+                .onChange(of: viewModel.currentFavoriteIndex) { _, newIndex in
+                    // 드래그 중이 아닐 때만 동기화
+                    if !isDragging {
+                        DispatchQueue.main.async {
+                            syncOnChange(to: newIndex)
+                        }
+                    }
+                }
+                .onChange(of: viewModel.favoriteItemVMs.count) { _, newCount in
+                    // 새로운 아이템이 추가되었을 때 현재 인덱스가 범위를 벗어나지 않도록 조정
+                    if viewModel.currentFavoriteIndex >= newCount && newCount > 0 {
+                        viewModel.onAssetChanged(to: newCount - 1)
+                    }
                 }
             }
         }
@@ -156,6 +170,12 @@ struct HomeView: View {
         .offset(x: xOffset, y: 0)
         .zIndex(zIndex)
         .animation(.none, value: draggingItem) // 드래그 중 애니메이션 비활성화
+        .onAppear {
+            // 각 카드가 나타날 때 이미지 로드
+            Task {
+                await asset.loadFullImage()
+            }
+        }
     }
     
     private var dragGesture: some Gesture {
@@ -170,7 +190,9 @@ struct HomeView: View {
                 
                 // 드래그 중에는 애니메이션 없이 직접 값 변경
                 let newDraggingItem = snappedItem - value.translation.width / 100
-                draggingItem = newDraggingItem
+                // 범위 제한: 0 이상, favoriteItemVMs.count - 1 이하
+                let clampedDraggingItem = max(0, min(Double(viewModel.favoriteItemVMs.count - 1), newDraggingItem))
+                draggingItem = clampedDraggingItem
             }
             .onEnded { value in
                 isDragging = false
@@ -179,20 +201,20 @@ struct HomeView: View {
                 let pred = value.predictedEndTranslation.width / 100
                 let targetDragging = snappedItem - pred
                 
-                // 인덱스 계산
+                // 인덱스 계산 및 범위 제한
                 let rawIndex = Int(round(targetDragging))
-                let itemCount = viewModel.itemVMs.count
-                let normalizedIndex = ((rawIndex % itemCount) + itemCount) % itemCount
+                let itemCount = viewModel.favoriteItemVMs.count
+                let clampedIndex = max(0, min(itemCount - 1, rawIndex))
                 
                 // 애니메이션과 함께 최종 위치로 이동
                 withAnimation(.easeOut(duration: 0.3)) {
-                    snappedItem = Double(normalizedIndex)
-                    draggingItem = Double(normalizedIndex)
+                    snappedItem = Double(clampedIndex)
+                    draggingItem = Double(clampedIndex)
                 }
                 
                 // 뷰모델 업데이트는 애니메이션 완료 후에 수행
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    viewModel.onAssetChanged(to: normalizedIndex)
+                    viewModel.onAssetChanged(to: clampedIndex)
                 }
             }
     }
@@ -204,6 +226,9 @@ struct HomeView: View {
     }
     
     private func syncOnChange(to newIndex: Int) {
+        // 유효한 인덱스인지 확인
+        guard newIndex >= 0 && newIndex < viewModel.favoriteItemVMs.count else { return }
+        
         let targetValue = Double(newIndex)
         // 애니메이션 없이 즉시 동기화
         snappedItem = targetValue
@@ -211,14 +236,8 @@ struct HomeView: View {
     }
     
     func distance(_ item: Int) -> Double {
-        let rawDistance = draggingItem - Double(item)
-        let itemCount = Double(viewModel.itemVMs.count)
-        
-        // 개선된 거리 계산 (순환 거리)
-        let normalizedDistance = ((rawDistance.remainder(dividingBy: itemCount)) + itemCount).remainder(dividingBy: itemCount)
-        
-        // 가장 가까운 거리 선택 (앞으로 가거나 뒤로 가거나)
-        return normalizedDistance > itemCount / 2 ? normalizedDistance - itemCount : normalizedDistance
+        // 단순한 선형 거리 계산 (순환하지 않음)
+        return draggingItem - Double(item)
     }
     
     func myXOffset(_ item: Int) -> Double {
