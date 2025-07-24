@@ -62,7 +62,7 @@ final class ScreenshotRepository {
                 debugPrint("❌ 서버에서 연관 태그 로드 실패: \(error.localizedDescription)")
                 // 실패 시 빈 배열 반환
                 return InMemoryScreenshotCache.shared.getOtherTags(for: tags)
-
+                
             }
         }
     }
@@ -72,40 +72,15 @@ final class ScreenshotRepository {
         if AccountStorage.shared.isGuest ?? true {
             return try SwiftDataManager.shared.fetchAllTags()
         } else {
-            // TagService를 사용하여 서버에서 전체 태그 목록 가져오기 (모든 페이지 순회)
-            var allTagNames: [String] = []
-            var currentPage = 0
-            var hasNext = true
-            let pageSize = 50
+            let result = await TagService.shared.fetchPopularTagList()
             
-            while hasNext {
-                let result = await TagService.shared.fetchTagList(page: currentPage, size: pageSize)
+            switch result {
+            case .success(let tagDTO):
+                return tagDTO.data.items.map { $0.name }
                 
-                switch result {
-                case .success(let tagDTO):
-                    // 현재 페이지의 태그들을 추가
-                    let pageTagNames = tagDTO.data.items.map { $0.name }
-                    allTagNames.append(contentsOf: pageTagNames)
-                    
-                    // 다음 페이지 확인
-                    hasNext = tagDTO.data.hasNext
-                    currentPage += 1
-                    
-                    debugPrint("✅ 서버에서 태그 페이지 \(currentPage-1) 로드 성공: \(pageTagNames.count)개, hasNext: \(hasNext)")
-                    
-                case .failure(let error):
-                    debugPrint("❌ 서버에서 태그 페이지 \(currentPage) 로드 실패: \(error.localizedDescription)")
-                    // 첫 페이지부터 실패한 경우 InMemoryCache 사용
-                    if currentPage == 0 {
-                        return InMemoryScreenshotCache.shared.getAllTags()
-                    }
-                    // 중간 페이지에서 실패한 경우 지금까지 수집한 태그들 반환
-                    hasNext = false
-                }
+            case .failure(let error):
+                return InMemoryScreenshotCache.shared.getAllTags()
             }
-            
-            debugPrint("✅ 서버에서 전체 태그 로드 완료: \(allTagNames.count)개 태그, \(currentPage)페이지")
-            return allTagNames
         }
     }
     
@@ -187,7 +162,7 @@ final class ScreenshotRepository {
             let viewModels = serverItems.map(viewModel(for:))
             
             // 메모리 캐시에만 저장 (로컬 저장 X) - 임시 주석처리
-             InMemoryScreenshotCache.shared.store(viewModels)
+            InMemoryScreenshotCache.shared.store(viewModels)
             
             return viewModels
             
@@ -242,19 +217,19 @@ final class ScreenshotRepository {
     
     // 🚫 서버 태그 추가 기능 임시 비활성화
     /*
-    /// 특정 이미지에 태그 추가 (서버)
-    func addTagToServer(id: String, tags: [String]) async throws {
-        let result = await ImageService.shared.addImage(tags: tags, id: id)
-        
-        switch result {
-        case .success:
-            debugPrint("✅ 서버에 태그 추가 성공: \(tags)")
-        case .failure(let error):
-            debugPrint("❌ 서버에 태그 추가 실패: \(error)")
-            throw error
-        }
-    }
-    */
+     /// 특정 이미지에 태그 추가 (서버)
+     func addTagToServer(id: String, tags: [String]) async throws {
+     let result = await ImageService.shared.addImage(tags: tags, id: id)
+     
+     switch result {
+     case .success:
+     debugPrint("✅ 서버에 태그 추가 성공: \(tags)")
+     case .failure(let error):
+     debugPrint("❌ 서버에 태그 추가 실패: \(error)")
+     throw error
+     }
+     }
+     */
     
     // MARK: - Common Operations
     
@@ -306,7 +281,7 @@ final class ScreenshotRepository {
             }
         }
     }
-
+    
     func removeTag(_ tag: String, fromIDs ids: [String]) async throws {
         if AccountStorage.shared.isGuest ?? true {
             try SwiftDataManager.shared.removeTag(tag, fromIDs: ids)
@@ -318,7 +293,7 @@ final class ScreenshotRepository {
             }
         }
     }
-
+    
     func renameTag(from oldName: String, to newName: String) async throws {
         if AccountStorage.shared.isGuest ?? true {
             try SwiftDataManager.shared.renameTag(from: oldName, to: newName)

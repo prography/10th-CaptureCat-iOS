@@ -15,8 +15,8 @@ final class TagService {
         self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
     }
     
-    func fetchTagList(page: Int, size: Int) async -> Result<TagDTO, Error> {
-        let builder = TagListBuilder(page: page, size: size)
+    func fetchPopularTagList() async -> Result<TagDTO, Error> {
+        let builder = PopularTagBuilder()
         
         do {
             let result = try await networkManager.fetchData(builder)
