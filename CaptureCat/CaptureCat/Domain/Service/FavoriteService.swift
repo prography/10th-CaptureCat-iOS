@@ -36,4 +36,16 @@ final class FavoriteService {
             return .failure(error)
         }
     }
+    
+    func checkFavoriteImageList(page: Int, size: Int) async -> Result<FavoriteImageDTO, Error> {
+        let builder = FavoriteImageBuilder(page: page, size: size)
+        
+        do {
+            let response = try await networkManager.fetchData(builder)
+            debugPrint("✅ Success: \(page) 이미지 목록 불러오기 성공!")
+            return Result<FavoriteImageDTO, Error>.success(response)
+        } catch {
+            return .failure(error)
+        }
+    }
 }

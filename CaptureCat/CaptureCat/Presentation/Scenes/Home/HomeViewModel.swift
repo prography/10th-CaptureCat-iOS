@@ -14,6 +14,8 @@ final class HomeViewModel: ObservableObject {
     // MARK: - Dependencies
     private let repository = ScreenshotRepository.shared
     @Published var itemVMs: [ScreenshotItemViewModel] = []
+    @Published var favoriteItemVMs: [ScreenshotItemViewModel] = []
+    @Published var currentFavoriteIndex: Int = 0
     @Published var isLoadingPage = false
     @Published var isInitialLoading = false
     private var canLoadMorePages = true
@@ -51,6 +53,8 @@ final class HomeViewModel: ObservableObject {
             await loadFromServerOnly()
         }
         
+        await loadFavorite()
+        
         hasLoadedInitialData = true
     }
     
@@ -73,7 +77,17 @@ final class HomeViewModel: ObservableObject {
             if serverItems.isEmpty {
                 canLoadMorePages = false         // 더 이상 불러올 게 없으면 멈춤
             } else {
-                self.itemVMs += serverItems
+                // 중복 제거: 기존 ID와 겹치지 않는 아이템만 추가
+                let existingIDs = Set(self.itemVMs.map { $0.id })
+                let newItems = serverItems.filter { !existingIDs.contains($0.id) }
+                
+                if !newItems.isEmpty {
+                    self.itemVMs += newItems
+                    debugPrint("✅ 새로운 아이템 \(newItems.count)개 추가 (중복 \(serverItems.count - newItems.count)개 제외)")
+                } else {
+                    debugPrint("⚠️ 모든 아이템이 중복이므로 추가하지 않음")
+                }
+                
                 page += 1
             }
         } catch {
@@ -95,14 +109,48 @@ final class HomeViewModel: ObservableObject {
         do {
             let serverItems = try await repository.loadFromServerOnly()
             
+            // 중복 제거: 고유한 ID만 유지
+            var uniqueItems: [ScreenshotItemViewModel] = []
+            var seenIDs: Set<String> = []
+            
+            for item in serverItems {
+                if !seenIDs.contains(item.id) {
+                    seenIDs.insert(item.id)
+                    uniqueItems.append(item)
+                }
+            }
+            
             // ✅ @MainActor에서 직접 동기적 업데이트
-            self.itemVMs = serverItems
+            self.itemVMs = uniqueItems
+            debugPrint("✅ 서버 초기 로드 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
         } catch {
             debugPrint("❌ 서버 로드 실패: \(error.localizedDescription)")
             // 서버 실패 시 빈 배열 (로컬 데이터 사용 X)
             self.itemVMs = []
         }
         page += 1
+    }
+    
+    func loadFavorite() async {
+        do {
+            let serverItems = try await repository.loadFavoriteFromServerOnly()
+            
+            // 중복 제거: 고유한 ID만 유지
+            var uniqueItems: [ScreenshotItemViewModel] = []
+            var seenIDs: Set<String> = []
+            
+            for item in serverItems {
+                if !seenIDs.contains(item.id) {
+                    seenIDs.insert(item.id)
+                    uniqueItems.append(item)
+                }
+            }
+            
+            self.favoriteItemVMs = uniqueItems
+            debugPrint("✅ 즐겨찾기 로드 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
+        } catch {
+            debugPrint("❌ 즐겨찾기 서버 로드 실패: \(error.localizedDescription)")
+        }
     }
     
     /// 메모리 캐시 클리어 (로그아웃 시 사용)
@@ -129,6 +177,11 @@ final class HomeViewModel: ObservableObject {
             // 2) 리스트에서 제거
             removeItem(with: viewModel.id)
         }
+    }
+    
+    // Carousel 등에서 index 변경 시 호출
+    func onAssetChanged(to index: Int) {
+        currentFavoriteIndex = index
     }
     
     deinit {

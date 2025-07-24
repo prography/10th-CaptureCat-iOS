@@ -451,7 +451,7 @@ extension ScreenshotRepository {
     }
     
     /// 즐겨찾기 목록 조회 (로그인 상태에 따라 분기)
-    func loadFavorites() async throws -> [ScreenshotItemViewModel] {
+    func loadFavorites(page: Int, size: Int) async throws -> [ScreenshotItemViewModel] {
         if AccountStorage.shared.isGuest ?? true {
             // 게스트 모드: 로컬에서 즐겨찾기 조회
             let favoriteEntities = try SwiftDataManager.shared.fetchFavoriteEntities()
@@ -468,7 +468,39 @@ extension ScreenshotRepository {
             }
             return items.map(viewModel(for:))
         } else {
-            // 로그인 모드: 메모리 캐시에서 즐겨찾기 조회
+            return try await loadFavoriteFromServerOnly(page: page, size: size)
+        }
+    }
+    
+    func loadFavoriteFromServerOnly(page: Int = 0, size: Int = 20) async throws -> [ScreenshotItemViewModel] {
+        let result = await FavoriteService.shared.checkFavoriteImageList(page: page, size: size)
+        
+        switch result {
+        case .success(let response):
+            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
+                guard let captureDate = parseServerDate(serverItem.captureDate) else {
+                    return nil
+                }
+                
+                let screenshotItem = ScreenshotItem(
+                    id: String(serverItem.id),
+                    imageData: Data(), // 서버 URL에서 별도 로드
+                    imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
+                    fileName: serverItem.name,
+                    createDate: captureDate,
+                    tags: [],
+                    isFavorite: serverItem.isBookmarked
+                )
+                
+                return screenshotItem
+            }
+            
+            let viewModels = serverItems.map(viewModel(for:))
+            
+            return viewModels
+            
+        case .failure(let error):
+            throw error
             return InMemoryScreenshotCache.shared.getFavorites()
         }
     }
