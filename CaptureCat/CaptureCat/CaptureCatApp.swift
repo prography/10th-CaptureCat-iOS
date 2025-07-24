@@ -23,6 +23,7 @@ struct CaptureCatApp: App {
     
     init() {
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
+        KeyChainModule.create(key: .didStarted, data: "false")
     }
     
     var body: some Scene {

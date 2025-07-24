@@ -13,7 +13,11 @@ struct RecommandLoginView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Button {
-                viewModel.authenticationState = .start
+                if KeyChainModule.read(key: .didStarted) == "true" {
+                    viewModel.authenticationState = .signIn
+                } else {
+                    viewModel.authenticationState = .start
+                }
             } label: {
                 Image(systemName: "xmark")
                     .foregroundStyle(.text01)
