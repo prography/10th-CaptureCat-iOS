@@ -22,13 +22,14 @@ enum WebLink {
 import SwiftUI
 
 struct WebView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var viewModel: AuthViewModel
     var webLink: WebLink
     
     var body: some View {
         VStack {
             CustomNavigationBar(title: "", onBack: {
-                viewModel.authenticationState = .initial
+                dismiss()
             })
             WKWebViewPresentation(url: webLink.url)
         }

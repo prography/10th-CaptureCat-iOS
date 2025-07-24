@@ -16,41 +16,24 @@ class AuthViewModel: ObservableObject {
     
     private let socialManager: SocialManager = SocialManager()
     private let authService: AuthService
+    var nickname: String = "캐치님"
     
     @Published var authenticationState: AuthenticationState = .initial {
         didSet {
             if authenticationState == .initial {
                 isLogInPresented = true
                 isRecommandLogIn = false
-                isPersonalPresented = false
-                isTermsPresented = false
             } else if authenticationState == .guest {
                 isLogInPresented = false
                 isRecommandLogIn = true
-                isPersonalPresented = false
-                isTermsPresented = false
-            } else if authenticationState == .personal {
-                isPersonalPresented = true
-                isTermsPresented = false
-                isLogInPresented = false
-                isRecommandLogIn = false
-            } else if authenticationState == .terms {
-                isPersonalPresented = false
-                isTermsPresented = true
-                isLogInPresented = false
-                isRecommandLogIn = false
             } else {
                 isLogInPresented = false
                 isRecommandLogIn = false
-                isPersonalPresented = false
-                isTermsPresented = false
             }
         }
     }
     
     @Published var isLogInPresented: Bool = true
-    @Published var isPersonalPresented: Bool = false
-    @Published var isTermsPresented: Bool = false
     @Published var isRecommandLogIn: Bool = false
     @Published var isStartedGetScreenshot: Bool = false
     @Published var isLogOutPresented: Bool = false
@@ -75,6 +58,7 @@ class AuthViewModel: ObservableObject {
                     
                     switch kakaoSignIn {
                     case .success(let success):
+                        nickname = success.data.nickname
                         if success.data.tutorialCompleted {
                             debugPrint("🟡 로그인 성공 > 시작하기 완료한 회원 🟡")
                             self.authenticationState = .signIn
@@ -104,6 +88,7 @@ class AuthViewModel: ObservableObject {
                     
                     switch appleSignIn {
                     case .success(let success):
+                        nickname = success.data.nickname
                         if success.data.tutorialCompleted {
                             debugPrint("🍏 로그인 성공 > 시작하기 완료한 회원 🍏")
                             debugPrint("닉네임: \(success.data.nickname)")

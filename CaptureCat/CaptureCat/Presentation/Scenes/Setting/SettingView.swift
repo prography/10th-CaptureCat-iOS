@@ -11,6 +11,8 @@ struct SettingsView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var showInitPopUp: Bool = false
+    @State private var showTerms: Bool = false
+    @State private var showPersonal: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -73,6 +75,18 @@ struct SettingsView: View {
             authViewModel.withdraw()
         }
         .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
+        .fullScreenCover(
+            isPresented: $showPersonal,
+            onDismiss: {}
+        ) {
+            WebView(webLink: .personal)
+        }
+        .fullScreenCover(
+            isPresented: $showTerms,
+            onDismiss: {}
+        ) {
+            WebView(webLink: .terms)
+        }
     }
     
     private var guestCard: some View {
@@ -94,7 +108,7 @@ struct SettingsView: View {
     
     private var idCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("캐치님")
+            Text(authViewModel.nickname)
                 .CFont(.subhead01Bold)
                 .foregroundColor(.text01)
                 .padding(24)
@@ -117,7 +131,7 @@ struct SettingsView: View {
             .background(Color.gray02)
             
             Button {
-                debugPrint("정보")
+                showPersonal = true
             } label: {
                 Text("개인정보 처리 방침")
                     .CFont(.body01Regular)
@@ -127,7 +141,7 @@ struct SettingsView: View {
             }
             
             Button {
-                debugPrint("정보")
+                showTerms = true
             } label: {
                 Text("서비스 이용약관")
                     .CFont(.body01Regular)

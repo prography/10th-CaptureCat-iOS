@@ -10,6 +10,8 @@ import SwiftUI
 
 struct LogInView: View {
     @EnvironmentObject var viewModel: AuthViewModel
+    @State private var showTerms: Bool = false
+    @State private var showPersonal: Bool = false
     
     var body: some View {
         VStack {
@@ -46,7 +48,7 @@ struct LogInView: View {
                     .foregroundStyle(.text03)
                 HStack(spacing: 0) {
                     Button {
-                        viewModel.authenticationState = .terms
+                        showTerms = true
                     } label: {
                         Text("이용약관")
                             .CFont(.caption02Regular)
@@ -57,7 +59,7 @@ struct LogInView: View {
                         .CFont(.caption02Regular)
                         .foregroundStyle(.text03)
                     Button {
-                        viewModel.authenticationState = .personal
+                        showTerms = true
                     } label: {
                         Text("개인정보 처리방침")
                             .CFont(.caption02Regular)
@@ -72,5 +74,17 @@ struct LogInView: View {
             .padding(.top, 24)
         }
         .padding(EdgeInsets(top: 0, leading: 12, bottom: 20, trailing: 12))
+        .fullScreenCover(
+            isPresented: $showPersonal,
+            onDismiss: {}
+        ) {
+            WebView(webLink: .personal)
+        }
+        .fullScreenCover(
+            isPresented: $showTerms,
+            onDismiss: {}
+        ) {
+            WebView(webLink: .terms)
+        }
     }
 }
