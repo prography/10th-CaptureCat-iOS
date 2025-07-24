@@ -14,13 +14,17 @@ struct SyncCompletedView: View {
     @State private var scaleEffect: CGFloat = 0.8
     
     var body: some View {
-        VStack(spacing: 40) {
-            // 결과에 따른 이미지와 애니메이션
+        VStack() {
+            Spacer()
             Text("모든 스크린샷 동기화 완료!")
                 .CFont(.headline01Bold)
+                .foregroundStyle(.text01)
+                .padding(.bottom, 4)
             Text("이제 모든 디바이스에서 저장하신\n스크린샷을 관리할 수 있어요.")
                 .multilineTextAlignment(.center)
                 .CFont(.body01Regular)
+                .foregroundStyle(.text02)
+                .padding(.bottom, 16)
             Image(.complete)
             Spacer()
             
@@ -33,10 +37,10 @@ struct SyncCompletedView: View {
                 .primaryStyle()
                 .padding(.horizontal, 16)
             }
-            .padding(.bottom, 40)
+            .padding(.bottom, 60)
         }
         .padding(.top, 80)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .navigationBarHidden(true)
         .onAppear {
             debugPrint("📊 SyncCompletedView 표시: 성공 \(syncResult.successCount), 실패 \(syncResult.failedCount)")
