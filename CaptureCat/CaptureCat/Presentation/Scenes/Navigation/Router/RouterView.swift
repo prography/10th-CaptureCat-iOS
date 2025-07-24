@@ -49,6 +49,10 @@ struct RouterView<Content: View>: View {
                         DetailView(imageId: id)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .completeSave(let count):
+                        UploadCompleteView(count: count)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }

@@ -201,11 +201,12 @@ final class HomeViewModel: ObservableObject {
     func removeItem(with id: String) {
         if let index = itemVMs.firstIndex(where: { $0.id == id }) {
             itemVMs.remove(at: index)
-                    debugPrint("✅ HomeView에서 아이템 제거 완료: \(id)")
+            debugPrint("✅ HomeView에서 아이템 제거 완료: \(id)")
+        }
     }
     
     /// 태그 편집 완료 후 데이터 새로고침
-    func refreshAfterTagEdit() async {
+    private func refreshAfterTagEdit() async {
         debugPrint("🔄 태그 편집 완료 - 홈 데이터 새로고침 시작")
         
         let isGuest = AccountStorage.shared.isGuest ?? true
@@ -225,7 +226,7 @@ final class HomeViewModel: ObservableObject {
     }
     
     /// 서버에서 데이터 새로고침 (기존 데이터 교체)
-    func refreshFromServer() async {
+    private func refreshFromServer() async {
         debugPrint("🔄 서버에서 데이터 새로고침")
         
         // 페이지와 상태 초기화
@@ -257,7 +258,6 @@ final class HomeViewModel: ObservableObject {
             debugPrint("❌ 서버 새로고침 실패: \(error.localizedDescription)")
         }
     }
-}
     
     func delete(_ viewModel: ScreenshotItemViewModel) {
         // 1) 서버·로컬 삭제 호출

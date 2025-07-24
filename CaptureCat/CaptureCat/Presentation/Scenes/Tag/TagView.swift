@@ -30,7 +30,8 @@ struct TagView: View {
                         NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
                         
                         authViewModel.authenticationState = .signIn
-                        router.popToRoot()
+                        router.push(.completeSave(count: viewModel.itemVMs.count))
+//                        router.popToRoot()
                     }
                 },
                 isSaveEnabled: viewModel.hasChanges
