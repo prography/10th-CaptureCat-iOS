@@ -25,6 +25,10 @@ struct TagView: View {
                 onAction: {
                     Task {
                         await viewModel.save()
+                        
+                        // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
+                        NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
+                        
                         authViewModel.authenticationState = .signIn
                         router.popToRoot()
                     }

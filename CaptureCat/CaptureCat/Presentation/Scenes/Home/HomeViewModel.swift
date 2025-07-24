@@ -201,9 +201,63 @@ final class HomeViewModel: ObservableObject {
     func removeItem(with id: String) {
         if let index = itemVMs.firstIndex(where: { $0.id == id }) {
             itemVMs.remove(at: index)
-            debugPrint("✅ HomeView에서 아이템 제거 완료: \(id)")
+                    debugPrint("✅ HomeView에서 아이템 제거 완료: \(id)")
+    }
+    
+    /// 태그 편집 완료 후 데이터 새로고침
+    func refreshAfterTagEdit() async {
+        debugPrint("🔄 태그 편집 완료 - 홈 데이터 새로고침 시작")
+        
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        
+        if isGuest {
+            // 게스트 모드: 로컬에서 다시 로드
+            loadScreenshotFromLocal()
+        } else {
+            // 로그인 모드: 서버에서 다시 로드
+            await refreshFromServer()
+        }
+        
+        // 즐겨찾기도 새로고침
+        await loadFavorite()
+        
+        debugPrint("✅ 태그 편집 완료 - 홈 데이터 새로고침 완료")
+    }
+    
+    /// 서버에서 데이터 새로고침 (기존 데이터 교체)
+    func refreshFromServer() async {
+        debugPrint("🔄 서버에서 데이터 새로고침")
+        
+        // 페이지와 상태 초기화
+        page = 0
+        canLoadMorePages = true
+        
+        do {
+            let serverItems = try await repository.loadFromServerOnly()
+            
+            // 중복 제거: 고유한 ID만 유지
+            var uniqueItems: [ScreenshotItemViewModel] = []
+            var seenIDs: Set<String> = []
+            
+            for item in serverItems {
+                if !seenIDs.contains(item.id) {
+                    seenIDs.insert(item.id)
+                    uniqueItems.append(item)
+                }
+            }
+            
+            // 메인 스레드에서 UI 업데이트
+            await MainActor.run {
+                self.itemVMs = uniqueItems
+                debugPrint("✅ 서버 새로고침 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
+            }
+            
+            page += 1
+        } catch {
+            debugPrint("❌ 서버 새로고침 실패: \(error.localizedDescription)")
         }
     }
+}
     
     func delete(_ viewModel: ScreenshotItemViewModel) {
         // 1) 서버·로컬 삭제 호출
@@ -233,12 +287,22 @@ final class HomeViewModel: ObservableObject {
     // MARK: - Notification Handling
     
     private func setupNotificationObservers() {
+        // 즐겨찾기 상태 변경 알림
         NotificationCenter.default.publisher(for: .favoriteStatusChanged)
             .compactMap { notification in
                 notification.userInfo?["favoriteInfo"] as? FavoriteStatusInfo
             }
             .sink { [weak self] favoriteInfo in
                 self?.updateFavoriteStatus(favoriteInfo)
+            }
+            .store(in: &cancellables)
+        
+        // 태그 편집 완료 알림
+        NotificationCenter.default.publisher(for: .tagEditCompleted)
+            .sink { [weak self] _ in
+                Task {
+                    await self?.refreshAfterTagEdit()
+                }
             }
             .store(in: &cancellables)
     }
