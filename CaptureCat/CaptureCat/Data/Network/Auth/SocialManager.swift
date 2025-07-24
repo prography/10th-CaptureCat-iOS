@@ -24,13 +24,12 @@ struct SocialManager {
         }
     }
     
-    func appleLogin() async -> Result<String, NetworkError> {
-        
+    func appleLogin() async -> Result<(String, String), NetworkError> {
         let result = await appleSignIn()
         
         switch result {
         case .success(let success):
-            AccountStorage.shared.appleToken = success
+            AccountStorage.shared.appleToken = success.token
             return .success(success)
         case .failure(let failure):
             debugPrint("애플 토큰 가져오기 실패 \(failure.localizedDescription)")
@@ -52,15 +51,14 @@ extension SocialManager {
         return .success(result)
     }
     
-    func appleSignIn() async -> Result<String, NetworkError> {
+    func appleSignIn() async -> Result<(token: String, nickname: String), NetworkError> {
         let appleLoginManager = AppleLoginManager()
         
         do {
-            let (token, _) = try await appleLoginManager.login()
+            let (token, nickname) = try await appleLoginManager.login()
             debugPrint("🟢🍏🟢 애플 로그인 시도 성공 🟢🍏🟢")
-            return .success(token)
-            
-        } catch(let error) {
+            return .success((token, nickname))
+        } catch (let error) {
             debugPrint("🔴🍎🔴 애플 로그인 시도 실패 \(error.localizedDescription) 🔴🍎🔴")
             return .failure(NetworkError.badRequest)
         }

@@ -1,5 +1,5 @@
 //
-//  SingOutBuilder.swift
+//  WithdrawBuilder.swift
 //  CaptureCat
 //
 //  Created by minsong kim on 7/24/25.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct SingOutBuilder: BuilderProtocol {
+struct WithdrawBuilder: BuilderProtocol {
     typealias Response = ResponseDTO
     
-    var path: String = PathURLType.auth.path()
+    var path: String = PathURLType.withdraw.path()
     var queries: [URLQueryItem]? = nil
     var method: HTTPMethod { .delete }
     var parameters: [String: Any] = [:]

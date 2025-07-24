@@ -70,8 +70,9 @@ struct SettingsView: View {
             confirmTitle: "회원탈퇴"
         ) {
             //TODO: - signOutView 화면으로 이동
-            authViewModel.logOut()
+            authViewModel.withdraw()
         }
+        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
     }
     
     private var guestCard: some View {
@@ -201,9 +202,3 @@ struct SettingsView: View {
         }
     }
 }
-
-//struct SettingsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        SettingsView()
-//    }
-//}

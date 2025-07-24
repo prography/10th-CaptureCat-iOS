@@ -37,6 +37,8 @@ class AuthViewModel: ObservableObject {
     @Published var isStartedGetScreenshot: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
+    @Published var errorToast: Bool = false
+    @Published var errorMessage: String?
     
     init(service: AuthService) {
         self.authService = service
@@ -51,7 +53,7 @@ class AuthViewModel: ObservableObject {
                 switch result {
                 case .success(let token):
                     debugPrint("🟡 카카오에서 토큰 값 가져오기 성공 \(token) 🟡")
-                    let kakaoSignIn = await authService.login(social: "kakao", idToken: token)
+                    let kakaoSignIn = await authService.login(social: "kakao", idToken: token, nickname: nil)
                     
                     switch kakaoSignIn {
                     case .success(let success):
@@ -80,7 +82,7 @@ class AuthViewModel: ObservableObject {
                 
                 switch result {
                 case .success(let token):
-                    let appleSignIn = await authService.login(social: "apple", idToken: token)
+                    let appleSignIn = await authService.login(social: "apple", idToken: token.0, nickname: token.1)
                     
                     switch appleSignIn {
                     case .success(let success):
@@ -117,13 +119,20 @@ class AuthViewModel: ObservableObject {
         self.authenticationState = .initial
     }
     
-    func signOut() {
-        KeyChainModule.delete(key: .accessToken)
-        KeyChainModule.delete(key: .refreshToken)
-        
-        // 메모리 캐시 클리어
-        ScreenshotRepository.shared.clearMemoryCache()
-        
-        self.authenticationState = .initial
+    func withdraw() {
+        Task {
+            let result = await authService.withdraw()
+            
+            switch result {
+            case .success (_):
+                KeyChainModule.delete(key: .accessToken)
+                KeyChainModule.delete(key: .refreshToken)
+                ScreenshotRepository.shared.clearMemoryCache()
+                self.authenticationState = .initial
+            case .failure (let error):
+                self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
+                self.errorToast = true
+            }
+        }
     }
 }

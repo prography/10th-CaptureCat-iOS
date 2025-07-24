@@ -7,6 +7,7 @@
 
 enum PathURLType {
     case auth
+    case withdraw
     case uploadImage
     case turorial
     case imagePages
@@ -21,6 +22,8 @@ enum PathURLType {
         switch self {
         case .auth:
             return "/v1/auth"
+        case .withdraw:
+            return "/v1/user/withdraw"
         case .uploadImage:
             return "/v1/images/upload"
         case .turorial:
