@@ -15,7 +15,7 @@ class NetworkManager {
     }
     
     // MARK: - Public
-    func fetchData<Builder: BuilderProtocol>(_ builder: Builder) async throws -> Builder.Response {
+    func fetchData<Builder: BuilderProtocol>(_ builder: Builder, isRetry: Bool = false) async throws -> Builder.Response {
         let request = try await makeRequest(builder)
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -48,6 +48,18 @@ class NetworkManager {
             debugPrint("🔴 401 Unauthorized - 인증 실패")
             debugPrint("🔴 현재 토큰: \(KeyChainModule.read(key: .accessToken) ?? "없음")")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            // 토큰 갱신 시도 (재시도가 아닌 경우에만)
+            if !isRetry && builder.useAuthorization {
+                debugPrint("🔄 토큰 갱신 시도")
+                if await refreshTokenIfNeeded() {
+                    debugPrint("✅ 토큰 갱신 성공, 원래 요청 재시도")
+                    return try await fetchData(builder, isRetry: true)
+                } else {
+                    debugPrint("❌ 토큰 갱신 실패")
+                }
+            }
+            
             throw NetworkError.unauthorized
         case 403:
             debugPrint("🔴 403 Forbidden - 권한 없음")
@@ -91,13 +103,6 @@ class NetworkManager {
         let request = try await makeRequest(builder)
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        // 응답 데이터 로깅
-        if let responseString = String(data: data, encoding: .utf8) {
-            debugPrint("📥 Login Response Data: \(responseString)")
-        } else {
-            debugPrint("📥 Login Response Data: [Binary Data - \(data.count) bytes]")
-        }
-        
         guard let httpResponse = response as? HTTPURLResponse else {
             debugPrint("🔴 Login HTTP Response를 가져올 수 없음")
             throw NetworkError.responseNotFound
@@ -105,13 +110,11 @@ class NetworkManager {
 
         // 상세 응답 정보 로깅
         debugPrint("📊 Login HTTP Status Code: \(httpResponse.statusCode)")
-        debugPrint("📊 Login HTTP Headers: \(httpResponse.allHeaderFields)")
         
         if let accessToken = httpResponse.value(forHTTPHeaderField: "Authorization"),
            let refreshToken = httpResponse.value(forHTTPHeaderField: "Refresh-Token") {
             KeyChainModule.create(key: .accessToken, data: accessToken)
             KeyChainModule.create(key: .refreshToken, data: refreshToken)
-            debugPrint("🔑 토큰 저장 완료 - Access: \(accessToken.prefix(20))..., Refresh: \(refreshToken.prefix(20))...")
         } else {
             debugPrint("⚠️ 응답 헤더에서 토큰을 찾을 수 없음")
         }
@@ -235,5 +238,118 @@ class NetworkManager {
         debugPrint("📤 ========================")
         
         return request
+    }
+}
+
+extension NetworkManager {
+    // MARK: - 토큰 갱신 관련 메서드
+    
+    /// 필요 시 토큰 갱신 시도
+    private func refreshTokenIfNeeded() async -> Bool {
+        guard let refreshToken = KeyChainModule.read(key: .refreshToken),
+              !refreshToken.isEmpty else {
+            debugPrint("🔴 RefreshToken이 없어서 토큰 갱신 불가")
+            return false
+        }
+        
+        do {
+            let builder = RefreshTokenBuilder(refreshToken: refreshToken)
+            let response = try await fetchRefreshToken(builder)
+            debugPrint("✅ 토큰 갱신 성공")
+            return true
+        } catch {
+            debugPrint("🔴 토큰 갱신 실패: \(error)")
+            // 갱신 실패 시 모든 토큰 삭제
+            AccountStorage.shared.reset()
+            KeyChainModule.delete(key: .refreshToken)
+            KeyChainModule.delete(key: .accessToken)
+            return false
+        }
+    }
+    
+    /// 토큰 갱신 전용 네트워크 요청 (로그인과 동일한 방식으로 헤더에서 토큰 추출)
+    private func fetchRefreshToken<Builder: BuilderProtocol>(_ builder: Builder) async throws -> Builder.Response {
+        let request = try await makeRequest(builder)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        // 응답 데이터 로깅
+        if let responseString = String(data: data, encoding: .utf8) {
+            debugPrint("📥 Token Refresh Response Data: \(responseString)")
+        } else {
+            debugPrint("📥 Token Refresh Response Data: [Binary Data - \(data.count) bytes]")
+        }
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            debugPrint("🔴 Token Refresh HTTP Response를 가져올 수 없음")
+            throw NetworkError.responseNotFound
+        }
+
+        // 상세 응답 정보 로깅
+        debugPrint("📊 Token Refresh HTTP Status Code: \(httpResponse.statusCode)")
+        debugPrint("📊 Token Refresh HTTP Headers: \(httpResponse.allHeaderFields)")
+        
+        switch httpResponse.statusCode {
+        case 200...299:
+            // 성공 시 헤더에서 새로운 토큰 추출 및 저장
+            if let newAccessToken = httpResponse.value(forHTTPHeaderField: "Authorization"),
+               let newRefreshToken = httpResponse.value(forHTTPHeaderField: "Refresh-Token") {
+                
+                // 기존 토큰 삭제 후 새 토큰 저장
+                KeyChainModule.delete(key: .accessToken)
+                KeyChainModule.delete(key: .refreshToken)
+                
+                KeyChainModule.create(key: .accessToken, data: newAccessToken)
+                KeyChainModule.create(key: .refreshToken, data: newRefreshToken)
+                
+                debugPrint("🔑 새로운 토큰 저장 완료")
+                debugPrint("🔑 - New Access: \(newAccessToken.prefix(20))...")
+                debugPrint("🔑 - New Refresh: \(newRefreshToken.prefix(20))...")
+                
+            } else {
+                debugPrint("⚠️ 토큰 갱신 응답 헤더에서 새로운 토큰을 찾을 수 없음")
+                throw NetworkError.unauthorized
+            }
+            
+            debugPrint("✅ 토큰 갱신 성공: \(httpResponse.statusCode)")
+            return try await builder.deserializer.deserialize(data)
+            
+        case 401:
+            debugPrint("🔴 토큰 갱신 401 Unauthorized - RefreshToken 만료")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            throw NetworkError.unauthorized
+            
+        case 400:
+            debugPrint("🔴 토큰 갱신 400 Bad Request")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            throw NetworkError.badRequest
+            
+        case 403:
+            debugPrint("🔴 토큰 갱신 403 Forbidden")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            throw NetworkError.forBidden
+            
+        case 404:
+            debugPrint("🔴 토큰 갱신 404 Not Found")
+            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            throw NetworkError.responseNotFound
+            
+        case 500:
+            debugPrint("🔴 토큰 갱신 500 Internal Server Error")
+            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
+            debugPrint("🔴 요청 Method: \(request.httpMethod ?? "nil")")
+            debugPrint("🔴 요청 Headers: \(request.allHTTPHeaderFields ?? [:])")
+            if let body = request.httpBody {
+                debugPrint("🔴 요청 Body: \(String(data: body, encoding: .utf8) ?? "[Binary Data - \(body.count) bytes]")")
+            }
+            debugPrint("🔴 서버 응답: \(String(data: data, encoding: .utf8) ?? "nil")")
+            throw NetworkError.unknown(httpResponse.statusCode)
+            
+        default:
+            debugPrint("🔴 토큰 갱신 예상하지 못한 HTTP 상태 코드: \(httpResponse.statusCode)")
+            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            throw NetworkError.unknown(httpResponse.statusCode)
+        }
     }
 }
