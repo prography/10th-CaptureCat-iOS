@@ -25,7 +25,7 @@ struct RefreshTokenBuilder: BuilderProtocol {
     init(refreshToken: String) {
         self.headers = [
             "Content-Type": JSONNetworkSerializer().contentType,
-            "Refresh-Token": "Bearer \(refreshToken)" // 🔑 헤더로 리프레시 토큰 전송
+            "Refresh-Token": "\(refreshToken)" // 🔑 헤더로 리프레시 토큰 전송
         ]
     }
 } 

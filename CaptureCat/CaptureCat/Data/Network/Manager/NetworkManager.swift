@@ -160,15 +160,11 @@ class NetworkManager {
     
     // MARK: - Private
     private func makeRequest<Builder: BuilderProtocol>(_ builder: Builder) async throws -> URLRequest {
-        debugPrint("🔧 URL 생성 시작 - Base: \(baseURL), Path: \(builder.path)")
         let fullURL = baseURL.appendingPathComponent(builder.path)
-        debugPrint("🔧 appendingPathComponent 결과: \(fullURL)")
         
         var components = URLComponents(url: fullURL, resolvingAgainstBaseURL: false)
-        debugPrint("🔧 URLComponents 생성: \(components?.description ?? "nil")")
         
         components?.queryItems = builder.queries
-        debugPrint("🔧 Query Items 추가: \(components?.queryItems?.description ?? "nil")")
         
         guard let url = components?.url else {
             debugPrint("🔴 URL 생성 실패!")
@@ -323,11 +319,8 @@ extension NetworkManager {
                let newRefreshToken = httpResponse.value(forHTTPHeaderField: "Refresh-Token") {
                 
                 // 기존 토큰 삭제 후 새 토큰 저장
-                KeyChainModule.delete(key: .accessToken)
-                KeyChainModule.delete(key: .refreshToken)
-                
-                KeyChainModule.create(key: .accessToken, data: newAccessToken)
-                KeyChainModule.create(key: .refreshToken, data: newRefreshToken)
+                KeyChainModule.update(key: .accessToken, data: newAccessToken)
+                KeyChainModule.update(key: .refreshToken, data: newRefreshToken)
                 
                 debugPrint("🔑 새로운 토큰 저장 완료")
                 debugPrint("🔑 - New Access: \(newAccessToken.prefix(20))...")
