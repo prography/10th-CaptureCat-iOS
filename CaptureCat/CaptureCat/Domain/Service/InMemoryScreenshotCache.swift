@@ -77,4 +77,20 @@ final class InMemoryScreenshotCache {
         let otherTags = matchingItems.flatMap { $0.tags }.filter { !baseTags.contains($0) }
         return Array(Set(otherTags)).sorted()
     }
+    
+    // MARK: - Favorite Operations
+    
+    /// 특정 아이템의 즐겨찾기 상태 업데이트
+    func updateFavorite(id: String, isFavorite: Bool) {
+        cache[id]?.isFavorite = isFavorite
+        
+        if let index = allItems.firstIndex(where: { $0.id == id }) {
+            allItems[index].isFavorite = isFavorite
+        }
+    }
+    
+    /// 즐겨찾기 상태인 아이템들만 반환
+    func getFavorites() -> [ScreenshotItemViewModel] {
+        return allItems.filter { $0.isFavorite }
+    }
 }

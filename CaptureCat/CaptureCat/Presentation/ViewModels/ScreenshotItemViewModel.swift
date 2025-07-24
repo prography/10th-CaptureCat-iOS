@@ -124,8 +124,16 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     
     // MARK: – User Actions
     func toggleFavorite() {
-        isFavorite.toggle()
-        scheduleSave()
+        // Repository를 통해 즐겨찾기 상태 토글 (자동 분기 처리)
+        Task {
+            do {
+                try await ScreenshotRepository.shared.toggleFavorite(id: id)
+                debugPrint("✅ 즐겨찾기 상태 토글 완료: \(id)")
+            } catch {
+                debugPrint("❌ 즐겨찾기 상태 토글 실패: \(error.localizedDescription)")
+                errorMessage = error.localizedDescription
+            }
+        }
     }
     
     func addTag(_ tag: String) {

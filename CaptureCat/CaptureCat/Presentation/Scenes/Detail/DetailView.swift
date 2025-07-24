@@ -10,7 +10,7 @@ import SwiftUI
 struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var homeViewModel: HomeViewModel
-    let item: ScreenshotItemViewModel
+    @ObservedObject var item: ScreenshotItemViewModel
     @StateObject private var viewModel: DetailViewModel
     
     init(item: ScreenshotItemViewModel) {
@@ -109,6 +109,21 @@ struct DetailView: View {
             
             tagOverlay
         }
+        .overlay(
+            Button {
+                viewModel.toggleFavorite()
+            } label: {
+                Image(item.isFavorite ? .selectedFavorite : .unselectedFavorite)
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .padding(3)
+                    .background(.overlayDim)
+                    .clipShape(Circle())
+            }
+                .padding(.trailing, 16)
+                .padding(.bottom, 32),
+            alignment: .bottomTrailing
+        )
     }
     
     private var tagOverlay: some View {

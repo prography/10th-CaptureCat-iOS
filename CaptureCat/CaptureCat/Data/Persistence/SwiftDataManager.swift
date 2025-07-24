@@ -204,3 +204,75 @@ extension SwiftDataManager {
         try context.save()
     }
 }
+
+// MARK: - Favorite Management
+extension SwiftDataManager {
+    /// 특정 이미지의 즐겨찾기 상태 설정
+    func setFavorite(imageId: String, isFavorite: Bool) throws {
+        guard let item = fetchEntity(id: imageId) else {
+            debugPrint("⚠️ 이미지 ID를 찾을 수 없음: \(imageId)")
+            return
+        }
+        
+        item.isFavorite = isFavorite
+        try context.save()
+        
+        debugPrint("✅ 즐겨찾기 상태 변경 완료: \(imageId) -> \(isFavorite)")
+    }
+    
+    /// 특정 이미지의 즐겨찾기 상태 토글
+    func toggleFavorite(imageId: String) throws {
+        guard let item = fetchEntity(id: imageId) else {
+            debugPrint("⚠️ 이미지 ID를 찾을 수 없음: \(imageId)")
+            return
+        }
+        
+        item.isFavorite.toggle()
+        try context.save()
+        
+        debugPrint("✅ 즐겨찾기 상태 토글 완료: \(imageId) -> \(item.isFavorite)")
+    }
+    
+    /// 즐겨찾기에 추가
+    func addToFavorites(imageId: String) throws {
+        try setFavorite(imageId: imageId, isFavorite: true)
+    }
+    
+    /// 즐겨찾기에서 제거
+    func removeFromFavorites(imageId: String) throws {
+        try setFavorite(imageId: imageId, isFavorite: false)
+    }
+    
+    /// 즐겨찾기 상태인 모든 엔티티 가져오기
+    func fetchFavoriteEntities() throws -> [Screenshot] {
+        let pred = #Predicate<Screenshot> { $0.isFavorite == true }
+        let descriptor = FetchDescriptor(predicate: pred)
+        return try context.fetch(descriptor)
+    }
+    
+    /// 특정 이미지의 즐겨찾기 상태 조회
+    func isFavorite(imageId: String) -> Bool {
+        guard let item = fetchEntity(id: imageId) else {
+            return false
+        }
+        return item.isFavorite
+    }
+    
+    /// 여러 이미지의 즐겨찾기 상태 일괄 설정
+    func setFavorites(imageIds: [String], isFavorite: Bool) throws {
+        let items = imageIds.compactMap { fetchEntity(id: $0) }
+        
+        for item in items {
+            item.isFavorite = isFavorite
+        }
+        
+        try context.save()
+        debugPrint("✅ 다중 즐겨찾기 상태 변경 완료: \(imageIds.count)개 -> \(isFavorite)")
+    }
+    
+    /// 즐겨찾기 개수 조회
+    func getFavoriteCount() throws -> Int {
+        let favorites = try fetchFavoriteEntities()
+        return favorites.count
+    }
+}

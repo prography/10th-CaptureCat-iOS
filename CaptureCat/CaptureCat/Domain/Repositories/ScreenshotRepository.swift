@@ -364,3 +364,112 @@ final class ScreenshotRepository {
         }
     }
 }
+
+// MARK: - Favorite Management
+extension ScreenshotRepository {
+    /// 즐겨찾기 추가 (로그인 상태에 따라 분기)
+    func uploadFavorite(id: String) async throws {
+        if AccountStorage.shared.isGuest ?? true {
+            // 게스트 모드: 로컬에만 저장
+            try SwiftDataManager.shared.addToFavorites(imageId: id)
+            
+            // 메모리의 ViewModel도 업데이트
+            if let viewModel = vms[id] {
+                viewModel.isFavorite = true
+            }
+            
+            debugPrint("✅ 로컬에 즐겨찾기 추가 성공: \(id)")
+        } else {
+            // 로그인 모드: 서버에 저장
+            let result = await FavoriteService.shared.uploadFavorite(id: id)
+            
+            switch result {
+            case .success:
+                // 메모리 캐시의 ViewModel도 업데이트
+                if let viewModel = vms[id] {
+                    viewModel.isFavorite = true
+                }
+                InMemoryScreenshotCache.shared.updateFavorite(id: id, isFavorite: true)
+                
+                debugPrint("✅ 서버에 즐겨찾기 추가 성공: \(id)")
+            case .failure(let error):
+                debugPrint("❌ 서버에 즐겨찾기 추가 실패: \(error)")
+                throw error
+            }
+        }
+    }
+    
+    /// 즐겨찾기 제거 (로그인 상태에 따라 분기)
+    func deleteFavorite(id: String) async throws {
+        if AccountStorage.shared.isGuest ?? true {
+            // 게스트 모드: 로컬에서 제거
+            try SwiftDataManager.shared.removeFromFavorites(imageId: id)
+            
+            // 메모리의 ViewModel도 업데이트
+            if let viewModel = vms[id] {
+                viewModel.isFavorite = false
+            }
+            
+            debugPrint("✅ 로컬에서 즐겨찾기 제거 성공: \(id)")
+        } else {
+            // 로그인 모드: 서버에서 제거
+            let result = await FavoriteService.shared.deleteFavorite(id: id)
+            
+            switch result {
+            case .success:
+                // 메모리 캐시의 ViewModel도 업데이트
+                if let viewModel = vms[id] {
+                    viewModel.isFavorite = false
+                }
+                InMemoryScreenshotCache.shared.updateFavorite(id: id, isFavorite: false)
+                
+                debugPrint("✅ 서버에서 즐겨찾기 제거 성공: \(id)")
+            case .failure(let error):
+                debugPrint("❌ 서버에서 즐겨찾기 제거 실패: \(error)")
+                throw error
+            }
+        }
+    }
+    
+    /// 즐겨찾기 상태 토글 (로그인 상태에 따라 분기)
+    func toggleFavorite(id: String) async throws {
+        // 현재 상태 확인
+        let currentFavoriteState: Bool
+        
+        if AccountStorage.shared.isGuest ?? true {
+            currentFavoriteState = SwiftDataManager.shared.isFavorite(imageId: id)
+        } else {
+            currentFavoriteState = vms[id]?.isFavorite ?? false
+        }
+        
+        // 상태에 따라 추가/제거
+        if currentFavoriteState {
+            try await deleteFavorite(id: id)
+        } else {
+            try await uploadFavorite(id: id)
+        }
+    }
+    
+    /// 즐겨찾기 목록 조회 (로그인 상태에 따라 분기)
+    func loadFavorites() async throws -> [ScreenshotItemViewModel] {
+        if AccountStorage.shared.isGuest ?? true {
+            // 게스트 모드: 로컬에서 즐겨찾기 조회
+            let favoriteEntities = try SwiftDataManager.shared.fetchFavoriteEntities()
+            let items = favoriteEntities.map { entity in
+                ScreenshotItem(
+                    id: entity.id,
+                    imageData: Data(),
+                    imageURL: nil, // 게스트 모드에서는 로컬 이미지
+                    fileName: entity.fileName,
+                    createDate: entity.createDate,
+                    tags: entity.tags,
+                    isFavorite: entity.isFavorite
+                )
+            }
+            return items.map(viewModel(for:))
+        } else {
+            // 로그인 모드: 메모리 캐시에서 즐겨찾기 조회
+            return InMemoryScreenshotCache.shared.getFavorites()
+        }
+    }
+}

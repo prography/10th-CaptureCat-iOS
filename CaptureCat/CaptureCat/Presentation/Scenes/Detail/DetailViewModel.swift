@@ -148,6 +148,32 @@ class DetailViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Favorite Management
+    func toggleFavorite() {
+        // 1. UI 상태 즉시 업데이트 (낙관적 업데이트)
+        let originalState = item.isFavorite
+        item.isFavorite.toggle()
+        
+        Task {
+            do {
+                if originalState {
+                    // 원래 즐겨찾기 상태였으면 삭제
+                    try await ScreenshotRepository.shared.deleteFavorite(id: item.id)
+                    debugPrint("✅ 즐겨찾기 제거 완료: \(item.fileName)")
+                } else {
+                    // 원래 즐겨찾기가 아니었으면 추가
+                    try await ScreenshotRepository.shared.uploadFavorite(id: item.id)
+                    debugPrint("✅ 즐겨찾기 추가 완료: \(item.fileName)")
+                }
+            } catch {
+                // 2. 실패 시 UI 상태 원복
+                item.isFavorite = originalState
+                errorMessage = "즐겨찾기 변경 중 오류가 발생했습니다: \(error.localizedDescription)"
+                debugPrint("❌ 즐겨찾기 토글 실패: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     // MARK: - Error Handling
     func clearError() {
         errorMessage = nil
