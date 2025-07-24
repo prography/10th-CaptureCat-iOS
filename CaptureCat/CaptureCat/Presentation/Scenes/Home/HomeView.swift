@@ -101,11 +101,7 @@ struct HomeView: View {
     
     private var carouselView: some View {
         Group {
-            if viewModel.favoriteItemVMs.isEmpty {
-                Text("즐겨찾기한 스크린샷이 없습니다.")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
+            if viewModel.favoriteItemVMs.isEmpty == false {
                 ZStack {
                     ForEach(viewModel.favoriteItemVMs.indices, id: \.self) { idx in
                         carouselCard(at: idx)
