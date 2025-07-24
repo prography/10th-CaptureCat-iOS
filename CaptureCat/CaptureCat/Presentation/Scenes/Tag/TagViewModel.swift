@@ -53,6 +53,21 @@ final class TagViewModel: ObservableObject {
         debugPrint("🧹 TagViewModel 해제 - 삭제 큐 정리 완료")
     }
     
+    func checkHasChanges() {
+        var result = 0
+        for item in itemVMs {
+            if item.tags.isEmpty {
+                result += 1
+            }
+        }
+        
+        if result == 0 {
+            hasChanges = true
+        } else {
+            hasChanges = false
+        }
+    }
+    
     // 배열을 받아서 대응하는 ScreenshotItemViewModel들을 생성
     func createViewModel(from ids: [String]) {
         let results =  PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil)

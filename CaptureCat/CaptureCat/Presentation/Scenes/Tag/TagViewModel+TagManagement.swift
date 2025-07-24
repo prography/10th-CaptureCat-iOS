@@ -43,7 +43,7 @@ extension TagViewModel {
                 }
             }
         }
-        hasChanges = true
+        checkHasChanges()
     }
     
     // MARK: - Mode & Navigation
@@ -108,7 +108,7 @@ extension TagViewModel {
             }
             selectedTags.insert(tag)
         }
-        hasChanges = true
+        checkHasChanges()
         updateSelectedTags()
     }
     
@@ -134,7 +134,7 @@ extension TagViewModel {
         
         selectedTags.insert(name)
         updateSelectedTags()
-        hasChanges = true
+        checkHasChanges()
         
         // UserDefaults에 태그 목록 저장 (영구 저장)
         saveTags()
@@ -170,6 +170,6 @@ extension TagViewModel {
         
         // UI 업데이트 강제 트리거
         updateTrigger.toggle()
-        hasChanges = true
+        checkHasChanges()
     }
 } 
