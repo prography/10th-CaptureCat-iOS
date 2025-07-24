@@ -33,6 +33,9 @@ final class TagViewModel: ObservableObject {
     @Published var itemVMs: [ScreenshotItemViewModel] = []
     private var networkManager: NetworkManager
     
+    /// UI 업데이트를 강제하기 위한 더미 프로퍼티
+    @Published private var updateTrigger = false
+    
     init(itemsIds: [String], networkManager: NetworkManager) {
         self.networkManager = networkManager
         createViewModel(from: itemsIds)
@@ -51,7 +54,7 @@ final class TagViewModel: ObservableObject {
                 fileName: asset.localIdentifier + ".jpg",
                 createDate: asset.creationDate ?? Date(),
                 tags: [],
-                isFavorite: false
+                isFavorite: asset.isFavorite
             )
             self.itemVMs.append( (ScreenshotItemViewModel(model: newItem)))
         }
@@ -148,6 +151,16 @@ final class TagViewModel: ObservableObject {
         tags.append(name)
         itemVMs[currentIndex].addTag(name)
         updateSelectedTags()
+    }
+    
+    /// Favorite 상태 토글 (UI 업데이트 보장)
+    func toggleFavorite(at index: Int) {
+        guard index < itemVMs.count else { return }
+        itemVMs[index].isFavorite.toggle()
+        
+        // UI 업데이트 강제 트리거
+        updateTrigger.toggle()
+        hasChanges = true
     }
     
     // 저장 (batch: all items, single: current)

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "SelectedFavorite.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

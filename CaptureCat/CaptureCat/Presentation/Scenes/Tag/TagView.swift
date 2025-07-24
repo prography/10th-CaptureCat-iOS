@@ -135,6 +135,20 @@ struct TagView: View {
             ScreenshotItemView(viewModel: asset) {
                 EmptyView()
             }
+            .overlay(
+                Button {
+                    viewModel.toggleFavorite(at: index)
+                } label: {
+                    Image(viewModel.itemVMs[index].isFavorite ? .selectedFavorite : .unselectedFavorite)
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .padding(3)
+                        .background(.overlayDim)
+                        .clipShape(Circle())
+                }
+                    .padding(16),
+                alignment: .bottomTrailing
+            )
         }
         .scaleEffect(scale)
         .opacity(opacity)
