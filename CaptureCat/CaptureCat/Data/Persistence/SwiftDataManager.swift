@@ -191,4 +191,16 @@ extension SwiftDataManager {
         }
         try context.save()
     }
+    
+    func updateTag(id: String, tags: [String]) throws {
+        let item = fetchEntity(id: id)
+        item?.tags = tags
+        try context.save()
+    }
+    
+    func deleteTag(imageId: String, tagId: String) throws {
+        let item = fetchEntity(id: imageId)
+        item?.tags.remove(at: Int(tagId) ?? 0)
+        try context.save()
+    }
 }

@@ -84,6 +84,30 @@ final class ScreenshotRepository {
         }
     }
     
+    func updateTag(id: String, tags: [String]) async throws {
+        if AccountStorage.shared.isGuest ?? true {
+            try SwiftDataManager.shared.updateTag(id: id, tags: tags)
+        } else {
+            try await updateTagToServer(id: id, tags: tags)
+        }
+    }
+    
+    func deleteTag(imageId: String, tagId: String) async throws {
+        if AccountStorage.shared.isGuest ?? true {
+            try SwiftDataManager.shared.deleteTag(imageId: imageId, tagId: tagId)
+        } else {
+            let result = await TagService.shared.deleteTag(imageId: imageId, tagId: tagId)
+            
+            switch result {
+            case .success:
+                debugPrint("✅ 서버에 태그 삭제 성공: \(tagId)")
+            case .failure(let error):
+                debugPrint("❌ 서버에 태그 삭제 실패: \(error)")
+                throw error
+            }
+        }
+    }
+    
     // MARK: - Local Only Operations (비로그인 모드)
     
     private func loadFromLocal() throws -> [ScreenshotItemViewModel] {
@@ -210,13 +234,10 @@ final class ScreenshotRepository {
     
     /// 서버에만 저장 (로컬 저장 X)
     func saveToServerOnly(_ viewModel: ScreenshotItemViewModel) async throws {
-        // 🚫 서버에 태그 업데이트 전송 임시 비활성화
-        // try await addTagToServer(id: viewModel.id, tags: viewModel.tags)
-        
         // 메모리 캐시 업데이트
         InMemoryScreenshotCache.shared.store(viewModel)
         
-        debugPrint("✅ 서버 전용 저장 완료 (태그 서버 전송 제외): \(viewModel.fileName)")
+        debugPrint("✅ 서버 전용 저장 완료: \(viewModel.fileName)")
     }
     
     /// 서버에만 업로드
@@ -252,21 +273,18 @@ final class ScreenshotRepository {
         }
     }
     
-    // 🚫 서버 태그 추가 기능 임시 비활성화
-    /*
-     /// 특정 이미지에 태그 추가 (서버)
-     func addTagToServer(id: String, tags: [String]) async throws {
-     let result = await ImageService.shared.addImage(tags: tags, id: id)
-     
-     switch result {
-     case .success:
-     debugPrint("✅ 서버에 태그 추가 성공: \(tags)")
-     case .failure(let error):
-     debugPrint("❌ 서버에 태그 추가 실패: \(error)")
-     throw error
-     }
-     }
-     */
+     /// 특정 이미지에 태그 업데이트
+    func updateTagToServer(id: String, tags: [String]) async throws {
+        let result = await TagService.shared.updateTag(imageId: id, tags: tags)
+        
+        switch result {
+        case .success:
+            debugPrint("✅ 서버에 태그 추가 성공: \(tags)")
+        case .failure(let error):
+            debugPrint("❌ 서버에 태그 추가 실패: \(error)")
+            throw error
+        }
+    }
     
     // MARK: - Common Operations
     

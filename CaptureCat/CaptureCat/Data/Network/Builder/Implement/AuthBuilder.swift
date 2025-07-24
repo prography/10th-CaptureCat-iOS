@@ -11,7 +11,7 @@ struct AuthBuilder: BuilderProtocol {
     typealias Response = LogInResponseDTO
     
     var path: String = PathURLType.auth.path()
-    var queries: [URLQueryItem]? = nil
+    var queries: [URLQueryItem]?
     var method: HTTPMethod { .post }
     var parameters: [String: Any] = [:]
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())

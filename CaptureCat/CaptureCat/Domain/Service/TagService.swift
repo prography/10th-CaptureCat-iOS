@@ -21,7 +21,7 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<TagDTO, Error>.success(result)
-        } catch (let error) {
+        } catch(let error) {
             return .failure(error)
         }
     }
@@ -32,7 +32,29 @@ final class TagService {
         do {
             let result = try await networkManager.fetchData(builder)
             return Result<TagDTO, Error>.success(result)
-        } catch (let error){
+        } catch(let error){
+            return .failure(error)
+        }
+    }
+    
+    func updateTag(imageId: String, tags: [String]) async -> Result<ResponseDTO, Error> {
+        let builder = UpdateTagBuilder(imageId: imageId, tags: tags)
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<ResponseDTO, Error>.success(result)
+        } catch(let error) {
+            return .failure(error)
+        }
+    }
+    
+    func deleteTag(imageId: String, tagId: String) async -> Result<ResponseDTO, Error> {
+        let builder = DeleteTagBuilder(imageId: imageId, tagId: tagId)
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<ResponseDTO, Error>.success(result)
+        } catch(let error) {
             return .failure(error)
         }
     }

@@ -31,9 +31,15 @@ struct DetailView: View {
         }
         .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
             AddTagSheet(
-                tags: .constant(viewModel.tags),
+                tags: $viewModel.tags,
                 selectedTags: $viewModel.tempSelectedTags,
-                isPresented: $viewModel.isShowingAddTagSheet
+                isPresented: $viewModel.isShowingAddTagSheet,
+                onAddNewTag: { newTag in
+                    viewModel.addNewTag(newTag)
+                },
+                onDeleteTag: { tag in
+                    viewModel.deleteTag(tag)
+                }
             )
         }
         .popUp(
@@ -76,7 +82,9 @@ struct DetailView: View {
         VStack {
             CustomNavigationBar(
                 title: viewModel.formattedDate,
-                onBack: { dismiss() },
+                onBack: {
+                    dismiss()
+                },
                 color: .white
             )
             .padding(.top, 10)

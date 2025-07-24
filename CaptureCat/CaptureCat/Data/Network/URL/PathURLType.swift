@@ -12,7 +12,6 @@ enum PathURLType {
     case turorial
     case imagePages
     case searchByTag
-    case oneImage
     case getTags
     case relatedTags
     case mostUsedTags
@@ -32,8 +31,6 @@ enum PathURLType {
             return "/v1/images"
         case .searchByTag:
             return "/v1/images/search"
-        case .oneImage:
-            return "/v1/images"
         case .getTags:
             return "/v1/tags"
         case .relatedTags:

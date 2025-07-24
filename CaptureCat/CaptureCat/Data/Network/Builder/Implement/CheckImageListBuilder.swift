@@ -10,8 +10,8 @@ import Foundation
 struct CheckImageListBuilder: BuilderProtocol {
     typealias Response = ImagListDTO
     
-    var path: String = PathURLType.oneImage.path()
-    var queries: [URLQueryItem]? = nil
+    var path: String = PathURLType.imagePages.path()
+    var queries: [URLQueryItem]?
     var method: HTTPMethod { .get }
     var parameters: [String: Any] = [:]
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())
