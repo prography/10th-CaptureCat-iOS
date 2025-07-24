@@ -186,10 +186,8 @@ final class TagViewModel: ObservableObject {
             await uploadToServerWithImageService(viewModels: itemVMs)
             
         case .single:
-            // 단일 모드: 현재 아이템만 업로드
-            if let viewModel = displayVM {
-                await uploadToServerWithImageService(viewModels: [viewModel])
-            }
+            // 단일 모드에서도 편집된 모든 아이템 업로드
+            await uploadToServerWithImageService(viewModels: itemVMs)
         }
     }
     

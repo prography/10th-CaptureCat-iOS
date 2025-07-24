@@ -15,7 +15,6 @@ final class ImageService {
         self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
     }
     
-    
     func uploadImages(imageDatas: [Data], imageMetas: [PhotoDTO]) async -> Result<ResponseDTO, Error> {
         let builder = UploadImageBuilder(imageDatas: imageDatas, imageMetas: imageMetas)
         
