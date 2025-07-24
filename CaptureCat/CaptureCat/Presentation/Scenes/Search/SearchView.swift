@@ -25,7 +25,7 @@ struct SearchView: View {
         }
         .background(Color(.systemBackground))
         .task {
-            viewModel.loadTags()
+            await viewModel.loadTags()
         }
     }
     

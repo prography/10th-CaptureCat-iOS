@@ -68,11 +68,44 @@ final class ScreenshotRepository {
     }
     
     /// 전체 태그 목록 (로그인 상태 자동 분기)
-    func fetchAllTags() throws -> [String] {
+    func fetchAllTags() async throws -> [String] {
         if AccountStorage.shared.isGuest ?? true {
             return try SwiftDataManager.shared.fetchAllTags()
         } else {
-            return InMemoryScreenshotCache.shared.getAllTags()
+            // TagService를 사용하여 서버에서 전체 태그 목록 가져오기 (모든 페이지 순회)
+            var allTagNames: [String] = []
+            var currentPage = 0
+            var hasNext = true
+            let pageSize = 50
+            
+            while hasNext {
+                let result = await TagService.shared.fetchTagList(page: currentPage, size: pageSize)
+                
+                switch result {
+                case .success(let tagDTO):
+                    // 현재 페이지의 태그들을 추가
+                    let pageTagNames = tagDTO.data.items.map { $0.name }
+                    allTagNames.append(contentsOf: pageTagNames)
+                    
+                    // 다음 페이지 확인
+                    hasNext = tagDTO.data.hasNext
+                    currentPage += 1
+                    
+                    debugPrint("✅ 서버에서 태그 페이지 \(currentPage-1) 로드 성공: \(pageTagNames.count)개, hasNext: \(hasNext)")
+                    
+                case .failure(let error):
+                    debugPrint("❌ 서버에서 태그 페이지 \(currentPage) 로드 실패: \(error.localizedDescription)")
+                    // 첫 페이지부터 실패한 경우 InMemoryCache 사용
+                    if currentPage == 0 {
+                        return InMemoryScreenshotCache.shared.getAllTags()
+                    }
+                    // 중간 페이지에서 실패한 경우 지금까지 수집한 태그들 반환
+                    hasNext = false
+                }
+            }
+            
+            debugPrint("✅ 서버에서 전체 태그 로드 완료: \(allTagNames.count)개 태그, \(currentPage)페이지")
+            return allTagNames
         }
     }
     

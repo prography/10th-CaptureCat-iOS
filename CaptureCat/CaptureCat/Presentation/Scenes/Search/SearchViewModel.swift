@@ -35,10 +35,10 @@ final class SearchViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func loadTags() {
+    func loadTags() async {
         isLoading = true
         do {
-            allTags = try repository.fetchAllTags()
+            allTags = try await repository.fetchAllTags()
             filteredTags = allTags
         } catch {
             print("태그 로딩 실패: \(error)")
