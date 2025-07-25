@@ -67,17 +67,8 @@ struct HomeView: View {
                                     Task {
                                         await viewModel.loadNextPageServer()
                                         
-                                        // 새로 로드된 아이템들의 이미지 로드 (안전한 범위 체크)
-                                        let currentItems = viewModel.itemVMs
-                                        let startIndex = max(0, thresholdIndex)
-                                        let endIndex = min(currentItems.count, startIndex + 10) // 최대 10개씩만 로드
-                                        
-                                        for i in startIndex..<endIndex {
-                                            // 인덱스가 여전히 유효한지 확인
-                                            if i < viewModel.itemVMs.count {
-                                                await viewModel.itemVMs[i].loadFullImage()
-                                            }
-                                        }
+                                        // ✅ 새로 로드된 아이템들의 이미지를 병렬로 로드
+                                        await loadNewPageImages(from: thresholdIndex)
                                     }
                                 }
                             }
@@ -92,11 +83,8 @@ struct HomeView: View {
             // 초기 데이터 로딩 (중복 방지)
             await viewModel.loadScreenshots()
             
-            // 모든 아이템의 이미지 로드 (안전한 방식)
-            let currentItems = Array(viewModel.itemVMs)
-            for itemVM in currentItems {
-                await itemVM.loadFullImage()
-            }
+            // ✅ 첫 화면에 보이는 이미지들만 병렬로 미리 로드 (선택적)
+            await loadInitialVisibleImages()
         }
         .refreshable {
             // Pull to refresh (중복 실행 방지 적용)
@@ -169,9 +157,14 @@ struct HomeView: View {
         .zIndex(zIndex)
         .animation(.none, value: draggingItem) // 드래그 중 애니메이션 비활성화
         .onAppear {
-            // 각 카드가 나타날 때 이미지 로드
-            Task {
-                await asset.loadFullImage()
+            // ✅ ScreenshotItemView가 자동으로 썸네일을 로드하므로
+            // 카로셀에서는 필요시에만 추가 처리
+            // 중복 로딩 방지를 위해 이미 로드된 경우 스킵
+            if asset.thumbnail == nil && asset.fullImage == nil && !asset.isLoadingImage {
+                Task {
+                    // 카로셀에서는 조금 더 큰 크기로 로드 (선택적)
+                    await asset.loadThumbnail(size: CGSize(width: 200, height: 300))
+                }
             }
         }
     }
@@ -240,5 +233,39 @@ struct HomeView: View {
     
     func myXOffset(_ item: Int) -> Double {
         return -distance(item) * 240  // 부호 반전으로 애니메이션 방향 수정
+    }
+    
+    // MARK: - Image Loading Helpers
+    
+    /// 첫 화면에 보이는 이미지들을 병렬로 미리 로드
+    private func loadInitialVisibleImages() async {
+        let visibleCount = min(6, viewModel.itemVMs.count) // 첫 화면에 보이는 6개 정도
+        
+        // ✅ 병렬 로딩으로 여러 이미지를 동시에 다운로드
+        await withTaskGroup(of: Void.self) { group in
+            for i in 0..<visibleCount {
+                group.addTask {
+                    await viewModel.itemVMs[i].loadThumbnail(size: CGSize(width: 150, height: 250))
+                }
+            }
+        }
+    }
+    
+    /// 새로운 페이지의 이미지들을 병렬로 로드
+    private func loadNewPageImages(from startIndex: Int) async {
+        let currentItems = viewModel.itemVMs
+        let safeStartIndex = max(0, startIndex)
+        let endIndex = min(currentItems.count, safeStartIndex + 10) // 최대 10개씩
+        
+        // ✅ 병렬 로딩으로 새 페이지 이미지들을 동시에 다운로드
+        await withTaskGroup(of: Void.self) { group in
+            for i in safeStartIndex..<endIndex {
+                guard i < viewModel.itemVMs.count else { break }
+                
+                group.addTask {
+                    await viewModel.itemVMs[i].loadThumbnail(size: CGSize(width: 150, height: 250))
+                }
+            }
+        }
     }
 }
