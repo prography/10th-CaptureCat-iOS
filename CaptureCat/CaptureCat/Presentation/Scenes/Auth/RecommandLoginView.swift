@@ -13,7 +13,11 @@ struct RecommandLoginView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Button {
-                viewModel.authenticationState = .start
+                if KeyChainModule.read(key: .didStarted) == "true" {
+                    viewModel.authenticationState = .signIn
+                } else {
+                    viewModel.authenticationState = .start
+                }
             } label: {
                 Image(systemName: "xmark")
                     .foregroundStyle(.text01)
@@ -42,7 +46,11 @@ struct RecommandLoginView: View {
                 .primaryStyle()
                 .padding(.horizontal, 16)
                 Button {
-                    viewModel.authenticationState = .start
+                    if KeyChainModule.read(key: .didStarted) == "true" {
+                        viewModel.authenticationState = .signIn
+                    } else {
+                        viewModel.authenticationState = .start
+                    }
                 } label: {
                     Text("나중에 하기")
                         .CFont(.caption02Regular)

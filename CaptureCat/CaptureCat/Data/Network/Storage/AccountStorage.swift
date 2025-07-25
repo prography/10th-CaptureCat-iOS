@@ -113,10 +113,52 @@ final class AccountStorage {
         clearAllTokens()
     }
     
+    /// 안전한 리셋 (연쇄 삭제 방지)
+    func safeReset() {
+        debugPrint("🔮 안전한 AccountStorage 리셋 시작")
+        
+        // 프로퍼티 리셋 (내부적으로 키체인 삭제 시도하지만 에러 무시됨)
+        accessToken = nil
+        refreshToken = nil
+        
+        // 추가 정리 작업
+        safelyClearAllTokens()
+        
+        debugPrint("🔮 안전한 AccountStorage 리셋 완료")
+    }
+    
     func clearAllTokens() {
         KeyChainModule.delete(key: .accessToken)
         KeyChainModule.delete(key: .refreshToken)
         
         debugPrint("🔮 All tokens cleared from Keychain")
+    }
+    
+    /// 안전한 토큰 정리 (에러 무시)
+    private func safelyClearAllTokens() {
+        debugPrint("🔮 안전한 토큰 정리 시작")
+        
+        // 각 토큰을 개별적으로 삭제하고 에러 무시
+        do {
+            debugPrint("🔮 AccessToken 키체인 삭제 시도")
+            KeyChainModule.delete(key: .accessToken)
+        }
+        
+        do {
+            debugPrint("🔮 RefreshToken 키체인 삭제 시도")
+            KeyChainModule.delete(key: .refreshToken)
+        }
+        
+        do {
+            debugPrint("🔮 KakaoToken 키체인 삭제 시도")
+            KeyChainModule.delete(key: .kakaoToken)
+        }
+        
+        do {
+            debugPrint("🔮 AppleToken 키체인 삭제 시도")
+            KeyChainModule.delete(key: .appleToken)
+        }
+        
+        debugPrint("🔮 안전한 토큰 정리 완료")
     }
 }

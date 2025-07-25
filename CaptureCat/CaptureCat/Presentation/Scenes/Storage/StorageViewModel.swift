@@ -83,10 +83,11 @@ final class StorageViewModel: ObservableObject {
     func toggleAllSelection() {
         if selectedIDs.isEmpty {
             selectAll()
+            isAllSelected = true
         } else {
             deselectAll()
+            isAllSelected = false
         }
-        isAllSelected.toggle()
     }
     
     func showDeletePopUp() {

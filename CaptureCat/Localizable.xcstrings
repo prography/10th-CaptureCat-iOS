@@ -5,221 +5,1170 @@
 
     },
     " 및 " : {
-
-    },
-    "%lld%% 완료" : {
-
-    },
-    "%lld장의 스크린샷이 있어요." : {
-
-    },
-    "Hello, world!" : {
-
-    },
-    "options" : {
-
-    },
-    "Tip. 즐겨찾기를 하면 홈에서\n더 자주 볼 수 있어요." : {
-
-    },
-    "가입하면 캡쳐캣의" : {
-
-    },
-    "개인정보 처리 방침" : {
-
-    },
-    "개인정보 처리방침" : {
-
-    },
-    "건너뛰기" : {
-
-    },
-    "검색" : {
-
-    },
-    "검색 결과가 없습니다" : {
-
-    },
-    "계속" : {
-
-    },
-    "계속하기" : {
-
-    },
-    "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요." : {
-
-    },
-    "그동안 이용해주셔서 감사합니다. 계정을 삭제하는 이유를 알려주시면 해당 문제에 관해 저희가 도움을 드릴 수 있습니다. 원치않으시는 경우 이유를 선택하지 않고 삭제를 계속 진행하실 수 있습니다." : {
-
-    },
-    "나중에 하기" : {
-
-    },
-    "나중에도 저장할 수 있으니 먼저 필요한 이미지만 골라보세요." : {
-
-    },
-    "다른 태그를 선택해보세요" : {
-
-    },
-    "다음" : {
-
-    },
-    "도움말" : {
-
-    },
-    "돌아가기" : {
-
-    },
-    "동기화 결과를 불러올 수 없습니다" : {
-
-    },
-    "로그아웃" : {
-
-    },
-    "로그인 후 이용하기" : {
-
-    },
-    "로그인하기" : {
-
-    },
-    "로그인하면 모든 디바이스에서 관리하고,\n갤러리에서 지워도 캡처캣에 안전하게 보관돼요." : {
-
-    },
-    "로딩 중..." : {
-
-    },
-    "모든 스크린샷 동기화 완료!" : {
-
-    },
-    "모든 스크린샷을\n동기화하고 있어요" : {
-
-    },
-    "버전 정보" : {
-
-    },
-    "버전 정보 %@.%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "버전 정보 %1$@.%2$@"
+            "state" : "translated",
+            "value" : "and"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "및"
+          }
+        }
+      }
+    },
+    "%lld%% 완료" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld% Completed"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% 완료"
+          }
+        }
+      }
+    },
+    "%lld장 정리 완료!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld screenshots organized"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld장 정리 완료!"
+          }
+        }
+      }
+    },
+    "%lld장의 스크린샷이 있어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There are %lld screenshots."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld장의 스크린샷이 있어요."
+          }
+        }
+      }
+    },
+    "Hello, world!" : {
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hello, world!"
+          }
+        }
+      }
+    },
+    "options" : {
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "options"
+          }
+        }
+      }
+    },
+    "Tip. 즐겨찾기를 하면 홈에서\n더 자주 볼 수 있어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TIP.Add to favorites to see it more often on the home screen."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip. 즐겨찾기를 하면 홈에서\n더 자주 볼 수 있어요."
+          }
+        }
+      }
+    },
+    "가입하면 캡쳐캣의" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By signing up, you agree to CaptureCat’s "
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가입하면 캡쳐캣의"
+          }
+        }
+      }
+    },
+    "개인정보 처리 방침" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인정보 처리방침"
+          }
+        }
+      }
+    },
+    "개인정보 처리방침" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인정보 처리방침"
+          }
+        }
+      }
+    },
+    "건너뛰기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건너뛰기"
+          }
+        }
+      }
+    },
+    "검색" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검색"
+          }
+        }
+      }
+    },
+    "검색결과가 없어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No search results found."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검색결과가 없어요."
+          }
+        }
+      }
+    },
+    "계속" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속"
+          }
+        }
+      }
+    },
+    "계속하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep going"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속하기"
+          }
+        }
+      }
+    },
+    "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select up to 5 topics of interest, Catch will create tags for you in advance."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요."
+          }
+        }
+      }
+    },
+    "그동안 이용해주셔서 감사합니다. 계정을 삭제하는 이유를 알려주시면 해당 문제에 관해 저희가 도움을 드릴 수 있습니다. 원치않으시는 경우 이유를 선택하지 않고 삭제를 계속 진행하실 수 있습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thank you for using our service. If you let us know why you’re deleting your account, we may be able to help with the issue. If you prefer not to, you can proceed with deletion without selecting a reason."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "그동안 이용해주셔서 감사합니다. 계정을 삭제하는 이유를 알려주시면 해당 문제에 관해 저희가 도움을 드릴 수 있습니다. 원치않으시는 경우 이유를 선택하지 않고 삭제를 계속 진행하실 수 있습니다."
+          }
+        }
+      }
+    },
+    "나중에 하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do it later"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나중에 하기"
+          }
+        }
+      }
+    },
+    "나중에도 저장할 수 있으니 먼저 필요한 이미지만 골라보세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can save it later, so just pick the images you need first."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나중에도 저장할 수 있으니 먼저 필요한 이미지만 골라보세요."
+          }
+        }
+      }
+    },
+    "다음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "도움말" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "도움말"
+          }
+        }
+      }
+    },
+    "돌아가기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go back"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "돌아가기"
+          }
+        }
+      }
+    },
+    "동기화 결과를 불러올 수 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to load sync results"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동기화 결과를 불러올 수 없습니다"
+          }
+        }
+      }
+    },
+    "로그아웃" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log out"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그아웃"
+          }
+        }
+      }
+    },
+    "로그인 후 이용하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in to continue"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 후 이용하기"
+          }
+        }
+      }
+    },
+    "로그인하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하기"
+          }
+        }
+      }
+    },
+    "로그인하면 모든 디바이스에서 관리하고,\n갤러리에서 지워도 캡처캣에 안전하게 보관돼요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in to manage everything across all your devices, Even if you delete them from your gallery, they’re safely stored in CaptureCat."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하면 모든 디바이스에서 관리하고,\n갤러리에서 지워도 캡처캣에 안전하게 보관돼요."
+          }
+        }
+      }
+    },
+    "로딩 중..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로딩 중..."
+          }
+        }
+      }
+    },
+    "모든 스크린샷 동기화 완료!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All screenshots synced!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 스크린샷 동기화 완료!"
+          }
+        }
+      }
+    },
+    "모든 스크린샷을\n동기화하고 있어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syncing all screenshots"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 스크린샷을\n동기화하고 있어요"
+          }
+        }
+      }
+    },
+    "버전 정보" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Information"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전 정보"
+          }
+        }
+      }
+    },
+    "버전 정보 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Information %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전 정보 %@"
           }
         }
       }
     },
     "삭제" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
+          }
+        }
+      }
     },
     "삭제하기 전에 도움을 받아보세요." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get help before deleting"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제하기 전에 도움을 받아보세요."
+          }
+        }
+      }
     },
     "삭제할래요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I want to delete"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제할래요"
+          }
+        }
+      }
+    },
+    "새로고침 중..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refreshing"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "새로고침 중..."
+          }
+        }
+      }
     },
     "서비스 이용약관" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Service"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스 이용약관"
+          }
+        }
+      }
     },
     "서비스 정보" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Service Info"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스 정보"
+          }
+        }
+      }
     },
     "선택 삭제" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete selected"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택 삭제"
+          }
+        }
+      }
+    },
+    "스크린샷을 태그해 정리해보세요!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize your screenshots with tags!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷을 태그해 정리해보세요!"
+          }
+        }
+      }
     },
     "시작하기 전에" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before you start"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작하기 전에"
+          }
+        }
+      }
     },
     "시작하기 전에 \n%lld장의 스크린샷이 있어요." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have %lld screenshots before getting started"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작하기 전에 \n%lld장의 스크린샷이 있어요."
+          }
+        }
+      }
+    },
+    "아직 스크린샷이 없어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No screenshots yet."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 스크린샷이 없어요."
+          }
+        }
+      }
+    },
+    "아직 태그가 없어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tags yet"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 태그가 없어요."
+          }
+        }
+      }
     },
     "에 동의하게 됩니다." : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "에 동의하게 됩니다."
+          }
+        }
+      }
     },
     "오류" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오류"
+          }
+        }
+      }
     },
     "완료" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        }
+      }
     },
     "이미지를 불러올 수 없습니다" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to load image."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지를 불러올 수 없습니다"
+          }
+        }
+      }
     },
     "이용약관" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Use"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이용약관"
+          }
+        }
+      }
     },
     "이제 모든 디바이스에서 저장하신\n스크린샷을 관리할 수 있어요." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can now manage your saved screenshots across all devices."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이제 모든 디바이스에서 저장하신\n스크린샷을 관리할 수 있어요."
+          }
+        }
+      }
     },
     "임시보관함" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drafts"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "임시보관함"
+          }
+        }
+      }
+    },
+    "임시보관함에서 스크린샷을 저장할 수 있어요!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can save screenshots in Drafts!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "임시보관함에서 스크린샷을 저장할 수 있어요!"
+          }
+        }
+      }
     },
     "자주 캡쳐하는 이미지가 있으신가요?" : {
-
-    },
-    "저장된 스크린샷이 없습니다." : {
-
-    },
-    "저장된 태그가 없습니다" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do you often capture certain images?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자주 캡쳐하는 이미지가 있으신가요?"
+          }
+        }
+      }
     },
     "전체 선택" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 선택"
+          }
+        }
+      }
     },
     "정리하기 %lld/10" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize %lld/10"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정리하기 %lld/10"
+          }
+        }
+      }
+    },
+    "즐겨찾기를 한 스크린샷은\n홈에서 더 자주 만날 수 있어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to favorites to see it more often on the home screen."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "즐겨찾기를 한 스크린샷은\n홈에서 더 자주 만날 수 있어요."
+          }
+        }
+      }
     },
     "즐겨찾기한 스크린샷이 없습니다." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No favorited screenshots."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "즐겨찾기한 스크린샷이 없습니다."
+          }
+        }
+      }
     },
     "초기화" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "초기화"
+          }
+        }
+      }
     },
     "최근 추가한 태그" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently added tags"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 추가한 태그"
+          }
+        }
+      }
     },
     "추가" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추가"
+          }
+        }
+      }
     },
     "추가된 태그" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added tags"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추가된 태그"
+          }
+        }
+      }
     },
     "추가할 태그를 입력해주세요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter tags to add"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추가할 태그를 입력해 주세요"
+          }
+        }
+      }
     },
     "취소" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        }
+      }
     },
     "캐치님" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mr.Catch"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캐치님"
+          }
+        }
+      }
     },
     "태그 바로가기" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag shortcuts"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 바로가기"
+          }
+        }
+      }
     },
     "태그 이름으로 검색해 보세요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search by tag name"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 이름으로 검색해 보세요."
+          }
+        }
+      }
     },
     "태그 추가" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add tag"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 추가"
+          }
+        }
+      }
     },
     "태그 편집" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit tag"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 편집"
+          }
+        }
+      }
     },
     "태그는 최대 4개까지 지정할 수 있어요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can save up to 4 tags."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그는 최대 4개까지 지정할 수 있어요"
+          }
+        }
+      }
     },
-    "해당 태그들이 모두 포함된 스크린샷이 없습니다" : {
-
+    "표시할 아이템이 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No items to display"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시할 아이템이 없습니다."
+          }
+        }
+      }
     },
     "현재 게스트 모드로 사용하고 있어요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’re currently using guest mode."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "현재 게스트 모드로 사용하고 있어요"
+          }
+        }
+      }
     },
     "홈" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HOME"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈"
+          }
+        }
+      }
     },
     "확인" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        }
+      }
     },
     "회원 탈퇴" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Account"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회원 탈퇴"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

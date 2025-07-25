@@ -27,10 +27,6 @@ class DetailViewModel: ObservableObject {
     }
     
     // MARK: - Computed Properties
-    var formattedDate: String {
-        item?.createDate.toString(format: "yyyy년 MM월 dd일") ?? ""
-    }
-    
     var displayImage: UIImage {
         item?.fullImage ?? UIImage(resource: .apple)
     }

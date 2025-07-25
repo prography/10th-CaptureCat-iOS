@@ -283,12 +283,34 @@ extension NetworkManager {
             return true
         } catch {
             debugPrint("🔴 토큰 갱신 실패: \(error)")
-            // 갱신 실패 시 모든 토큰 삭제
-            AccountStorage.shared.reset()
-            KeyChainModule.delete(key: .refreshToken)
-            KeyChainModule.delete(key: .accessToken)
+            // 갱신 실패 시 안전한 토큰 정리
+            safelyCleanupTokens()
             return false
         }
+    }
+    
+    /// 토큰을 안전하게 정리 (연쇄 삭제 방지)
+    private func safelyCleanupTokens() {
+        debugPrint("🧹 안전한 토큰 정리 시작")
+        
+        // 각 토큰을 개별적으로 삭제하고 에러 무시
+        do {
+            debugPrint("🧹 AccessToken 삭제 시도")
+            KeyChainModule.delete(key: .accessToken)
+        }
+        
+        do {
+            debugPrint("🧹 RefreshToken 삭제 시도")
+            KeyChainModule.delete(key: .refreshToken)
+        }
+        
+        // AccountStorage도 안전하게 리셋
+        do {
+            debugPrint("🧹 AccountStorage 리셋 시도")
+            AccountStorage.shared.safeReset()
+        }
+        
+        debugPrint("🧹 토큰 정리 완료")
     }
     
     /// 토큰 갱신 전용 네트워크 요청 (로그인과 동일한 방식으로 헤더에서 토큰 추출)

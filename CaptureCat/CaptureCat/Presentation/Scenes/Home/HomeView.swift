@@ -34,13 +34,18 @@ struct HomeView: View {
             
             Spacer()
             
-            if viewModel.isInitialLoading {
-                ProgressView("로딩 중...")
+            if viewModel.isInitialLoading || viewModel.isRefreshing {
+                ProgressView(viewModel.isRefreshing ? "새로고침 중..." : "로딩 중...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.itemVMs.isEmpty {
-                Text("저장된 스크린샷이 없습니다.")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                VStack(alignment: .center, spacing: 4) {
+                    Text("아직 스크린샷이 없어요.")
+                        .foregroundStyle(.text01)
+                        .CFont(.headline02Bold)
+                    Text("임시보관함에서 스크린샷을 저장할 수 있어요!")
+                        .foregroundStyle(.text03)
+                        .CFont(.body01Regular)
+                }
             } else {
                 ScrollView {
                     carouselView
@@ -94,18 +99,14 @@ struct HomeView: View {
             }
         }
         .refreshable {
-            // Pull to refresh
+            // Pull to refresh (중복 실행 방지 적용)
             await viewModel.refreshScreenshots()
         }
     }
     
     private var carouselView: some View {
         Group {
-            if viewModel.favoriteItemVMs.isEmpty {
-                Text("즐겨찾기한 스크린샷이 없습니다.")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
+            if viewModel.favoriteItemVMs.isEmpty == false {
                 ZStack {
                     ForEach(viewModel.favoriteItemVMs.indices, id: \.self) { idx in
                         carouselCard(at: idx)

@@ -84,7 +84,7 @@ struct DetailView: View {
     private var contentView: some View {
         VStack {
             CustomNavigationBar(
-                title: viewModel.formattedDate,
+                title: viewModel.item?.createDate ?? "",
                 onBack: {
                     router.pop()
                 },
@@ -182,7 +182,7 @@ struct DetailView: View {
     private var loadingView: some View {
         VStack {
             CustomNavigationBar(
-                title: viewModel.formattedDate,
+                title: viewModel.item?.createDate ?? "",
                 onBack: { router.pop() },
                 color: .white
             )

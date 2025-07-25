@@ -164,10 +164,6 @@ final class ScreenshotRepository {
         switch result {
         case .success(let response):
             let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                guard let captureDate = parseServerDate(serverItem.captureDate) else {
-                    return nil
-                }
-                
                 let mappedTags = serverItem.tags.map { $0.name }
                 
                 let screenshotItem = ScreenshotItem(
@@ -175,7 +171,7 @@ final class ScreenshotRepository {
                     imageData: Data(), // 서버 URL에서 별도 로드
                     imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
                     fileName: serverItem.name,
-                    createDate: captureDate,
+                    createDate: serverItem.captureDate,
                     tags: mappedTags, // ✅ 매핑된 태그 사용
                     isFavorite: serverItem.isBookmarked
                 )
@@ -201,10 +197,6 @@ final class ScreenshotRepository {
         switch result {
         case .success(let response):
             let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                guard let captureDate = parseServerDate(serverItem.captureDate) else {
-                    return nil
-                }
-                
                 let mappedTags = serverItem.tags.map { $0.name }
                 
                 let screenshotItem = ScreenshotItem(
@@ -212,7 +204,7 @@ final class ScreenshotRepository {
                     imageData: Data(), // 서버 URL에서 별도 로드
                     imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
                     fileName: serverItem.name,
-                    createDate: captureDate,
+                    createDate: serverItem.captureDate,
                     tags: mappedTags, // ✅ 매핑된 태그 사용
                     isFavorite: serverItem.isBookmarked
                 )
@@ -349,10 +341,6 @@ final class ScreenshotRepository {
         
         switch result {
         case .success(let response):
-            guard let captureDate = parseServerDate(response.data.captureDate) else {
-                throw NetworkError.badRequest
-            }
-            
             let mappedTags = response.data.tags.map { $0.name }
             
             let screenshotItem = ScreenshotItem(
@@ -360,7 +348,7 @@ final class ScreenshotRepository {
                 imageData: Data(), // 서버 URL에서 별도 로드
                 imageURL: response.data.url, // ✅ 서버 이미지 URL 포함
                 fileName: response.data.name,
-                createDate: captureDate,
+                createDate: response.data.captureDate,
                 tags: mappedTags,
                 isFavorite: response.data.isBookmarked
             )
@@ -546,16 +534,12 @@ extension ScreenshotRepository {
         switch result {
         case .success(let response):
             let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                guard let captureDate = parseServerDate(serverItem.captureDate) else {
-                    return nil
-                }
-                
                 let screenshotItem = ScreenshotItem(
                     id: String(serverItem.id),
                     imageData: Data(), // 서버 URL에서 별도 로드
                     imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
                     fileName: serverItem.name,
-                    createDate: captureDate,
+                    createDate: serverItem.captureDate,
                     tags: [],
                     isFavorite: serverItem.isBookmarked
                 )

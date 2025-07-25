@@ -27,7 +27,7 @@ struct CaptureCatApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if onBoardingViewModel.isOnBoarding {
+            if KeyChainModule.read(key: .didStarted) == "true" {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
                 let service = AuthService(networkManager: networkManager)

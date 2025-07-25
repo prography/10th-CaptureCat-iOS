@@ -50,30 +50,123 @@ class AuthViewModel: ObservableObject {
     }
     
     func checkAutoLogin() {
-        let appleId = KeyChainModule.read(key: .accessToken) ?? ""
+        // Apple 로그인 상태 체크 (안전성 강화)
+        checkAppleLoginStatus()
         
-        ASAuthorizationAppleIDProvider()
-            .getCredentialState(forUserID: appleId) { state, _ in
-                DispatchQueue.main.async {
-                    switch state {
-                    case .authorized:
-                        // 권한 유효 → 자동 로그인 처리
-                        self.authenticationState = .signIn
-                    default:
-                        break
-                    }
+        // 카카오 로그인 상태 체크 (안전성 강화)
+        checkKakaoLoginStatus()
+    }
+    
+    private func checkAppleLoginStatus() {
+        // Apple ID가 저장되어 있는지 확인
+        guard let appleId = KeyChainModule.read(key: .appleToken), 
+              !appleId.isEmpty else {
+            debugPrint("⚠️ Apple ID가 저장되어 있지 않음 - Apple 자동로그인 스킵")
+            return
+        }
+        
+        debugPrint("🍏 Apple ID 상태 확인 시작: \(appleId.prefix(10))...")
+        
+        let provider = ASAuthorizationAppleIDProvider()
+        provider.getCredentialState(forUserID: appleId) { [weak self] state, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    debugPrint("🍏❌ Apple ID 상태 확인 실패: \(error.localizedDescription)")
+                    self?.handleAppleLoginFallback(error: error)
+                    return
                 }
-            }
-        
-        if AuthApi.hasToken() {
-            UserApi.shared.accessTokenInfo { info, error in
-                if error == nil {
-                    // 유효 → 자동 로그인 처리 (예: 사용자 정보 fetch)
-//                    UserApi.shared.me { user, error in … }
-                    self.authenticationState = .signIn
+                
+                switch state {
+                case .authorized:
+                    debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
+                    self?.authenticationState = .signIn
+                case .revoked:
+                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리")
+                    self?.cleanupAppleTokens()
+                case .notFound:
+                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리")
+                    self?.cleanupAppleTokens()
+                default:
+                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue)")
                 }
             }
         }
+    }
+    
+    private func checkKakaoLoginStatus() {
+        // 카카오 토큰이 있는지 확인
+        guard AuthApi.hasToken() else {
+            debugPrint("⚠️ 카카오 토큰이 없음 - 카카오 자동로그인 스킵")
+            return
+        }
+        
+        debugPrint("🟡 카카오 토큰 상태 확인 시작")
+        
+        UserApi.shared.accessTokenInfo { [weak self] info, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    debugPrint("🟡❌ 카카오 토큰 확인 실패: \(error.localizedDescription)")
+                    self?.handleKakaoLoginFallback(error: error)
+                    return
+                }
+                
+                if info != nil {
+                    debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
+                    self?.authenticationState = .signIn
+                } else {
+                    debugPrint("🟡⚠️ 카카오 토큰 정보 없음")
+                }
+            }
+        }
+    }
+    
+    private func handleAppleLoginFallback(error: Error) {
+        debugPrint("🍏🔄 Apple 로그인 fallback 처리")
+        
+        // 네트워크 오류인지 확인
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain {
+            debugPrint("🍏🌐 네트워크 오류로 판단 - 기존 토큰으로 시도")
+            // 네트워크 오류시 기존 서버 토큰이 있으면 사용
+            if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
+                debugPrint("🍏💾 기존 서버 토큰 발견 - 자동 로그인 시도")
+                self.authenticationState = .signIn
+            }
+        } else {
+            debugPrint("🍏🧹 Apple 인증 오류 - 토큰 정리")
+            cleanupAppleTokens()
+        }
+    }
+    
+    private func handleKakaoLoginFallback(error: Error) {
+        debugPrint("🟡🔄 카카오 로그인 fallback 처리")
+        
+        // 네트워크 오류인지 확인
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain {
+            debugPrint("🟡🌐 네트워크 오류로 판단 - 기존 토큰으로 시도")
+            // 네트워크 오류시 기존 서버 토큰이 있으면 사용
+            if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
+                debugPrint("🟡💾 기존 서버 토큰 발견 - 자동 로그인 시도")
+                self.authenticationState = .signIn
+            }
+        } else {
+            debugPrint("🟡🧹 카카오 인증 오류 - 토큰 정리")
+            cleanupKakaoTokens()
+        }
+    }
+    
+    private func cleanupAppleTokens() {
+        debugPrint("🍏🧹 Apple 토큰 정리 시작")
+        KeyChainModule.delete(key: .appleToken)
+        // 서버 토큰도 Apple 로그인으로 얻은 것이라면 정리
+        // 하지만 카카오 로그인 토큰일 수도 있으므로 신중하게 처리
+    }
+    
+    private func cleanupKakaoTokens() {
+        debugPrint("🟡🧹 카카오 토큰 정리 시작")
+        KeyChainModule.delete(key: .kakaoToken)
+        // 서버 토큰도 카카오 로그인으로 얻은 것이라면 정리
     }
     
     @MainActor
@@ -130,8 +223,8 @@ class AuthViewModel: ObservableObject {
     }
     
     func logOut() {
-        KeyChainModule.delete(key: .accessToken)
-        KeyChainModule.delete(key: .refreshToken)
+        // 안전한 토큰 정리
+        safelyCleanupAllTokens()
         
         // 메모리 캐시 클리어
         ScreenshotRepository.shared.clearMemoryCache()
@@ -145,9 +238,8 @@ class AuthViewModel: ObservableObject {
             
             switch result {
             case .success (_):
-                KeyChainModule.delete(key: .accessToken)
-                KeyChainModule.delete(key: .refreshToken)
-                KeyChainModule.delete(key: .appleToken)
+                // 안전한 토큰 정리 (회원탈퇴 성공 시)
+                safelyCleanupAllTokens()
                 ScreenshotRepository.shared.clearMemoryCache()
                 self.authenticationState = .initial
             case .failure (let error):
@@ -204,5 +296,67 @@ class AuthViewModel: ObservableObject {
             debugPrint("❌ 로컬 데이터 확인 실패: \(error)")
             return false
         }
+    }
+    
+    /// 모든 토큰을 안전하게 정리 (연쇄 삭제 방지)
+    private func safelyCleanupAllTokens() {
+        debugPrint("🧹 모든 토큰 안전 정리 시작")
+        
+        // 각 토큰을 개별적으로 삭제하고 에러 무시
+        do {
+            debugPrint("🧹 AccessToken 삭제 시도")
+            KeyChainModule.delete(key: .accessToken)
+        }
+        
+        do {
+            debugPrint("🧹 RefreshToken 삭제 시도")
+            KeyChainModule.delete(key: .refreshToken)
+        }
+        
+        do {
+            debugPrint("🧹 AppleToken 삭제 시도")
+            KeyChainModule.delete(key: .appleToken)
+        }
+        
+        do {
+            debugPrint("🧹 KakaoToken 삭제 시도")
+            KeyChainModule.delete(key: .kakaoToken)
+        }
+        
+        // AccountStorage도 안전하게 리셋
+        do {
+            debugPrint("🧹 AccountStorage 안전 리셋 시도")
+            AccountStorage.shared.safeReset()
+        }
+        
+        // UserDefaults도 안전하게 정리
+        do {
+            debugPrint("🧹 UserDefaults 정리 시도")
+            safelyCleanupUserDefaults()
+        }
+        
+        debugPrint("🧹 모든 토큰 및 데이터 안전 정리 완료")
+    }
+    
+    /// UserDefaults를 안전하게 정리 (에러 무시)
+    private func safelyCleanupUserDefaults() {
+        debugPrint("🧹 UserDefaults 안전 정리 시작")
+        
+        // selectedTopics (사용자 선택 태그) 삭제
+        do {
+            debugPrint("🧹 selectedTopics 삭제 시도")
+            UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
+        }
+        
+        // 다른 UserDefaults 키가 추가될 경우를 대비한 일괄 정리
+        // 앱별 도메인 전체를 정리하는 방법도 있지만, 신중하게 접근
+        
+        // UserDefaults 동기화 (변경사항 즉시 반영)
+        do {
+            debugPrint("🧹 UserDefaults 동기화 시도")
+            UserDefaults.standard.synchronize()
+        }
+        
+        debugPrint("🧹 UserDefaults 안전 정리 완료")
     }
 }

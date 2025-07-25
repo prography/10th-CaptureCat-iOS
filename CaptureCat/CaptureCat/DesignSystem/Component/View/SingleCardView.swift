@@ -74,9 +74,13 @@ struct SingleCardView<Content: View>: View {
                     if dragOffset.height < threshold {
                         // 충분히 밀었다면 사라짐
                         isDismissed = true
-                        // 삭제 콜백 호출
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            onDelete?()
+                        
+                        // 즉시 삭제 콜백 호출 (Race Condition 방지)
+                        onDelete?()
+                        
+                        // 애니메이션은 별도로 처리 (UI 갱신 방해 없음)
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            // 애니메이션만 수행, 콜백은 이미 호출됨
                         }
                     } else {
                         // 아니면 원위치
