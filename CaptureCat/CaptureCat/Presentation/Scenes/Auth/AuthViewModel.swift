@@ -116,7 +116,7 @@ class AuthViewModel: ObservableObject {
                     return
                 }
                 
-                if info != nil {
+                if info != nil && KeyChainModule.read(key: .kakaoToken) == "true" {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
                     self?.authenticationState = .signIn
                 } else {
@@ -189,6 +189,7 @@ class AuthViewModel: ObservableObject {
                     switch kakaoSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
+                        KeyChainModule.create(key: .kakaoToken, data: "true")
                         // 토큰 저장 완료 후 동기화 시작
                         await handleLoginSuccess(tutorialCompleted: success.data.tutorialCompleted)
                     case .failure(let failure):

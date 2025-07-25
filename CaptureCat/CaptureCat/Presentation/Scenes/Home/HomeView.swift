@@ -42,10 +42,17 @@ struct HomeView: View {
                     Text("아직 스크린샷이 없어요.")
                         .foregroundStyle(.text01)
                         .CFont(.headline02Bold)
-                    Text("임시보관함에서 스크린샷을 저장할 수 있어요!")
-                        .foregroundStyle(.text03)
-                        .CFont(.body01Regular)
+                    if AccountStorage.shared.isGuest ?? false {
+                        Text("로그인 하면 스크린샷을 저장할 수 있어요! ")
+                            .foregroundStyle(.text03)
+                            .CFont(.body01Regular)
+                    } else {
+                        Text("임시보관함에서 스크린샷을 저장할 수 있어요!")
+                            .foregroundStyle(.text03)
+                            .CFont(.body01Regular)
+                    }
                 }
+                Spacer()
             } else {
                 ScrollView {
                     carouselView
