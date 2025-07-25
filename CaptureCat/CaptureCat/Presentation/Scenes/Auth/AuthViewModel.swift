@@ -229,6 +229,9 @@ class AuthViewModel: ObservableObject {
         // 메모리 캐시 클리어
         ScreenshotRepository.shared.clearMemoryCache()
         
+        // 서버 이미지 캐시 클리어
+        PhotoLoader.shared.clearAllServerImageCache()
+        
         self.authenticationState = .initial
     }
     
@@ -241,6 +244,10 @@ class AuthViewModel: ObservableObject {
                 // 안전한 토큰 정리 (회원탈퇴 성공 시)
                 safelyCleanupAllTokens()
                 ScreenshotRepository.shared.clearMemoryCache()
+                
+                // 서버 이미지 캐시 클리어
+                PhotoLoader.shared.clearAllServerImageCache()
+                
                 self.authenticationState = .initial
             case .failure (let error):
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."

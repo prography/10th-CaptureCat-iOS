@@ -234,6 +234,7 @@ final class HomeViewModel: ObservableObject {
     /// 메모리 캐시 클리어 (로그아웃 시 사용)
     func clearCache() {
         repository.clearMemoryCache()
+        PhotoLoader.shared.clearAllServerImageCache()
         hasLoadedInitialData = false
         DispatchQueue.main.async {
             self.itemVMs = []
