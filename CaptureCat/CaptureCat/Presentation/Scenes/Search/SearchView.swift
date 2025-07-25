@@ -97,8 +97,7 @@ struct SearchView: View {
                 }
                 .padding(.vertical, 20)
             } else if viewModel.filteredTags.isEmpty {
-                VStack(alignment: .center, spacing: 4) {
-                    Spacer()
+                VStack(spacing: 4) {
                     if viewModel.searchText.isEmpty {
                         Text("아직 태그가 없어요.")
                             .CFont(.headline02Bold)
@@ -111,8 +110,8 @@ struct SearchView: View {
                     Text("스크린샷을 태그해 정리해보세요!")
                         .CFont(.body01Regular)
                         .foregroundColor(.text03)
-                    Spacer()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .padding(.vertical, 20)
             } else {
                 tagGrid(tags: viewModel.filteredTags)
