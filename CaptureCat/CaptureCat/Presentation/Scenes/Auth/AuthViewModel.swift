@@ -23,21 +23,27 @@ class AuthViewModel: ObservableObject {
     
     @Published var authenticationState: AuthenticationState = .initial {
         didSet {
-            if authenticationState == .initial {
-                isLogInPresented = true
-                isRecommandLogIn = false
-            } else if authenticationState == .guest {
-                isLogInPresented = false
-                isRecommandLogIn = true
-            } else {
-                isLogInPresented = false
-                isRecommandLogIn = false
+            switch authenticationState {
+            case .initial:
+                // 처음 진입 시 로그인 화면
+                activeSheet = .login
+                
+            case .guest:
+                // 게스트 모드 진입 시 추천 로그인 화면
+                activeSheet = .recommend
+                
+            default:
+                // 그 외(튜토리얼, 메인 진입 등)는 모달 닫기
+                activeSheet = nil
             }
         }
     }
     
-    @Published var isLogInPresented: Bool = true
-    @Published var isRecommandLogIn: Bool = false
+    enum ActiveSheet: Identifiable {
+      case login, recommend
+      var id: ActiveSheet { self }
+    }
+    @Published var activeSheet: ActiveSheet?
     @Published var isStartedGetScreenshot: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
