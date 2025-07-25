@@ -41,6 +41,7 @@ final class HomeViewModel: ObservableObject {
     init(networkManager: NetworkManager) {
         self.netwworkManager = networkManager
         setupNotificationObservers()
+        Task { await loadScreenshots() }
     }
     
     deinit {
