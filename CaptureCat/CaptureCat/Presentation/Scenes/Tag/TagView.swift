@@ -47,7 +47,6 @@ struct TagView: View {
             .frame(width: 200)
             .onChange(of: viewModel.mode) { _, _ in
                 viewModel.updateSelectedTags()   // 모드별 태그 초기화
-                viewModel.hasChanges = false
             }
             
             if viewModel.mode == .batch {
