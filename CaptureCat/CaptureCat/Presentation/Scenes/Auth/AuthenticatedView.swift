@@ -37,8 +37,10 @@ struct AuthenticatedView: View {
         }
         .fullScreenCover(item: $authViewModel.activeSheet) { sheet in
           switch sheet {
-            case .login: LogInView()
-            case .recommend: RecommandLoginView()
+            case .login:
+              LogInView()
+            case .recommend:
+              RecommandLoginView()
           }
         }
         .transaction { transaction in
