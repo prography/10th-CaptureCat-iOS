@@ -43,6 +43,9 @@ final class TagViewModel: ObservableObject {
     
     /// UI 업데이트를 강제하기 위한 더미 프로퍼티 (Extension에서 사용)
     @Published var updateTrigger = false
+    @Published var isUploading: Bool = false
+    @Published var uploadProgress: Double = 0.0  // 업로드 진행률 (0.0 ~ 1.0)
+    @Published var uploadedCount: Int = 0  // 업로드 완료된 아이템 수
     
     init(itemsIds: [String], networkManager: NetworkManager, router: Router? = nil) {
         self.networkManager = networkManager

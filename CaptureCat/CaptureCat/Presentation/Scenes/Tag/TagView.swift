@@ -17,58 +17,116 @@ struct TagView: View {
     @State private var isDragging = false
     
     var body: some View {
-        VStack {
-            CustomNavigationBar(
-                title: viewModel.mode == .batch ? "태그하기" : "태그하기 \(viewModel.progressText)",
-                onBack: { router.pop() },
-                actionTitle: "저장",
-                onAction: {
-                    Task {
-                        await viewModel.save()
-                        
-                        // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
-                        NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
-                        
-                        authViewModel.authenticationState = .signIn
-                        router.push(.completeSave(count: viewModel.itemVMs.count))
-//                        router.popToRoot()
-                    }
-                },
-                isSaveEnabled: viewModel.hasChanges
-            )
-            
-            Picker("options", selection: $viewModel.mode) {
-                Text(viewModel.segments[0])
-                    .tag(Mode.batch)   // ⬅️ Mode.batch
-                Text(viewModel.segments[1])
-                    .tag(Mode.single)  // ⬅️ Mode.single
-            }
-            .pickerStyle(.segmented)
-            .frame(width: 200)
-            .onChange(of: viewModel.mode) { _, _ in
-                viewModel.updateSelectedTags()   // 모드별 태그 초기화
-            }
-            
-            if viewModel.mode == .batch {
-                MultiCardView {
-                    // 안전한 배열 접근 (크래시 방지)
-                    if !viewModel.itemVMs.isEmpty {
-                        ScreenshotItemView(viewModel: viewModel.itemVMs[0]) {
-                            EmptyView()
-                        }
-                    } else {
-                        Text("표시할 아이템이 없습니다.")
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    }
+        mainContentView
+            .overlay(uploadProgressOverlay)
+            .task {
+                // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
+                for itemVM in viewModel.itemVMs {
+                    await itemVM.loadFullImage()
                 }
-                .padding(.horizontal, 40)
-                .padding(.top, 12)
-            } else {
-                carouselView
-                    .padding(.top, 12)
             }
+            .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
+                AddTagSheet(
+                    tags: $viewModel.tags,
+                    selectedTags: $viewModel.selectedTags,
+                    isPresented: $viewModel.isShowingAddTagSheet,
+                    onAddNewTag: { newTag in
+                        viewModel.addNewTag(name: newTag)
+                    },
+                    onDeleteTag: { tag in
+                        viewModel.toggleTag(tag) // 기존 toggleTag 로직으로 태그 제거
+                    }
+                )
+            }
+    }
+    
+    // MARK: - Main Content View
+    private var mainContentView: some View {
+        VStack {
+            navigationBarView
+            
+            modePickerView
+            
+            contentSectionView
+            
             Spacer()
+            
+            tagSectionView
+            
+            Spacer()
+        }
+    }
+    
+    // MARK: - Navigation Bar
+    private var navigationBarView: some View {
+        CustomNavigationBar(
+            title: viewModel.mode == .batch ? "태그하기" : "태그하기 \(viewModel.progressText)",
+            onBack: { router.pop() },
+            actionTitle: "저장",
+            onAction: {
+                Task {
+                    await viewModel.save()
+                    
+                    // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
+                    NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
+                    authViewModel.authenticationState = .signIn
+                    router.push(.completeSave(count: viewModel.itemVMs.count))
+                }
+            },
+            isSaveEnabled: viewModel.hasChanges && !viewModel.isUploading
+        )
+    }
+    
+    // MARK: - Mode Picker
+    private var modePickerView: some View {
+        Picker("options", selection: $viewModel.mode) {
+            Text(viewModel.segments[0])
+                .tag(Mode.batch)
+            Text(viewModel.segments[1])
+                .tag(Mode.single)
+        }
+        .pickerStyle(.segmented)
+        .frame(width: 200)
+        .onChange(of: viewModel.mode) { _, _ in
+            viewModel.updateSelectedTags()
+        }
+    }
+    
+    // MARK: - Content Section
+    private var contentSectionView: some View {
+        Group {
+            if viewModel.mode == .batch {
+                batchContentView
+            } else {
+                singleContentView
+            }
+        }
+    }
+    
+    private var batchContentView: some View {
+        MultiCardView {
+            if !viewModel.itemVMs.isEmpty {
+                ScreenshotItemView(viewModel: viewModel.itemVMs[0]) {
+                    EmptyView()
+                }
+            } else {
+                Text("표시할 아이템이 없습니다.")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .padding(.horizontal, 40)
+        .padding(.top, 12)
+    }
+    
+    private var singleContentView: some View {
+        carouselView
+            .padding(.top, 12)
+    }
+    
+    // MARK: - Tag Section
+    private var tagSectionView: some View {
+        VStack(spacing: 12) {
             HStack {
                 Text("최근 추가한 태그")
                     .CFont(.subhead01Bold)
@@ -96,27 +154,52 @@ struct TagView: View {
                 }
             }
             .padding(.leading, 16)
-            
-            Spacer()
         }
-        .task {
-            // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
-            for itemVM in viewModel.itemVMs {
-                await itemVM.loadFullImage()
-                        }
+    }
+    
+    
+    // MARK: - Upload Progress Overlay
+    private var uploadProgressOverlay: some View {
+        Group {
+            if viewModel.isUploading {
+                uploadProgressView
+            }
         }
-        .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
-            AddTagSheet(
-                tags: $viewModel.tags,
-                selectedTags: $viewModel.selectedTags,
-                isPresented: $viewModel.isShowingAddTagSheet,
-                onAddNewTag: { newTag in
-                    viewModel.addNewTag(name: newTag)
-                },
-                onDeleteTag: { tag in
-                    viewModel.toggleTag(tag) // 기존 toggleTag 로직으로 태그 제거
-                }
-            )
+    }
+    
+    private var uploadProgressView: some View {
+        ZStack {
+            uploadBackgroundOverlay
+            uploadContentView
+        }
+    }
+    
+    private var uploadBackgroundOverlay: some View {
+        Color.black.opacity(0.6)
+            .ignoresSafeArea()
+    }
+    
+    private var uploadContentView: some View {
+        VStack(spacing: 16) {
+            uploadProgressBar
+            uploadCountText
+        }
+    }
+    
+    private var uploadProgressBar: some View {
+        ProgressView(value: viewModel.uploadProgress)
+            .progressViewStyle(.circular)
+            .tint(.primary01)
+            .frame(width: 300)
+            .scaleEffect(1.2)
+    }
+    
+    @ViewBuilder
+    private var uploadCountText: some View {
+        if viewModel.uploadedCount > 0 {
+            Text("\(viewModel.uploadedCount)/\(viewModel.itemVMs.count) 완료")
+                .CFont(.body01Regular)
+                .foregroundColor(.white.opacity(0.8))
         }
     }
     
@@ -189,7 +272,6 @@ struct TagView: View {
             onDelete: {
                 // 삭제 중이 아닐 때만 삭제 허용
                 guard !viewModel.isDeletingItem else {
-                    debugPrint("⚠️ 이미 삭제 진행 중 - 무시")
                     return
                 }
                 // 안전한 삭제 (큐 시스템 사용)
@@ -273,7 +355,6 @@ struct TagView: View {
                 // 아이템이 없으면 드래그 제스쳐 무시 (크래시 방지)
                 let itemCount = viewModel.itemVMs.count
                 guard itemCount > 0 else {
-                    debugPrint("⚠️ dragGesture: 아이템이 없어서 드래그 무시")
                     return
                 }
                 
@@ -299,8 +380,6 @@ struct TagView: View {
                     // 애니메이션 완료 후에도 아이템이 존재하는지 확인
                     if safeIndex < viewModel.itemVMs.count {
                         viewModel.onAssetChanged(to: safeIndex)
-                    } else {
-                        debugPrint("⚠️ dragGesture: 애니메이션 완료 후 인덱스 범위 벗어남")
                     }
                 }
             }

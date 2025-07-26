@@ -13,6 +13,18 @@ extension TagViewModel {
     
     // 저장 (batch: all items, single: current)
     func save() async {
+        // 업로드 시작 시 초기화
+        isUploading = true
+        uploadProgress = 0.0
+        uploadedCount = 0
+        
+        defer {
+            // 업로드 완료 시 상태 초기화
+            isUploading = false
+            uploadProgress = 0.0
+            uploadedCount = 0
+        }
+        
         if AccountStorage.shared.isGuest ?? true {
             // 게스트 모드: 로컬 전용 저장
             await saveToLocal()
@@ -26,14 +38,34 @@ extension TagViewModel {
     private func saveToLocal() async {
         switch mode {
         case .batch:
-            for viewModel in itemVMs {
+            let totalItems = itemVMs.count
+            for (index, viewModel) in itemVMs.enumerated() {
+                // 진행률 업데이트
+                let progress = Double(index + 1) / Double(totalItems)
+                await MainActor.run {
+                    uploadProgress = progress
+                    uploadedCount = index + 1
+                    debugPrint("📊 로컬 저장 진행률: \(Int(progress * 100))% (\(uploadedCount)/\(totalItems))")
+                }
+                
                 await viewModel.saveToLocal()
             }
             debugPrint("✅ 배치 모드 로컬 저장 완료: \(itemVMs.count)개")
             
         case .single:
             if let viewModel = displayVM {
+                await MainActor.run {
+                    uploadProgress = 0.5
+                    debugPrint("📊 단일 모드 로컬 저장 시작: 50%")
+                }
+                
                 await viewModel.saveToLocal()
+                
+                await MainActor.run {
+                    uploadProgress = 1.0
+                    uploadedCount = 1
+                    debugPrint("📊 단일 모드 로컬 저장 완료: 100%")
+                }
                 debugPrint("✅ 단일 모드 로컬 저장 완료")
             }
         }
@@ -57,10 +89,18 @@ extension TagViewModel {
         var imageDatas: [Data] = []
         var imageMetas: [PhotoDTO] = []
         
-        debugPrint("🔄 서버 업로드 시작: \(viewModels.count)개 아이템")
+        let totalItems = viewModels.count
+        debugPrint("🔄 서버 업로드 시작: \(totalItems)개 아이템")
         
         // 1. 각 viewModel에서 이미지 데이터와 메타데이터 수집
-        for viewModel in viewModels {
+        for (index, viewModel) in viewModels.enumerated() {
+            // 진행률 업데이트 (데이터 수집 단계)
+            let progress = Double(index) / Double(totalItems) * 0.5  // 전체의 50%까지가 데이터 수집
+            await MainActor.run {
+                uploadProgress = progress
+                debugPrint("📊 데이터 수집 진행률: \(Int(progress * 100))%")
+            }
+            
             // PHAsset에서 실제 이미지 데이터 가져오기
             let assets = PHAsset.fetchAssets(withLocalIdentifiers: [viewModel.id], options: nil)
             guard let asset = assets.firstObject else {
@@ -95,6 +135,12 @@ extension TagViewModel {
              }
         }
         
+        // 데이터 수집 완료 (50% 진행률)
+        await MainActor.run {
+            uploadProgress = 0.5
+            debugPrint("📊 데이터 수집 완료: 50%")
+        }
+        
         // 2. 수집된 데이터가 있으면 서버에 업로드
         guard !imageDatas.isEmpty && !imageMetas.isEmpty else {
             debugPrint("⚠️ 업로드할 이미지 데이터가 없습니다.")
@@ -109,11 +155,24 @@ extension TagViewModel {
             debugPrint("🚀 - Meta[\(index)]: 태그=\(meta.tags)")
         }
         
+        // 서버 업로드 시작 (50% -> 100%)
+        await MainActor.run {
+            uploadProgress = 0.5
+            debugPrint("📊 서버 업로드 시작: 50%")
+        }
+        
         let result = await ImageService.shared.uploadImages(imageDatas: imageDatas, imageMetas: imageMetas)
         
                  switch result {
          case .success:
              debugPrint("✅ ImageService 서버 업로드 성공: \(imageDatas.count)개 이미지")
+             
+             // 업로드 성공 시 진행률 100%로 설정
+             await MainActor.run {
+                 uploadProgress = 1.0
+                 uploadedCount = imageDatas.count
+                 debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
+             }
              
              // 4. 성공시 메모리 캐시에 저장 (InMemoryScreenshotCache 없이 처리)
              for viewModel in viewModels {
@@ -123,6 +182,7 @@ extension TagViewModel {
              
          case .failure(let error):
              debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
+             // 실패 시에도 진행률 초기화는 defer에서 처리됨
          }
     }
 } 
