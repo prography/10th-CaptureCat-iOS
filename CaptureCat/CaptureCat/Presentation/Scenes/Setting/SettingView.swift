@@ -107,7 +107,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
                 .padding(24)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var serviceSection: some View {
