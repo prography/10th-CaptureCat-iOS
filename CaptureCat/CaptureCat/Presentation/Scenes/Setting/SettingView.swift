@@ -136,9 +136,11 @@ struct SettingsView: View {
                 Text("개인정보 처리 방침")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
             }
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
+            .contentShape(Rectangle())
             
             Button {
                 showTerms = true
@@ -146,9 +148,11 @@ struct SettingsView: View {
                 Text("서비스 이용약관")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
             }
+            .contentShape(Rectangle())
             
             Button {
                 debugPrint("버전 정보")
@@ -156,9 +160,12 @@ struct SettingsView: View {
                 Text("버전 정보 \(Bundle.main.appVersion)")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
             }
+            .contentShape(Rectangle())
+            .disabled(true)
         }
     }
     
@@ -186,9 +193,11 @@ struct SettingsView: View {
                     Text("초기화")
                         .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
+                        .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }
+                .contentShape(Rectangle())
             } else {
                 Button {
                     withAnimation {
@@ -198,9 +207,12 @@ struct SettingsView: View {
                     Text("로그아웃")
                         .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
+                        .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }
+                .contentShape(Rectangle())
+                
                 Button {
                     withAnimation {
                         authViewModel.isSignOutPresented = true
@@ -208,10 +220,11 @@ struct SettingsView: View {
                 } label: {
                     Text("회원 탈퇴")
                         .CFont(.body02Regular)
-                        .foregroundStyle(Color.text01)
+                        .foregroundStyle(Color.text01).frame(maxWidth: .infinity, minHeight: 16, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }
+                .contentShape(Rectangle())
             }
         }
     }
