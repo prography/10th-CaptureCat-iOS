@@ -139,30 +139,25 @@ struct HomeView: View {
         let zIndex = 1.0 - abs(distance) * 0.1
         let xOffset = myXOffset(index)
         
-        SingleCardView() {
-            ScreenshotItemView(viewModel: asset) {
-                EmptyView()
-            }
-            .overlay(
-                Button {
-                    router.push(.favorite)
-                } label: {
-                    Image(.selectedFavorite)
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .padding(3)
-                        .background(.overlayDim)
-                        .clipShape(Circle())
-                }
-                    .padding(16),
-                alignment: .bottomTrailing
-            )
+        ScreenshotItemView(viewModel: asset) {
+            EmptyView()
         }
+        .overlay(
+            Button {
+                router.push(.favorite)
+            } label: {
+                Image(.favoriteList)
+                    .resizable()
+                    .frame(width: 32, height: 32)
+            }
+                .padding(.trailing, 16)
+                .padding(.bottom, 12),
+            alignment: .bottomTrailing
+        )
         .scaleEffect(scale)
         .opacity(opacity)
         .offset(x: xOffset, y: 0)
         .zIndex(zIndex)
-        .animation(.none, value: draggingItem) // 드래그 중 애니메이션 비활성화
         .onAppear {
             // ✅ ScreenshotItemView가 자동으로 썸네일을 로드하므로
             // 카로셀에서는 필요시에만 추가 처리
