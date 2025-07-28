@@ -23,7 +23,7 @@ struct SettingsView: View {
                 onAction: nil,
                 isSaveEnabled: false
             )
-            if AccountStorage.shared.isGuest == true {
+            if authViewModel.authenticationState == .guest {
                 guestCard
                     .background(Color(.gray02))
                     .cornerRadius(12)
@@ -90,7 +90,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
             
             Button(action: {
-                authViewModel.authenticationState = .initial
+                authViewModel.activeSheet = .login
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)

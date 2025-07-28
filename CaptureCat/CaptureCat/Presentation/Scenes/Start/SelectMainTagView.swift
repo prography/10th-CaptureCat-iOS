@@ -71,7 +71,3 @@ struct SelectMainTagView: View {
         }
     }
 }
-
-//#Preview {
-//    SelectMainTagView()
-//}
