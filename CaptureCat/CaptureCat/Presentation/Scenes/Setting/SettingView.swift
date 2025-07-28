@@ -136,9 +136,9 @@ struct SettingsView: View {
                 Text("개인정보 처리 방침")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
             }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
             
             Button {
                 showTerms = true
