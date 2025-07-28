@@ -20,11 +20,6 @@ struct AuthenticatedView: View {
     var body: some View {
         ZStack {
             switch authViewModel.authenticationState {
-            case .start:
-                RouterView(networkManager: networkManager) {
-                    let viewModel = SelectMainTagViewModel(networkManager: networkManager)
-                    SelectMainTagView(viewModel: viewModel)
-                }
             case .syncing:
                 SyncProgressView().environmentObject(authViewModel)
             case .syncCompleted:
@@ -41,6 +36,11 @@ struct AuthenticatedView: View {
               LogInView()
             case .recommend:
               RecommandLoginView()
+            case .start:
+              NavigationStack {
+                  let viewModel = SelectMainTagViewModel(networkManager: networkManager)
+                  SelectMainTagView(networkManager: networkManager, viewModel: viewModel)
+              }
           }
         }
         .transaction { transaction in

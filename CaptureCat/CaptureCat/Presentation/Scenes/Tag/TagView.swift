@@ -65,12 +65,18 @@ struct TagView: View {
             actionTitle: "저장",
             onAction: {
                 Task {
-                    await viewModel.save()
-                    
-                    // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
-                    NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
-                    authViewModel.authenticationState = .signIn
-                    router.push(.completeSave(count: viewModel.itemVMs.count))
+                    if authViewModel.authenticationState == .guest {
+                        await viewModel.saveToLocal()
+                        authViewModel.activeSheet = nil
+                    } else {
+                        await viewModel.save()
+                        
+                        // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
+                        NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
+                        authViewModel.activeSheet = nil
+                        router.push(.completeSave(count: viewModel.itemVMs.count))
+                        
+                    }
                 }
             },
             isSaveEnabled: viewModel.hasChanges && !viewModel.isUploading
@@ -238,8 +244,8 @@ struct TagView: View {
                 }
                 .simultaneousGesture(viewModel.isDeletingItem ? nil : dragGesture)  // 삭제 중 드래그 비활성화
                 .allowsHitTesting(!viewModel.isDeletingItem)  // 삭제 중 터치 비활성화
-                .onAppear { 
-                    syncOnAppear() 
+                .onAppear {
+                    syncOnAppear()
                 }
                 .onChange(of: viewModel.currentIndex) { _, newIndex in
                     // 드래그 중이 아닐 때만 동기화
@@ -267,10 +273,9 @@ struct TagView: View {
         let opacity = max(0.3, 1.0 - abs(distance) * 0.3)
         let zIndex = 1.0 - abs(distance) * 0.1
         let xOffset = myXOffset(index)
-    
+        
         SingleCardView(
             onDelete: {
-                // 삭제 중이 아닐 때만 삭제 허용
                 guard !viewModel.isDeletingItem else {
                     return
                 }
@@ -431,7 +436,6 @@ struct TagView: View {
         
         // 모든 아이템이 삭제된 경우
         guard itemCount > 0 else {
-            debugPrint("🔄 TagView: 모든 아이템 삭제됨 - 캐러셀 상태 초기화")
             withAnimation(.easeOut(duration: 0.3)) {
                 snappedItem = 0
                 draggingItem = 0
@@ -448,7 +452,5 @@ struct TagView: View {
             snappedItem = targetValue
             draggingItem = targetValue
         }
-        
-        debugPrint("🔄 TagView: 캐러셀 동기화 완료 - 인덱스: \(newCurrentIndex)/\(itemCount)")
     }
 }
