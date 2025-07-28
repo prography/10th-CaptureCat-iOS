@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct SelectMainTagView: View {
+    var networkManager: NetworkManager
     @StateObject var viewModel: SelectMainTagViewModel
-    @EnvironmentObject private var router: Router
+    @State private var pushNext = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -48,18 +49,25 @@ struct SelectMainTagView: View {
             .padding(.top, 16)
             
             Spacer()
+            
             Button(viewModel.selectionText) {
-                debugPrint("선택 완료 \(viewModel.selected.map(\.title))")
                 viewModel.saveTopicLocal()
-                router.push(.startGetScreenshot)
+                pushNext = true
             }
             .primaryStyle()
             .disabled(viewModel.selected.isEmpty)
             .padding(.horizontal, 16)
         }
+        .navigationDestination(isPresented: $pushNext) {
+            let viewModel = StartGetScreenshotViewModel(
+                service: TutorialService(networkManager: networkManager)
+            )
+            return StartGetScreenshotView(
+                viewModel: viewModel,
+                networkManager: networkManager
+            )
+            .navigationBarBackButtonHidden()
+            .toolbar(.hidden, for: .navigationBar)
+        }
     }
 }
-
-//#Preview {
-//    SelectMainTagView()
-//}

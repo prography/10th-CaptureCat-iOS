@@ -25,24 +25,21 @@ class AuthViewModel: ObservableObject {
         didSet {
             switch authenticationState {
             case .initial:
-                // 처음 진입 시 로그인 화면
                 activeSheet = .login
-                
-            case .guest:
-                // 게스트 모드 진입 시 추천 로그인 화면
-                activeSheet = .recommend
-                
             default:
-                // 그 외(튜토리얼, 메인 진입 등)는 모달 닫기
                 activeSheet = nil
             }
         }
     }
     
     enum ActiveSheet: Identifiable {
-      case login, recommend
-      var id: ActiveSheet { self }
+        case login
+        case recommend
+        case start
+        
+        var id: ActiveSheet { self }
     }
+    
     @Published var activeSheet: ActiveSheet?
     @Published var isStartedGetScreenshot: Bool = false
     @Published var isLogOutPresented: Bool = false
@@ -56,22 +53,17 @@ class AuthViewModel: ObservableObject {
     }
     
     func checkAutoLogin() {
-        // Apple 로그인 상태 체크 (안전성 강화)
         checkAppleLoginStatus()
-        
-        // 카카오 로그인 상태 체크 (안전성 강화)
         checkKakaoLoginStatus()
     }
     
     private func checkAppleLoginStatus() {
         // Apple ID가 저장되어 있는지 확인
-        guard let appleId = KeyChainModule.read(key: .appleToken), 
-              !appleId.isEmpty else {
+        guard let appleId = KeyChainModule.read(key: .appleToken),
+                !appleId.isEmpty else {
             debugPrint("⚠️ Apple ID가 저장되어 있지 않음 - Apple 자동로그인 스킵")
             return
         }
-        
-        debugPrint("🍏 Apple ID 상태 확인 시작: \(appleId.prefix(10))...")
         
         let provider = ASAuthorizationAppleIDProvider()
         provider.getCredentialState(forUserID: appleId) { [weak self] state, error in
@@ -85,7 +77,7 @@ class AuthViewModel: ObservableObject {
                 switch state {
                 case .authorized:
                     debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn
+                    self?.authenticationState = .signIn //문제의 원인
                 case .revoked:
                     debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리")
                     self?.cleanupAppleTokens()
@@ -100,13 +92,10 @@ class AuthViewModel: ObservableObject {
     }
     
     private func checkKakaoLoginStatus() {
-        // 카카오 토큰이 있는지 확인
         guard AuthApi.hasToken() else {
             debugPrint("⚠️ 카카오 토큰이 없음 - 카카오 자동로그인 스킵")
             return
         }
-        
-        debugPrint("🟡 카카오 토큰 상태 확인 시작")
         
         UserApi.shared.accessTokenInfo { [weak self] info, error in
             DispatchQueue.main.async {
@@ -118,7 +107,7 @@ class AuthViewModel: ObservableObject {
                 
                 if info != nil && KeyChainModule.read(key: .kakaoToken) == "true" {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn
+                    self?.authenticationState = .signIn //문제 원인
                 } else {
                     debugPrint("🟡⚠️ 카카오 토큰 정보 없음")
                 }
@@ -136,7 +125,7 @@ class AuthViewModel: ObservableObject {
             // 네트워크 오류시 기존 서버 토큰이 있으면 사용
             if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
                 debugPrint("🍏💾 기존 서버 토큰 발견 - 자동 로그인 시도")
-                self.authenticationState = .signIn
+                self.authenticationState = .signIn // 문제 원인
             }
         } else {
             debugPrint("🍏🧹 Apple 인증 오류 - 토큰 정리")
@@ -227,6 +216,7 @@ class AuthViewModel: ObservableObject {
     
     func guestMode() {
         self.authenticationState = .guest
+        self.activeSheet = .recommend
     }
     
     func logOut() {
@@ -282,7 +272,7 @@ class AuthViewModel: ObservableObject {
         } else {
             // 튜토리얼 미완료 사용자
             debugPrint("🔄 로그인 성공 + 튜토리얼 미완료 → 시작하기 화면")
-            self.authenticationState = .start
+            self.activeSheet = .start
         }
     }
     

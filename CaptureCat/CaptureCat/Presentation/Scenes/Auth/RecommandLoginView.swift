@@ -14,9 +14,9 @@ struct RecommandLoginView: View {
         VStack(alignment: .leading) {
             Button {
                 if KeyChainModule.read(key: .didStarted) == "true" {
-                    viewModel.authenticationState = .signIn
+                    viewModel.activeSheet = nil
                 } else {
-                    viewModel.authenticationState = .start
+                    viewModel.activeSheet = .start
                 }
             } label: {
                 Image(systemName: "xmark")
@@ -47,9 +47,9 @@ struct RecommandLoginView: View {
                 .padding(.horizontal, 16)
                 Button {
                     if KeyChainModule.read(key: .didStarted) == "true" {
-                        viewModel.authenticationState = .signIn
+                        viewModel.activeSheet = nil
                     } else {
-                        viewModel.authenticationState = .start
+                        viewModel.activeSheet = .start
                     }
                 } label: {
                     Text("나중에 하기")

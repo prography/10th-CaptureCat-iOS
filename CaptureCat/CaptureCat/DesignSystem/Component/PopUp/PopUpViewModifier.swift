@@ -23,9 +23,7 @@ struct PopUpViewModifier: ViewModifier {
                 Color.overlayDim
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation {
-                            isPresented = false
-                        }
+                        isPresented = false
                     }
                 
                 VStack(alignment: .center, spacing: 16) {
@@ -42,7 +40,7 @@ struct PopUpViewModifier: ViewModifier {
                     
                     HStack(spacing: 8) {
                         Button(action: {
-                            withAnimation { isPresented = false }
+                            isPresented = false
                         }) {
                             Text(cancelTitle)
                                 .frame(maxWidth: .infinity, minHeight: 48)
@@ -53,7 +51,7 @@ struct PopUpViewModifier: ViewModifier {
                         }
                         
                         Button(action: {
-                            withAnimation { isPresented = false }
+                            isPresented = false
                             confirmAction()
                         }) {
                             Text(confirmTitle)

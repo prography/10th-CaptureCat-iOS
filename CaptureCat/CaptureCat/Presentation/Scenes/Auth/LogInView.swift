@@ -74,17 +74,11 @@ struct LogInView: View {
             .padding(.top, 24)
         }
         .padding(EdgeInsets(top: 0, leading: 12, bottom: 20, trailing: 12))
-        .fullScreenCover(
-            isPresented: $showPersonal,
-            onDismiss: {}
-        ) {
-            WebView(webLink: .personal)
-        }
-        .fullScreenCover(
-            isPresented: $showTerms,
-            onDismiss: {}
-        ) {
-            WebView(webLink: .terms)
-        }
+        .sheet(isPresented: $showPersonal, content: {
+            SafariView(url: URL(string: WebLink.personal.url)!)
+        })
+        .sheet(isPresented: $showTerms, content: {
+            SafariView(url: URL(string: WebLink.terms.url)!)
+        })
     }
 }

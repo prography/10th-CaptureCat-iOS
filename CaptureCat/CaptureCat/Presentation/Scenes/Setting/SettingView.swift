@@ -23,7 +23,7 @@ struct SettingsView: View {
                 onAction: nil,
                 isSaveEnabled: false
             )
-            if AccountStorage.shared.isGuest == true {
+            if authViewModel.authenticationState == .guest {
                 guestCard
                     .background(Color(.gray02))
                     .cornerRadius(12)
@@ -75,18 +75,12 @@ struct SettingsView: View {
             authViewModel.withdraw()
         }
         .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
-        .fullScreenCover(
-            isPresented: $showPersonal,
-            onDismiss: {}
-        ) {
-            WebView(webLink: .personal)
-        }
-        .fullScreenCover(
-            isPresented: $showTerms,
-            onDismiss: {}
-        ) {
-            WebView(webLink: .terms)
-        }
+        .sheet(isPresented: $showPersonal, content: {
+            SafariView(url: URL(string: WebLink.personal.url)!)
+        })
+        .sheet(isPresented: $showTerms, content: {
+            SafariView(url: URL(string: WebLink.terms.url)!)
+        })
     }
     
     private var guestCard: some View {
@@ -96,7 +90,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
             
             Button(action: {
-                authViewModel.authenticationState = .initial
+                authViewModel.activeSheet = .login
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)
@@ -113,7 +107,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
                 .padding(24)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var serviceSection: some View {
@@ -136,9 +130,11 @@ struct SettingsView: View {
                 Text("개인정보 처리 방침")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
             }
+            .contentShape(Rectangle())
             
             Button {
                 showTerms = true
@@ -146,9 +142,11 @@ struct SettingsView: View {
                 Text("서비스 이용약관")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
             }
+            .contentShape(Rectangle())
             
             Button {
                 debugPrint("버전 정보")
@@ -156,9 +154,12 @@ struct SettingsView: View {
                 Text("버전 정보 \(Bundle.main.appVersion)")
                     .CFont(.body01Regular)
                     .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
             }
+            .contentShape(Rectangle())
+            .disabled(true)
         }
     }
     
@@ -186,9 +187,11 @@ struct SettingsView: View {
                     Text("초기화")
                         .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
+                        .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }
+                .contentShape(Rectangle())
             } else {
                 Button {
                     withAnimation {
@@ -198,9 +201,12 @@ struct SettingsView: View {
                     Text("로그아웃")
                         .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
+                        .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }
+                .contentShape(Rectangle())
+                
                 Button {
                     withAnimation {
                         authViewModel.isSignOutPresented = true
@@ -208,10 +214,11 @@ struct SettingsView: View {
                 } label: {
                     Text("회원 탈퇴")
                         .CFont(.body02Regular)
-                        .foregroundStyle(Color.text01)
+                        .foregroundStyle(Color.text01).frame(maxWidth: .infinity, minHeight: 16, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }
+                .contentShape(Rectangle())
             }
         }
     }

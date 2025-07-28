@@ -35,7 +35,7 @@ extension TagViewModel {
     }
     
     /// 로컬 전용 저장 (게스트 모드)
-    private func saveToLocal() async {
+    func saveToLocal() async {
         switch mode {
         case .batch:
             let totalItems = itemVMs.count
