@@ -75,18 +75,12 @@ struct SettingsView: View {
             authViewModel.withdraw()
         }
         .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
-        .fullScreenCover(
-            isPresented: $showPersonal,
-            onDismiss: {}
-        ) {
-            WebView(webLink: .personal)
-        }
-        .fullScreenCover(
-            isPresented: $showTerms,
-            onDismiss: {}
-        ) {
-            WebView(webLink: .terms)
-        }
+        .sheet(isPresented: $showPersonal, content: {
+            SafariView(url: URL(string: WebLink.personal.url)!)
+        })
+        .sheet(isPresented: $showTerms, content: {
+            SafariView(url: URL(string: WebLink.terms.url)!)
+        })
     }
     
     private var guestCard: some View {
