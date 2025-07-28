@@ -18,6 +18,7 @@ final class StorageViewModel: ObservableObject {
     @Published var showOverlimitToast = false
     @Published var showCountToast = false
     @Published var isAllSelected = false
+    @Published var showPermissionAlert = false
     
     // MARK: - Constants
     private let maxSelection = 20
@@ -32,7 +33,7 @@ final class StorageViewModel: ObservableObject {
         self.networkManager = networkManager
         // 초기 데이터
         assets = manager.assets
-
+        
         // ScreenshotManager → ViewModel 동기화
         manager.$assets
             .receive(on: DispatchQueue.main)
@@ -135,5 +136,36 @@ final class StorageViewModel: ObservableObject {
     private func deselectAll() {
         manager.deselectAll()
         selectedIDs.removeAll()
+    }
+}
+
+extension StorageViewModel {
+    func checkPhotoPermission() {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        switch status {
+        case .notDetermined:
+            // 최초 요청
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { newStatus in
+                if newStatus == .denied || newStatus == .restricted {
+                    DispatchQueue.main.async {
+                        self.showPermissionAlert = true
+                    }
+                }
+                // authorized/limited 이면 viewModel.assets 로직 실행됨
+            }
+        case .denied, .restricted:
+            // 이미 거부된 상태
+            showPermissionAlert = true
+        case .authorized, .limited:
+            // 접근 OK
+            break
+        @unknown default:
+            break
+        }
+    }
+    
+    func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 }

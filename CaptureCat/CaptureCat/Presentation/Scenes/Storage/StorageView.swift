@@ -46,6 +46,16 @@ struct StorageView: View {
             }
 
         }
+        .onAppear(perform: viewModel.checkPhotoPermission)
+        .popUp(
+            isPresented: $viewModel.showPermissionAlert,
+            title: "사진 접근 권한이 필요합니다.",
+            message: "스크린샷을 불러오기 위해 권한이 필요합니다.\n선택하지 않는 한 서버에 올라가지 않습니다.",
+            cancelTitle: "취소",
+            confirmTitle: "설정으로 이동"
+        ) {
+            viewModel.openAppSettings()
+        }
         .toast(
             isShowing: $viewModel.showOverlimitToast,
             message: "최대 20장까지 선택할 수 있어요.",
