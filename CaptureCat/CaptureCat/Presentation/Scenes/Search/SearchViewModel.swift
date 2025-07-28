@@ -115,8 +115,14 @@ final class SearchViewModel: ObservableObject {
     }
     
     private func loadThumbnailsForFilteredScreenshots() async {
-        for itemVM in filteredScreenshots {
-            await itemVM.loadFullImage()
+        // ✅ 병렬 로딩으로 여러 이미지를 동시에 다운로드
+        await withTaskGroup(of: Void.self) { group in
+            for itemVM in filteredScreenshots {
+                group.addTask {
+                    // 썸네일로 로드하여 더 빠르게 처리
+                    await itemVM.loadThumbnail(size: CGSize(width: 150, height: 250))
+                }
+            }
         }
     }
     

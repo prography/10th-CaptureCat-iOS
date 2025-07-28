@@ -138,11 +138,14 @@ final class ScreenshotManager: ObservableObject {
     
     // 현재 로드된 스크린샷 중 20개만 모두 선택
     func selectAll() {
-        
         let list = assets.map(\.localIdentifier)
         
-        for index in 0..<20 {
-            selectedIDs.insert(list[index])
+        if list.count <= 20 {
+            selectedIDs = Set(list)
+        } else {
+            for index in 0..<20 {
+                selectedIDs.insert(list[index])
+            }
         }
     }
     

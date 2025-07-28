@@ -15,7 +15,23 @@ final class PhotoLoader {
     private let cache = NSCache<NSString, UIImage>()
     private let imageManager = PHCachingImageManager()
     
-    private init() {}
+    // 서버 이미지용 URLCache (디스크 캐싱)
+    private let urlCache: URLCache
+    
+    private init() {
+        // URLCache 설정 (100MB 메모리, 500MB 디스크)
+        self.urlCache = URLCache(
+            memoryCapacity: 100 * 1024 * 1024,  // 100MB
+            diskCapacity: 500 * 1024 * 1024,    // 500MB
+            diskPath: "server_image_cache"
+        )
+        
+        // NSCache 메모리 제한 설정
+        cache.totalCostLimit = 200 * 1024 * 1024  // 200MB
+        cache.countLimit = 500  // 최대 500개 이미지
+    }
+    
+    // MARK: - PHAsset (로컬 이미지) 메서드들
     
     // 앱 실행 직후 혹은 스크린샷 리스트 페칭 뒤에…
     func prefetch(ids: [String], size: CGSize) {
@@ -84,9 +100,130 @@ final class PhotoLoader {
         await requestImage(id: id, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFit, options: options)
     }
     
-    /// 캐시 삭제
+    // MARK: - 서버 이미지 캐싱 메서드들
+    
+    /// 서버 URL에서 이미지를 다운로드하고 캐싱 (썸네일 크기 지정 가능)
+    func requestServerImage(
+        url: URL,
+        targetSize: CGSize? = nil
+    ) async -> UIImage? {
+        let cacheKey = cacheKey(for: url, size: targetSize)
+        
+        // 1) 메모리 캐시 확인
+        if let cached = cache.object(forKey: cacheKey as NSString) {
+            debugPrint("✅ 메모리 캐시에서 이미지 로드: \(url.lastPathComponent)")
+            return cached
+        }
+        
+        // 2) 디스크 캐시 확인
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+        if let cachedResponse = urlCache.cachedResponse(for: request),
+           let image = UIImage(data: cachedResponse.data) {
+            debugPrint("✅ 디스크 캐시에서 이미지 로드: \(url.lastPathComponent)")
+            
+            // 크기 조정이 필요한 경우
+            let finalImage = targetSize != nil ? resizeImage(image, to: targetSize!) : image
+            
+            // 메모리 캐시에도 저장
+            cache.setObject(finalImage, forKey: cacheKey as NSString)
+            return finalImage
+        }
+        
+        // 3) 서버에서 다운로드
+        return await downloadAndCacheServerImage(url: url, targetSize: targetSize)
+    }
+    
+    /// 서버 이미지 풀사이즈 다운로드
+    func requestFullServerImage(url: URL) async -> UIImage? {
+        return await requestServerImage(url: url, targetSize: nil)
+    }
+    
+    /// 서버 이미지 썸네일 다운로드
+    func requestServerThumbnail(url: URL, size: CGSize) async -> UIImage? {
+        return await requestServerImage(url: url, targetSize: size)
+    }
+    
+    // MARK: - Private Helper Methods
+    
+    /// 서버에서 이미지 다운로드 및 캐싱
+    private func downloadAndCacheServerImage(url: URL, targetSize: CGSize?) async -> UIImage? {
+        do {
+            debugPrint("🔄 서버에서 이미지 다운로드 시작: \(url.lastPathComponent)")
+            
+            let request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy)
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let image = UIImage(data: data) else {
+                debugPrint("❌ 이미지 데이터 변환 실패: \(url.lastPathComponent)")
+                return nil
+            }
+            
+            // 크기 조정이 필요한 경우
+            let finalImage = targetSize != nil ? resizeImage(image, to: targetSize!) : image
+            
+            // 메모리 캐시에 저장
+            let cacheKey = cacheKey(for: url, size: targetSize)
+            cache.setObject(finalImage, forKey: cacheKey as NSString)
+            
+            // 디스크 캐시에 저장 (원본 데이터)
+            let cachedResponse = CachedURLResponse(response: response, data: data)
+            urlCache.storeCachedResponse(cachedResponse, for: request)
+            
+            debugPrint("✅ 서버 이미지 다운로드 및 캐싱 완료: \(url.lastPathComponent)")
+            return finalImage
+            
+        } catch {
+            debugPrint("❌ 서버 이미지 다운로드 실패: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    /// 이미지 크기 조정
+    private func resizeImage(_ image: UIImage, to size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
+    
+    /// 캐시 키 생성 (URL + 크기 정보)
+    private func cacheKey(for url: URL, size: CGSize?) -> String {
+        if let size = size {
+            return "\(url.absoluteString)_\(Int(size.width))x\(Int(size.height))"
+        } else {
+            return url.absoluteString
+        }
+    }
+    
+    // MARK: - Cache Management
+    
+    /// 특정 ID/URL의 캐시 삭제
     func clearCache(for id: String) {
         cache.removeObject(forKey: id as NSString)
+    }
+    
+    /// 특정 URL의 캐시 삭제
+    func clearServerImageCache(for url: URL) {
+        // 메모리 캐시 삭제 (모든 크기 변형 포함)
+        let baseKey = url.absoluteString
+        cache.removeObject(forKey: baseKey as NSString)
+        
+        // 디스크 캐시 삭제
+        let request = URLRequest(url: url)
+        urlCache.removeCachedResponse(for: request)
+    }
+    
+    /// 모든 서버 이미지 캐시 삭제
+    func clearAllServerImageCache() {
+        urlCache.removeAllCachedResponses()
+        debugPrint("🗑️ 모든 서버 이미지 캐시 삭제 완료")
+    }
+    
+    /// 캐시 상태 정보
+    func cacheInfo() {
+        debugPrint("📊 캐시 정보:")
+        debugPrint("📊 - 메모리 캐시 사용량: \(cache.totalCostLimit / 1024 / 1024)MB")
+        debugPrint("📊 - 디스크 캐시 사용량: \(urlCache.currentDiskUsage / 1024 / 1024)MB / \(urlCache.diskCapacity / 1024 / 1024)MB")
     }
 }
 

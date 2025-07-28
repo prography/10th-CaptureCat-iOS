@@ -50,5 +50,24 @@ struct ScreenshotItemView<Overlay: View>: View {
         }
         .aspectRatio(45/76, contentMode: .fit)
         .clipped()
+        .onAppear {
+            // ✅ 각 뷰가 나타날 때 개별적으로 썸네일 로드
+            loadImageIfNeeded()
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    /// 이미지가 필요한 경우에만 로드 (중복 로드 방지)
+    private func loadImageIfNeeded() {
+        // 이미 이미지가 있거나 로딩 중인 경우 스킵
+        guard viewModel.thumbnail == nil && 
+              viewModel.fullImage == nil && 
+              !viewModel.isLoadingImage else { return }
+        
+        Task {
+            // 썸네일 크기로 이미지 로드 (더 빠름)
+            await viewModel.loadThumbnail(size: CGSize(width: 150, height: 250))
+        }
     }
 }

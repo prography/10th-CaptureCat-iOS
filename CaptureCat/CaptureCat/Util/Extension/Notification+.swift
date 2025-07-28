@@ -18,4 +18,4 @@ extension Notification.Name {
 struct FavoriteStatusInfo {
     let imageId: String
     let isFavorite: Bool
-} 
+}

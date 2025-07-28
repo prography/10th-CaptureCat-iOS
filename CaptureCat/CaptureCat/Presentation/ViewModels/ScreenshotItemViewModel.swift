@@ -48,9 +48,14 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         defer { isLoadingImage = false }
         
         if isServerImage {
-            // 서버 URL에서 이미지 다운로드
+            // 서버 URL에서 썸네일 다운로드 (PhotoLoader 사용)
             debugPrint("⭐️ 썸네일 다운로드 시작! URL: \(imageURL ?? "없음")")
-            thumbnail = await downloadImageFromURL(size: size)
+            if let urlString = imageURL, let url = URL(string: urlString) {
+                thumbnail = await PhotoLoader.shared.requestServerThumbnail(url: url, size: size)
+            } else {
+                debugPrint("❌ 유효하지 않은 이미지 URL: \(imageURL ?? "nil")")
+                thumbnail = nil
+            }
         } else {
             // 로컬 PHAsset에서 이미지 로드
             debugPrint("📱 로컬 PHAsset에서 썸네일 로드 시작 - ID: \(id)")
@@ -72,53 +77,17 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         defer { isLoadingImage = false }
         
         if isServerImage {
-            // 서버 URL에서 풀사이즈 이미지 다운로드
-            debugPrint("⭐️ 이미지 다운로드 시작!")
-            fullImage = await downloadImageFromURL(size: nil)
+            // 서버 URL에서 풀사이즈 이미지 다운로드 (PhotoLoader 사용)
+            debugPrint("⭐️ 풀사이즈 이미지 다운로드 시작!")
+            if let urlString = imageURL, let url = URL(string: urlString) {
+                fullImage = await PhotoLoader.shared.requestFullServerImage(url: url)
+            } else {
+                debugPrint("❌ 유효하지 않은 이미지 URL: \(imageURL ?? "nil")")
+                fullImage = nil
+            }
         } else {
             // 로컬 PHAsset에서 풀사이즈 이미지 로드
             fullImage = await PhotoLoader.shared.requestFullImage(id: id)
-        }
-    }
-    
-    /// 서버 URL에서 이미지 다운로드
-    private func downloadImageFromURL(size: CGSize?) async -> UIImage? {
-        guard let imageURL = imageURL,
-              let url = URL(string: imageURL) else {
-            debugPrint("❌ 유효하지 않은 이미지 URL: \(imageURL ?? "nil")")
-            return nil
-        }
-        
-        do {
-            debugPrint("🔄 이미지 다운로드 시작: \(url)")
-            let (data, _) = try await URLSession.shared.data(from: url)
-            
-            guard let image = UIImage(data: data) else {
-                debugPrint("❌ 이미지 데이터 변환 실패")
-                return nil
-            }
-            
-            // 크기 조정이 필요한 경우 (썸네일)
-            if let targetSize = size {
-                let resizedImage = resizeImage(image, to: targetSize)
-                debugPrint("✅ 썸네일 다운로드 완료: \(targetSize)")
-                return resizedImage
-            } else {
-                debugPrint("✅ 풀사이즈 이미지 다운로드 완료")
-                return image
-            }
-            
-        } catch {
-            debugPrint("❌ 이미지 다운로드 실패: \(error.localizedDescription)")
-            return nil
-        }
-    }
-    
-    /// 이미지 크기 조정 헬퍼
-    private func resizeImage(_ image: UIImage, to size: CGSize) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: size))
         }
     }
     

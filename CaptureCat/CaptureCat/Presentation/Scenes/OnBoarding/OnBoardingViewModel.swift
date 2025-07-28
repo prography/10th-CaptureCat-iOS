@@ -16,6 +16,12 @@ class OnBoardingViewModel {
          Page(description: "태그로 쉽게 찾고\n바로 활용해요", image: .onBoard3, indicator: .indicator3, next: "시작하기")]
     var isOnBoarding: Bool = true
     
+    init() {
+        if KeyChainModule.read(key: .didStarted) == "true" {
+            self.isOnBoarding = false
+        }
+    }
+    
     func increasePage() {
         if currentPage < onBoardingPages.count - 1 {
             currentPage += 1

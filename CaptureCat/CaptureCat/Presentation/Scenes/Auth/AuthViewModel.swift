@@ -23,21 +23,27 @@ class AuthViewModel: ObservableObject {
     
     @Published var authenticationState: AuthenticationState = .initial {
         didSet {
-            if authenticationState == .initial {
-                isLogInPresented = true
-                isRecommandLogIn = false
-            } else if authenticationState == .guest {
-                isLogInPresented = false
-                isRecommandLogIn = true
-            } else {
-                isLogInPresented = false
-                isRecommandLogIn = false
+            switch authenticationState {
+            case .initial:
+                // 처음 진입 시 로그인 화면
+                activeSheet = .login
+                
+            case .guest:
+                // 게스트 모드 진입 시 추천 로그인 화면
+                activeSheet = .recommend
+                
+            default:
+                // 그 외(튜토리얼, 메인 진입 등)는 모달 닫기
+                activeSheet = nil
             }
         }
     }
     
-    @Published var isLogInPresented: Bool = true
-    @Published var isRecommandLogIn: Bool = false
+    enum ActiveSheet: Identifiable {
+      case login, recommend
+      var id: ActiveSheet { self }
+    }
+    @Published var activeSheet: ActiveSheet?
     @Published var isStartedGetScreenshot: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
@@ -110,7 +116,7 @@ class AuthViewModel: ObservableObject {
                     return
                 }
                 
-                if info != nil {
+                if info != nil && KeyChainModule.read(key: .kakaoToken) == "true" {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
                     self?.authenticationState = .signIn
                 } else {
@@ -183,6 +189,7 @@ class AuthViewModel: ObservableObject {
                     switch kakaoSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
+                        KeyChainModule.create(key: .kakaoToken, data: "true")
                         // 토큰 저장 완료 후 동기화 시작
                         await handleLoginSuccess(tutorialCompleted: success.data.tutorialCompleted)
                     case .failure(let failure):
@@ -229,6 +236,9 @@ class AuthViewModel: ObservableObject {
         // 메모리 캐시 클리어
         ScreenshotRepository.shared.clearMemoryCache()
         
+        // 서버 이미지 캐시 클리어
+        PhotoLoader.shared.clearAllServerImageCache()
+        
         self.authenticationState = .initial
     }
     
@@ -241,6 +251,10 @@ class AuthViewModel: ObservableObject {
                 // 안전한 토큰 정리 (회원탈퇴 성공 시)
                 safelyCleanupAllTokens()
                 ScreenshotRepository.shared.clearMemoryCache()
+                
+                // 서버 이미지 캐시 클리어
+                PhotoLoader.shared.clearAllServerImageCache()
+                
                 self.authenticationState = .initial
             case .failure (let error):
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
