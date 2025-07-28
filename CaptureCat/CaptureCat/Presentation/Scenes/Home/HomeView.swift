@@ -146,14 +146,12 @@ struct HomeView: View {
             Button {
                 router.push(.favorite)
             } label: {
-                Image(.selectedFavorite)
+                Image(.favoriteList)
                     .resizable()
-                    .frame(width: 24, height: 24)
-                    .padding(3)
-                    .background(.overlayDim)
-                    .clipShape(Circle())
+                    .frame(width: 32, height: 32)
             }
-                .padding(16),
+                .padding(.trailing, 16)
+                .padding(.bottom, 12),
             alignment: .bottomTrailing
         )
         .scaleEffect(scale)
