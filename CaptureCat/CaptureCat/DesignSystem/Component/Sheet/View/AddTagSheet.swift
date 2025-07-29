@@ -35,9 +35,13 @@ struct AddTagSheet: View {
             // 입력 필드
             TextField("추가할 태그를 입력해주세요", text: $newTag)
                 .CFont(.body02Regular)
-                .textFieldStyle(.roundedBorder)
-                .backgroundStyle(.gray01)
-                .foregroundStyle(.text03)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .frame(height: 38)
+                .background(.gray01)
+                .cornerRadius(8)
+                .foregroundColor(.text03)
+                .textFieldStyle(.plain)
                 .padding(.horizontal, 16)
             
             // 선택된 태그 안내
