@@ -10,9 +10,7 @@ import Photos
 
 // MARK: - Save Operations
 extension TagViewModel {
-    
-    // 저장 (batch: all items, single: current)
-    func save() async {
+    func save(isGuest: Bool) async {
         // 업로드 시작 시 초기화
         isUploading = true
         uploadProgress = 0.0
@@ -25,7 +23,7 @@ extension TagViewModel {
             uploadedCount = 0
         }
         
-        if AccountStorage.shared.isGuest ?? true {
+        if isGuest {
             // 게스트 모드: 로컬 전용 저장
             await saveToLocal()
         } else {
@@ -35,9 +33,7 @@ extension TagViewModel {
     }
     
     /// 로컬 전용 저장 (게스트 모드)
-    func saveToLocal() async {
-        switch mode {
-        case .batch:
+    private func saveToLocal() async {
             let totalItems = itemVMs.count
             for (index, viewModel) in itemVMs.enumerated() {
                 // 진행률 업데이트
@@ -50,38 +46,12 @@ extension TagViewModel {
                 
                 await viewModel.saveToLocal()
             }
-            debugPrint("✅ 배치 모드 로컬 저장 완료: \(itemVMs.count)개")
-            
-        case .single:
-            if let viewModel = displayVM {
-                await MainActor.run {
-                    uploadProgress = 0.5
-                    debugPrint("📊 단일 모드 로컬 저장 시작: 50%")
-                }
-                
-                await viewModel.saveToLocal()
-                
-                await MainActor.run {
-                    uploadProgress = 1.0
-                    uploadedCount = 1
-                    debugPrint("📊 단일 모드 로컬 저장 완료: 100%")
-                }
-                debugPrint("✅ 단일 모드 로컬 저장 완료")
-            }
-        }
+            debugPrint("✅ 로컬 저장 완료: \(itemVMs.count)개")
     }
     
     /// 서버 전용 저장 (로그인 모드) - ImageService 직접 사용
     private func saveToServer() async {
-        switch mode {
-        case .batch:
-            // 배치 모드: 모든 아이템을 한번에 업로드
-            await uploadToServerWithImageService(viewModels: itemVMs)
-            
-        case .single:
-            // 단일 모드에서도 편집된 모든 아이템 업로드
-            await uploadToServerWithImageService(viewModels: itemVMs)
-        }
+        await uploadToServerWithImageService(viewModels: itemVMs)
     }
     
     /// ImageService를 사용한 실제 서버 업로드
@@ -108,16 +78,11 @@ extension TagViewModel {
                 continue
             }
             
-                         // 원본 이미지 데이터 가져오기
+            // 원본 이미지 데이터 가져오기
              if let imageData = await asset.requestFullImageData(compressionQuality: 0.8) {
                  imageDatas.append(imageData)
                  
                  // PhotoDTO 메타데이터 생성
-                 debugPrint("🔧 PhotoDTO 생성 중:")
-                 debugPrint("🔧 - ID: \(viewModel.id)")
-                 debugPrint("🔧 - 파일명: \(viewModel.fileName)")
-                 debugPrint("🔧 - 태그: \(viewModel.tags) (개수: \(viewModel.tags.count))")
-                 
                  let photoDTO = PhotoDTO(
                      id: viewModel.id,
                      fileName: viewModel.fileName,
@@ -148,9 +113,6 @@ extension TagViewModel {
         }
         
         // 3. ImageService를 통해 실제 업로드
-        debugPrint("🚀 ImageService 업로드 시작:")
-        debugPrint("🚀 - 이미지 개수: \(imageDatas.count)")
-        debugPrint("🚀 - 메타데이터 개수: \(imageMetas.count)")
         for (index, meta) in imageMetas.enumerated() {
             debugPrint("🚀 - Meta[\(index)]: 태그=\(meta.tags)")
         }
@@ -172,12 +134,6 @@ extension TagViewModel {
                  uploadProgress = 1.0
                  uploadedCount = imageDatas.count
                  debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
-             }
-             
-             // 4. 성공시 메모리 캐시에 저장 (InMemoryScreenshotCache 없이 처리)
-             for viewModel in viewModels {
-                 // 로컬 저장은 하지 않고 업로드만 성공했다고 로그
-                 debugPrint("✅ 업로드 완료: \(viewModel.fileName)")
              }
              
          case .failure(let error):

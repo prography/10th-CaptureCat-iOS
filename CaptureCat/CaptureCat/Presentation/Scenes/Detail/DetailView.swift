@@ -32,19 +32,19 @@ struct DetailView: View {
                 errorView
             }
         }
-        .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
-            AddTagSheet(
-                tags: $viewModel.tags,
-                selectedTags: $viewModel.tempSelectedTags,
-                isPresented: $viewModel.isShowingAddTagSheet,
-                onAddNewTag: { newTag in
-                    viewModel.addNewTag(newTag)
-                },
-                onDeleteTag: { tag in
-                    viewModel.deleteTag(tag)
-                }
-            )
-        }
+        .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
+            NavigationStack {
+                AddTagSheet(
+                    tags: $viewModel.tags,
+                    selectedTags: $viewModel.tempSelectedTags,
+                    isPresented: $viewModel.isShowingAddTagSheet,
+                    onAddNewTag: { newTag in viewModel.addNewTag(newTag) },
+                    onDeleteTag: { tag in viewModel.deleteTag(tag) }
+                )
+                .presentationDetents([ .height(250) ])
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+            }
+        })
         .popUp(
             isPresented: $viewModel.isDeleted,
             title: "삭제할까요?",
@@ -54,15 +54,6 @@ struct DetailView: View {
         ) {
             Task {
                 await handleDelete()
-            }
-        }
-        .alert("오류", isPresented: .constant(viewModel.errorMessage != nil)) {
-            Button("확인") {
-                viewModel.clearError()
-            }
-        } message: {
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
             }
         }
         .onAppear {

@@ -22,13 +22,25 @@ struct ScreenshotItemView<Overlay: View>: View {
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            Group {
+            GeometryReader { proxy in
                 // ✅ thumbnail 우선, 없으면 fullImage 사용
-                if let img = viewModel.thumbnail ?? viewModel.fullImage {
+                if let img = viewModel.fullImage {
                     Image(uiImage: img)
                         .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(Color.overlayDim, lineWidth: 1)
+                        )
                 } else if viewModel.isLoadingImage {
                     ProgressView()
+                        .frame(
+                            width: proxy.size.width,
+                            height: proxy.size.height
+                        )
                 } else {
                     // 이미지 로드 실패 시 플레이스홀더
                     Rectangle()
@@ -37,17 +49,18 @@ struct ScreenshotItemView<Overlay: View>: View {
                             Image(systemName: "photo")
                                 .foregroundColor(.gray)
                         )
+                        .frame(
+                            width: proxy.size.width,
+                            height: proxy.size.height
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color.overlayDim, lineWidth: 1)
-            )
             
             overlay()
                 .padding(6)
         }
+        .frame(maxWidth: .infinity)
         .aspectRatio(45/76, contentMode: .fit)
         .clipped()
         .onAppear {
@@ -67,7 +80,7 @@ struct ScreenshotItemView<Overlay: View>: View {
         
         Task {
             // 썸네일 크기로 이미지 로드 (더 빠름)
-            await viewModel.loadThumbnail(size: CGSize(width: 150, height: 250))
+            await viewModel.loadFullImage()
         }
     }
 }

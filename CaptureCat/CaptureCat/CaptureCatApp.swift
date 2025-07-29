@@ -25,6 +25,7 @@ struct CaptureCatApp: App {
     
     init() {
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
+        UITextField.appearance().tintColor = .gray09
         setupMemoryWarningNotification()
     }
     

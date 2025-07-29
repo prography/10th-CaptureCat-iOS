@@ -23,7 +23,6 @@ final class HomeViewModel: ObservableObject {
     private var canLoadMoreFavoritePages = true
     private var page: Int = 0
     private var favoritePage: Int = 0
-    private var hasLoadedInitialData = false
     
     // 중복 실행 방지를 위한 플래그들
     @Published var isRefreshing = false  // UI에서 접근 가능하도록 public으로 변경
@@ -53,7 +52,11 @@ final class HomeViewModel: ObservableObject {
     
     /// 스마트 로딩 (로그인 상태에 따라 자동 분기) - 초기 로딩용
     func loadScreenshots() async {
-        guard !hasLoadedInitialData else { return }
+        // 이미 로딩 중이면 중복 실행 방지
+        guard !isInitialLoading else { 
+            debugPrint("⚠️ 이미 초기 로딩 중 - loadScreenshots 스킵")
+            return 
+        }
         
         isInitialLoading = true
         defer { isInitialLoading = false }
@@ -70,8 +73,6 @@ final class HomeViewModel: ObservableObject {
         }
         
         await loadFavorite()
-        
-        hasLoadedInitialData = true
     }
     
     /// 강제 새로고침 (삭제 후 등에 사용) - 중복 실행 방지
@@ -105,7 +106,6 @@ final class HomeViewModel: ObservableObject {
         debugPrint("🔄 전체 새로고침 시작")
         
         // 상태 초기화 및 새로 로드
-        hasLoadedInitialData = false
         page = 0
         canLoadMorePages = true
         itemVMs = []
@@ -236,7 +236,6 @@ final class HomeViewModel: ObservableObject {
     func clearCache() {
         repository.clearMemoryCache()
         PhotoLoader.shared.clearAllServerImageCache()
-        hasLoadedInitialData = false
         DispatchQueue.main.async {
             self.itemVMs = []
         }
