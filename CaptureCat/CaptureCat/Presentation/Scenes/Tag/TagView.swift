@@ -15,6 +15,7 @@ struct TagView: View {
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
     @State private var isDragging = false
+    @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
     
     var body: some View {
         mainContentView
@@ -88,6 +89,10 @@ struct TagView: View {
         }
         .pickerStyle(.segmented)
         .frame(width: 200)
+        .zIndex((viewModel.isDeletingItem || isDeletingWithGesture) ? 0 : 1000) // 삭제 중이거나 삭제 제스처 중일 때는 가려지고, 평상시에는 최상위에서 클릭 가능
+        .allowsHitTesting(!(viewModel.isDeletingItem || isDeletingWithGesture)) // 삭제 중이거나 삭제 제스처 중일 때는 터치 비활성화
+        .opacity((viewModel.isDeletingItem || isDeletingWithGesture) ? 0.3 : 1.0) // 삭제 중이거나 삭제 제스처 중일 때 반투명으로 표시
+        .animation(.easeInOut(duration: 0.3), value: viewModel.isDeletingItem || isDeletingWithGesture) // 부드러운 상태 전환
         .onChange(of: viewModel.mode) { _, _ in
             viewModel.updateSelectedTags()
         }
@@ -123,6 +128,7 @@ struct TagView: View {
     private var singleContentView: some View {
         carouselView
             .padding(.top, 12)
+            .zIndex((viewModel.isDeletingItem || isDeletingWithGesture) ? 1000 : 0) // 삭제 중이거나 삭제 제스처 중일 때는 상위에, 평상시에는 하위에 위치
     }
     
     // MARK: - Tag Section
@@ -158,13 +164,10 @@ struct TagView: View {
         }
     }
     
-    
     // MARK: - Upload Progress Overlay
     private var uploadProgressOverlay: some View {
         Group {
-            if viewModel.isUploading {
-                uploadProgressView
-            }
+            if viewModel.isUploading { uploadProgressView }
         }
     }
     
@@ -176,8 +179,7 @@ struct TagView: View {
     }
     
     private var uploadBackgroundOverlay: some View {
-        Color.black.opacity(0.6)
-            .ignoresSafeArea()
+        Color.black.opacity(0.6).ignoresSafeArea()
     }
     
     private var uploadContentView: some View {
@@ -207,55 +209,43 @@ struct TagView: View {
     // 현재 표시되는 이미지의 인덱스 계산 (안전한 계산)
     private var currentDisplayIndex: Int {
         let itemCount = viewModel.itemVMs.count
-        
-        // 아이템이 없으면 0 반환
         guard itemCount > 0 else { return 0 }
-        
         let index = Int(round(snappedItem).remainder(dividingBy: Double(itemCount)))
         return index >= 0 ? index : index + itemCount
     }
     
     private var carouselView: some View {
-        Group {
-            if viewModel.itemVMs.isEmpty {
-                // 아이템이 없는 경우 빈 상태 표시
-                Text("표시할 아이템이 없습니다.")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ZStack {
-                    // ID 기반 ForEach로 변경 (안정적인 렌더링)
-                    ForEach(viewModel.itemVMs, id: \.id) { itemVM in
-                        if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
-                            carouselCard(for: itemVM, at: index)
-                                .opacity(viewModel.isDeletingItem ? 0.3 : 1.0)  // 삭제 중 반투명
-                        }
-                    }
-                    
-                    // 삭제 진행률 오버레이
-                    if viewModel.isDeletingItem {
-                        deletionProgressOverlay
-                    }
+        ZStack {
+            // ID 기반 ForEach로 변경 (안정적인 렌더링)
+            ForEach(viewModel.itemVMs, id: \.id) { itemVM in
+                if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
+                    carouselCard(for: itemVM, at: index)
+                        .opacity(viewModel.isDeletingItem ? 0.3 : 1.0)  // 삭제 중 반투명
                 }
-                .simultaneousGesture(viewModel.isDeletingItem ? nil : dragGesture)  // 삭제 중 드래그 비활성화
-                .allowsHitTesting(!viewModel.isDeletingItem)  // 삭제 중 터치 비활성화
-                .onAppear {
-                    syncOnAppear()
+            }
+            
+            // 삭제 진행률 오버레이
+            if viewModel.isDeletingItem {
+                deletionProgressOverlay
+            }
+        }
+        .simultaneousGesture(viewModel.isDeletingItem ? nil : dragGesture)  // 삭제 중 드래그 비활성화
+        .allowsHitTesting(!viewModel.isDeletingItem)  // 삭제 중 터치 비활성화
+        .onAppear {
+            syncOnAppear()
+        }
+        .onChange(of: viewModel.currentIndex) { _, newIndex in
+            // 드래그 중이 아닐 때만 동기화
+            if !isDragging {
+                DispatchQueue.main.async {
+                    syncOnChange(to: newIndex)
                 }
-                .onChange(of: viewModel.currentIndex) { _, newIndex in
-                    // 드래그 중이 아닐 때만 동기화
-                    if !isDragging {
-                        DispatchQueue.main.async {
-                            syncOnChange(to: newIndex)
-                        }
-                    }
-                }
-                .onChange(of: viewModel.shouldSyncCarousel) { _, _ in
-                    // 삭제 후 캐러셀 상태 동기화
-                    DispatchQueue.main.async {
-                        syncCarouselAfterDeletion()
-                    }
-                }
+            }
+        }
+        .onChange(of: viewModel.shouldSyncCarousel) { _, _ in
+            // 삭제 후 캐러셀 상태 동기화
+            DispatchQueue.main.async {
+                syncCarouselAfterDeletion()
             }
         }
     }
@@ -276,6 +266,10 @@ struct TagView: View {
                 }
                 // 안전한 삭제 (큐 시스템 사용)
                 safeDeleteItem(at: index)
+            },
+            onDragStateChanged: { isDragging in
+                // 삭제 제스처 진행 상태 업데이트
+                isDeletingWithGesture = isDragging
             }
         ) {
             ScreenshotItemView(viewModel: itemVM) {

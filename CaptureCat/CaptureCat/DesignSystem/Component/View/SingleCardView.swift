@@ -16,15 +16,18 @@ struct SingleCardView<Content: View>: View {
     let content: Content
     let cornerRadius: CGFloat
     let onDelete: (() -> Void)?  // 삭제 콜백 추가
+    let onDragStateChanged: ((Bool) -> Void)?  // 드래그 상태 변경 콜백 추가
     
     init(
         cornerRadius: CGFloat = 24,
         onDelete: (() -> Void)? = nil,  // 삭제 콜백 매개변수 추가
+        onDragStateChanged: ((Bool) -> Void)? = nil,  // 드래그 상태 변경 콜백 매개변수 추가
         @ViewBuilder content: () -> Content
     ) {
         self.content = content()
         self.cornerRadius = cornerRadius
         self.onDelete = onDelete
+        self.onDragStateChanged = onDragStateChanged
     }
     
     var body: some View {
@@ -69,8 +72,14 @@ struct SingleCardView<Content: View>: View {
                     guard abs(value.translation.height) > abs(value.translation.width) else { return }
                     // 오직 위 방향으로만
                     dragOffset.height = min(0, value.translation.height)
+                    
+                    // 삭제 제스처 진행 상태 전달 (위로 드래그하고 있을 때)
+                    onDragStateChanged?(dragOffset.height < 0)
                 }
                 .onEnded { _ in
+                    // 드래그 종료 상태 전달
+                    onDragStateChanged?(false)
+                    
                     if dragOffset.height < threshold {
                         // 충분히 밀었다면 사라짐
                         isDismissed = true
