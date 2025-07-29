@@ -20,24 +20,21 @@ struct TagView: View {
         mainContentView
             .overlay(uploadProgressOverlay)
             .task {
-                // 2) 뷰가 올라온 다음, 각 뷰모델에 이미지 로딩
-                for itemVM in viewModel.itemVMs {
-                    await itemVM.loadFullImage()
+                for itemVM in viewModel.itemVMs {  await itemVM.loadFullImage() }
+            }
+            .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
+                NavigationStack {
+                    AddTagSheet(
+                        tags: $viewModel.tags,
+                        selectedTags: $viewModel.selectedTags,
+                        isPresented: $viewModel.isShowingAddTagSheet,
+                        onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
+                        onDeleteTag: { tag in viewModel.toggleTag(tag) }
+                    )
+                    .presentationDetents([ .height(200) ])
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
-            }
-            .popupBottomSheet(isPresented: $viewModel.isShowingAddTagSheet) {
-                AddTagSheet(
-                    tags: $viewModel.tags,
-                    selectedTags: $viewModel.selectedTags,
-                    isPresented: $viewModel.isShowingAddTagSheet,
-                    onAddNewTag: { newTag in
-                        viewModel.addNewTag(name: newTag)
-                    },
-                    onDeleteTag: { tag in
-                        viewModel.toggleTag(tag) // 기존 toggleTag 로직으로 태그 제거
-                    }
-                )
-            }
+            })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
                     .navigationBarBackButtonHidden()
@@ -49,15 +46,10 @@ struct TagView: View {
     private var mainContentView: some View {
         VStack {
             navigationBarView
-            
             modePickerView
-            
             contentSectionView
-            
             Spacer()
-            
             tagSectionView
-            
             Spacer()
         }
     }
@@ -77,7 +69,6 @@ struct TagView: View {
                     } else {
                         await viewModel.save(isGuest: false)
                         
-                        // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
                         router.push(.completeSave(count: viewModel.itemVMs.count))
                     }
                     NotificationCenter.default.post(name: .tagEditCompleted, object: nil)

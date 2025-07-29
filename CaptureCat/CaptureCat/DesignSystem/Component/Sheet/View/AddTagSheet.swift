@@ -74,22 +74,26 @@ struct AddTagSheet: View {
         .padding(.top, 28)
         .toolbar(content: {
             ToolbarItemGroup(placement: .keyboard) {
-                Button("완료") {
-                    let trimmedTag = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
-                    
-                    // 새 태그 추가 콜백 호출
-                    if !trimmedTag.isEmpty {
-                        onAddNewTag?(trimmedTag)
+                HStack(spacing: 0) {
+                    Button("완료") {
+                        let trimmedTag = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                        
+                        // 새 태그 추가 콜백 호출
+                        if !trimmedTag.isEmpty {
+                            onAddNewTag?(trimmedTag)
+                        }
+                        
+                        // 입력 필드 초기화 및 키보드 숨김
+                        newTag = ""
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     }
-                    
-                    // 입력 필드 초기화 및 키보드 숨김
-                    newTag = ""
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    .primaryStyle(cornerRadius: 0)
+                    .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
                 }
-                .primaryStyle(cornerRadius: 0)
-                .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
+                .padding(.horizontal, -16)
+                .background(Color(UIColor.systemBackground))
             }
         })
     }
