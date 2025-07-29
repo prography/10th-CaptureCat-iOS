@@ -120,6 +120,13 @@ class DetailViewModel: ObservableObject {
             do {
                 try await ScreenshotRepository.shared.deleteTag(imageId: item.id, tagId: String(tagIndex + 1))
                 debugPrint("✅ 태그 삭제 완료: \(tag)")
+                
+                // 다른 뷰들에게 태그 변경 알림
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("TagChanged"),
+                    object: nil,
+                    userInfo: ["imageId": item.id, "action": "delete", "tag": tag]
+                )
             } catch {
                 debugPrint("❌ 태그 삭제 실패: \(error.localizedDescription)")
                 
@@ -136,7 +143,16 @@ class DetailViewModel: ObservableObject {
         Task {
             do {
                 try await ScreenshotRepository.shared.updateTag(id: item.id, tags: [newTag])
+                debugPrint("✅ 태그 추가 완료: \(newTag)")
+                
+                // 다른 뷰들에게 태그 변경 알림
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("TagChanged"),
+                    object: nil,
+                    userInfo: ["imageId": item.id, "action": "add", "tag": newTag]
+                )
             } catch {
+                debugPrint("❌ 태그 추가 실패: \(error.localizedDescription)")
                 print(error.localizedDescription)
             }
         }
@@ -162,6 +178,13 @@ class DetailViewModel: ObservableObject {
         do {
             try await item.delete()
             debugPrint("✅ 스크린샷 삭제 완료: \(item.fileName)")
+            
+            // 다른 뷰들에게 스크린샷 삭제 알림
+            NotificationCenter.default.post(
+                name: NSNotification.Name("ScreenshotDeleted"),
+                object: nil,
+                userInfo: ["imageId": item.id]
+            )
         } catch {
             errorMessage = "삭제 중 오류가 발생했습니다: \(error.localizedDescription)"
             debugPrint("❌ 스크린샷 삭제 실패: \(error.localizedDescription)")

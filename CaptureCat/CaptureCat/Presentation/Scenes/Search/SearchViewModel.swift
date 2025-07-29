@@ -25,12 +25,40 @@ final class SearchViewModel: ObservableObject {
     
     init(networkManager: NetworkManager) {
         self.networkManager = networkManager
+        
         // 검색어 변경 시 필터링 (태그가 선택되지 않은 경우에만)
         $searchText
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] searchText in
                 guard let self = self, self.selectedTags.isEmpty else { return }
                 self.filterTags(with: searchText)
+            }
+            .store(in: &cancellables)
+        
+        // 태그 변경 알림 구독
+        NotificationCenter.default.publisher(for: NSNotification.Name("TagChanged"))
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.refreshData()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 즐겨찾기 변경 알림 구독
+        NotificationCenter.default.publisher(for: .favoriteStatusChanged)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.refreshData()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 스크린샷 삭제 알림 구독
+        NotificationCenter.default.publisher(for: NSNotification.Name("ScreenshotDeleted"))
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.refreshData()
+                }
             }
             .store(in: &cancellables)
     }
@@ -123,6 +151,17 @@ final class SearchViewModel: ObservableObject {
                     await itemVM.loadThumbnail(size: CGSize(width: 150, height: 250))
                 }
             }
+        }
+    }
+    
+    func refreshData() async {
+        // 1. 태그 목록 다시 로드
+        await loadTags()
+        
+        // 2. 선택된 태그가 있다면 해당 데이터들도 다시 로드
+        if !selectedTags.isEmpty {
+            loadScreenshotsByTags()
+            await loadRelatedTags()
         }
     }
     

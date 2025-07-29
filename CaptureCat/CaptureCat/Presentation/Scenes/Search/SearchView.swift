@@ -28,6 +28,11 @@ struct SearchView: View {
         .task {
             await viewModel.loadTags()
         }
+        .onAppear {
+            Task {
+                await viewModel.refreshData()
+            }
+        }
     }
     
     // MARK: - 검색바
