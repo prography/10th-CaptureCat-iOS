@@ -27,6 +27,7 @@ final class TagViewModel: ObservableObject {
     @Published var tags: [String] = []
     @Published var selectedTags: Set<String> = []
     var batchSelectedTags: Set<String> = []
+    @Published var canSelectTag: Bool = false
     
     @Published var currentIndex: Int = 0
     

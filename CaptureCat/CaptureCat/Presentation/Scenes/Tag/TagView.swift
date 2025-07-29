@@ -41,6 +41,7 @@ struct TagView: View {
                     .navigationBarBackButtonHidden()
                     .toolbar(.hidden, for: .navigationBar)
             }
+            .toast(isShowing: $viewModel.canSelectTag, message: "태그는 4개까지 추가할 수 있습니다.", cornerRadius: 0)
     }
     
     // MARK: - Main Content View
@@ -128,7 +129,7 @@ struct TagView: View {
     private var singleContentView: some View {
         carouselView
             .padding(.top, 12)
-            .zIndex((viewModel.isDeletingItem || isDeletingWithGesture) ? 1000 : 0) // 삭제 중이거나 삭제 제스처 중일 때는 상위에, 평상시에는 하위에 위치
+            .zIndex((viewModel.isDeletingItem || isDeletingWithGesture) ? 1000 : 0)
     }
     
     // MARK: - Tag Section

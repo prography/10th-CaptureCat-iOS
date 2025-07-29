@@ -43,6 +43,7 @@ extension TagViewModel {
                 }
             }
         }
+        
         checkHasChanges()
     }
     
@@ -107,6 +108,14 @@ extension TagViewModel {
                 }
             }
             selectedTags.insert(tag)
+        } else {
+            // 5개째 태그를 선택하려고 할 때 토스트 표시
+            canSelectTag = true
+            
+            // 토스트를 표시한 후 자동으로 리셋 (3.5초 후)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                self.canSelectTag = false
+            }
         }
         checkHasChanges()
         updateSelectedTags()
@@ -115,6 +124,19 @@ extension TagViewModel {
     // 새 태그 추가
     func addNewTag(name: String) {
         guard !tags.contains(name) else { return }
+        
+        // 4개 제한 확인
+        if selectedTags.count >= 4 {
+            // 5개째 태그를 추가하려고 할 때 토스트 표시
+            canSelectTag = true
+            
+            // 토스트를 표시한 후 자동으로 리셋 (3.5초 후)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                self.canSelectTag = false
+            }
+            return
+        }
+        
         tags.append(name)
         
         // mode에 따라 다르게 처리
