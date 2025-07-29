@@ -80,7 +80,7 @@ struct ScreenshotItemView<Overlay: View>: View {
         
         Task {
             // 썸네일 크기로 이미지 로드 (더 빠름)
-            await viewModel.loadThumbnail(size: CGSize(width: 150, height: 250))
+            await viewModel.loadFullImage()
         }
     }
 }
