@@ -31,7 +31,7 @@ struct TagView: View {
                         onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                         onDeleteTag: { tag in viewModel.toggleTag(tag) }
                     )
-                    .presentationDetents([ .height(200) ])
+                    .presentationDetents([ .height(250) ])
                     .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
             })
