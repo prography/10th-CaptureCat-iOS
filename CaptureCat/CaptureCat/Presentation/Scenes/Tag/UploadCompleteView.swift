@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct UploadCompleteView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var router: Router
-//    @EnvironmentObject var authViewModel: AuthViewModel
     let count: Int
     
     var body: some View {
@@ -26,8 +26,11 @@ struct UploadCompleteView: View {
         Image(.cleanComplete)
         Spacer()
         Button {
-//            authViewModel.authenticationState = .signIn
-            router.popToRoot()
+            if authViewModel.authenticationState == .guest {
+                authViewModel.activeSheet = nil
+            } else {
+                router.popToRoot()
+            }
         } label: {
             Text("다음")
         }

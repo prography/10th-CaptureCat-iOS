@@ -21,6 +21,7 @@ final class TagViewModel: ObservableObject {
     @Published var hasChanges: Bool = false
     @Published var mode: Mode = .batch
     @Published var isShowingAddTagSheet: Bool = false
+    @Published var pushNext: Bool = false
     let segments = ["한번에", "한장씩"]
     
     @Published var tags: [String] = []

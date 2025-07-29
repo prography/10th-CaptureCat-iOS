@@ -38,6 +38,11 @@ struct TagView: View {
                     }
                 )
             }
+            .navigationDestination(isPresented: $viewModel.pushNext) {
+                UploadCompleteView(count: viewModel.itemVMs.count)
+                    .navigationBarBackButtonHidden()
+                    .toolbar(.hidden, for: .navigationBar)
+            }
     }
     
     // MARK: - Main Content View
@@ -66,17 +71,16 @@ struct TagView: View {
             onAction: {
                 Task {
                     if authViewModel.authenticationState == .guest {
-                        await viewModel.saveToLocal()
-                        authViewModel.activeSheet = nil
+                        await viewModel.save(isGuest: true)
+                        
+                        viewModel.pushNext = true
                     } else {
-                        await viewModel.save()
+                        await viewModel.save(isGuest: false)
                         
                         // 태그 편집 완료 알림 발송 (홈 화면 새로고침용)
-                        NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
-                        authViewModel.activeSheet = nil
                         router.push(.completeSave(count: viewModel.itemVMs.count))
-                        
                     }
+                    NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
                 }
             },
             isSaveEnabled: viewModel.hasChanges && !viewModel.isUploading

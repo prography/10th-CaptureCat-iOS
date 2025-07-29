@@ -160,11 +160,6 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     
     /// 로컬에만 저장 (게스트 모드 전용)
     func saveToLocal() async {
-        guard AccountStorage.shared.isGuest ?? true else {
-            debugPrint("⚠️ 로그인 모드에서는 로컬 저장을 사용할 수 없습니다.")
-            return
-        }
-        
         isSaving = true
         defer { isSaving = false }
         

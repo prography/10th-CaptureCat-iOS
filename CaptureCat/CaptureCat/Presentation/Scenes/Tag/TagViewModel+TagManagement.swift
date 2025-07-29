@@ -153,21 +153,6 @@ extension TagViewModel {
         let itemVM = itemVMs[index]
         itemVM.isFavorite.toggle()
         
-        // 게스트 모드일 때만 즉시 로컬 저장
-        if AccountStorage.shared.isGuest ?? true {
-            Task {
-                do {
-                    try SwiftDataManager.shared.setFavorite(
-                        imageId: itemVM.id, 
-                        isFavorite: itemVM.isFavorite
-                    )
-                    debugPrint("✅ 즐겨찾기 상태 로컬 저장 완료: \(itemVM.id)")
-                } catch {
-                    debugPrint("❌ 즐겨찾기 상태 로컬 저장 실패: \(error.localizedDescription)")
-                }
-            }
-        }
-        
         // UI 업데이트 강제 트리거
         updateTrigger.toggle()
         checkHasChanges()

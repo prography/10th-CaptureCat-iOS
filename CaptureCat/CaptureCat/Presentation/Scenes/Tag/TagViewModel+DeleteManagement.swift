@@ -9,7 +9,6 @@ import SwiftUI
 
 // MARK: - Delete Management
 extension TagViewModel {
-    
     /// 삭제 작업 큐 시스템 프로퍼티들
     var deletionQueue: DispatchQueue {
         DispatchQueue(label: "com.capturecat.deletion", qos: .userInitiated)
@@ -84,10 +83,6 @@ extension TagViewModel {
             debugPrint("🗑️ 큐에서 삭제 처리: [\(targetIndex)] \(fileName)")
             
             do {
-                // 1단계: 로컬 DB에서 삭제
-                try SwiftDataManager.shared.delete(id: itemId)
-                debugPrint("✅ DB 삭제 완료: \(fileName)")
-                
                 // 2단계: 메모리에서 제거 (배치 처리)
                 await safelyRemoveItemWithBatching(at: targetIndex)
                 

@@ -15,23 +15,21 @@ struct TabContainerView: View {
     init(networkManager: NetworkManager) {
         self.networkManager = networkManager
     }
-
+    
     var body: some View {
         ZStack {
             // 1) 탭별 화면 분기
-//            Group {
-                switch selectedTab {
-                case .temporaryStorage:
-                    let viewModel = StorageViewModel(networkManager: networkManager)
-                    StorageView(viewModel: viewModel)
-                case .home:
-                    HomeView()
-                case .search:
-                    let viewModel = SearchViewModel(networkManager: networkManager)
-                    SearchView(viewModel: viewModel)
-                }
-//            }
-
+            switch selectedTab {
+            case .temporaryStorage:
+                let viewModel = StorageViewModel(networkManager: networkManager)
+                StorageView(viewModel: viewModel)
+            case .home:
+                HomeView()
+            case .search:
+                let viewModel = SearchViewModel(networkManager: networkManager)
+                SearchView(viewModel: viewModel)
+            }
+            
             // 2) 화면 아래에 탭 바
             VStack {
                 Spacer()
