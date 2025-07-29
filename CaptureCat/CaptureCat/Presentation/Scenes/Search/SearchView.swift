@@ -42,18 +42,30 @@ struct SearchView: View {
                 .foregroundColor(.gray06)
             
             if !viewModel.selectedTags.isEmpty {
-                // 선택된 태그들을 칩 형태로 표시
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(viewModel.selectedTags, id: \.self) { tag in
-                            Button {
-                                viewModel.removeTag(tag)
-                            } label: {
-                                Text(tag)
+                HStack {
+                    // 선택된 태그들을 칩 형태로 표시
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(viewModel.selectedTags, id: \.self) { tag in
+                                Button {
+                                    viewModel.removeTag(tag)
+                                } label: {
+                                    Text(tag)
+                                }
+                                .chipStyle(isSelected: true, selectedBackground: .white, selectedForeground: .primary01, selectedBorderColor: .primary01, icon: Image(.xmark))
                             }
-                            .chipStyle(isSelected: true, selectedBackground: .white, selectedForeground: .primary01, selectedBorderColor: .primary01, icon: Image(.xmark))
+                            Spacer()
                         }
-                        Spacer()
+                    }
+                    .padding(.vertical, 4)
+                    .background(Color.gray03)
+                    .cornerRadius(8)
+                    Button {
+                        viewModel.selectedTags.removeAll()
+                    } label: {
+                        Text("취소")
+                            .CFont(.body02Regular)
+                            .foregroundStyle(.text02)
                     }
                 }
             } else {
@@ -61,12 +73,12 @@ struct SearchView: View {
                 TextField("태그 이름으로 검색해 보세요", text: $viewModel.searchText)
                     .CFont(.body02Regular)
                     .foregroundColor(.gray06)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color.gray03)
+                    .cornerRadius(8)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(Color.gray03)
-        .cornerRadius(8)
     }
     
     // MARK: - 태그 바로가기 섹션
