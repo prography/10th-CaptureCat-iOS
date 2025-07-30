@@ -26,7 +26,7 @@ struct StorageView: View {
                 
             }
             
-            if AccountStorage.shared.isGuest == true {
+            if authViewModel.authenticationState == .guest {
                 VStack {
                     Spacer()
                     
@@ -172,7 +172,7 @@ struct StorageView: View {
                     }
                 }
             }
-            .blur(radius: AccountStorage.shared.isGuest == true ? 8 : 0)
+            .blur(radius: authViewModel.authenticationState == .guest ? 8 : 0)
         }
     }
 
