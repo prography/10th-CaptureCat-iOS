@@ -18,7 +18,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     @Published var thumbnail: UIImage?
     @Published var fullImage: UIImage?
     @Published var isLoadingImage = false
-    @Published var tags: [String]
+    @Published var tags: [Tag]
     @Published var isFavorite: Bool
     @Published var isSaving = false
     @Published var errorMessage: String?
@@ -106,13 +106,14 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     }
     
     func addTag(_ tag: String) {
-        guard !tags.contains(tag) else { return }
-        tags.append(tag)
+        let tagNames = tags.map { $0.name }
+        guard !tagNames.contains(tag) else { return }
+        tags.append(Tag(id: tagNames.count, name: tag))
         scheduleSave()
     }
     
     func removeTag(_ tag: String) {
-        tags.removeAll { $0 == tag }
+        tags.removeAll { $0.name == tag }
         scheduleSave()
     }
     
@@ -216,7 +217,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
             id: id,
             fileName: fileName,
             createDate: createDate,
-            tags: tags,
+            tags: tags.map { $0.name },
             isFavorite: isFavorite,
             imageData: thumbnail?.jpegData(compressionQuality: 0.8)
         )

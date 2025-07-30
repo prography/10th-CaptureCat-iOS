@@ -58,23 +58,26 @@ final class InMemoryScreenshotCache {
     // MARK: - Tag Operations
     
     func getItemsByTag(_ tag: String) -> [ScreenshotItemViewModel] {
-        return allItems.filter { $0.tags.contains(tag) }
+        return allItems.filter { item in
+            item.tags.contains { $0.name == tag }
+        }
     }
     
     func getItemsByTags(_ tags: [String]) -> [ScreenshotItemViewModel] {
         return allItems.filter { item in
-            tags.allSatisfy { tag in item.tags.contains(tag) }
+            let itemTagNames = item.tags.map { $0.name }
+            return tags.allSatisfy { tag in itemTagNames.contains(tag) }
         }
     }
     
     func getAllTags() -> [String] {
-        let allTags = allItems.flatMap { $0.tags }
+        let allTags = allItems.flatMap { $0.tags.map { $0.name } }
         return Array(Set(allTags)).sorted()
     }
     
     func getOtherTags(for baseTags: [String]) -> [String] {
         let matchingItems = getItemsByTags(baseTags)
-        let otherTags = matchingItems.flatMap { $0.tags }.filter { !baseTags.contains($0) }
+        let otherTags = matchingItems.flatMap { $0.tags.map { $0.name } }.filter { !baseTags.contains($0) }
         return Array(Set(otherTags)).sorted()
     }
     

@@ -30,7 +30,7 @@ extension TagViewModel {
         case .single:
             // 안전한 인덱스 접근 (크래시 방지)
             if currentIndex >= 0 && currentIndex < itemVMs.count {
-                selectedTags = Set(itemVMs[currentIndex].tags)
+                selectedTags = Set(itemVMs[currentIndex].tags.map { $0.name })
             } else {
                 debugPrint("⚠️ updateSelectedTags: 잘못된 currentIndex \(currentIndex) (총 \(itemVMs.count)개)")
                 selectedTags = []

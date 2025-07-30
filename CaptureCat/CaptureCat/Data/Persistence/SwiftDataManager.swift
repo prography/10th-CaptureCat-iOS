@@ -67,14 +67,14 @@ final class SwiftDataManager {
         if let screenshot = fetchEntity(id: item.id) {
             screenshot.fileName = item.fileName
             screenshot.createDate = item.createDate
-            screenshot.tags = item.tags
+            screenshot.tags = item.getTagNames()  // Tag 배열을 String 배열로 변환
             screenshot.isFavorite = item.isFavorite
         } else {
             let screenshot = Screenshot(
                 id: item.id,
                 fileName: item.fileName,
                 createDate: item.createDate,
-                tags: item.tags,
+                tags: item.getTagNames(),  // Tag 배열을 String 배열로 변환
                 isFavorite: item.isFavorite
             )
             context.insert(screenshot)
