@@ -11,6 +11,7 @@ import Photos
 struct HomeView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: HomeViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
     @State private var isDragging = false
@@ -46,6 +47,11 @@ struct HomeView: View {
                         Text("로그인 하면 스크린샷을 저장할 수 있어요! ")
                             .foregroundStyle(.text03)
                             .CFont(.body01Regular)
+                        Button("로그인하기") {
+                            authViewModel.authenticationState = .initial
+                        }
+                        .primaryStyle(fillWidth: false)
+                        .padding(.top, 16)
                     } else {
                         Text("임시보관함에서 스크린샷을 저장할 수 있어요!")
                             .foregroundStyle(.text03)
@@ -158,17 +164,6 @@ struct HomeView: View {
         .opacity(opacity)
         .offset(x: xOffset, y: 0)
         .zIndex(zIndex)
-        .onAppear {
-            // ✅ ScreenshotItemView가 자동으로 썸네일을 로드하므로
-            // 카로셀에서는 필요시에만 추가 처리
-            // 중복 로딩 방지를 위해 이미 로드된 경우 스킵
-//            if asset.thumbnail == nil && asset.fullImage == nil && !asset.isLoadingImage {
-//                Task {
-//                    // 카로셀에서는 조금 더 큰 크기로 로드 (선택적)
-//                    await asset.loadThumbnail(size: CGSize(width: 200, height: 300))
-//                }
-//            }
-        }
     }
     
     private var dragGesture: some Gesture {

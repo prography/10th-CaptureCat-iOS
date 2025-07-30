@@ -92,11 +92,6 @@ class AuthViewModel: ObservableObject {
     }
     
     private func checkKakaoLoginStatus() {
-        guard AuthApi.hasToken() else {
-            debugPrint("⚠️ 카카오 토큰이 없음 - 카카오 자동로그인 스킵")
-            return
-        }
-        
         UserApi.shared.accessTokenInfo { [weak self] info, error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -105,7 +100,7 @@ class AuthViewModel: ObservableObject {
                     return
                 }
                 
-                if info != nil && KeyChainModule.read(key: .kakaoToken) == "true" {
+                if info != nil {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
                     self?.authenticationState = .signIn //문제 원인
                 } else {

@@ -253,8 +253,8 @@ extension NetworkManager {
         debugPrint("🔄 - 기존 AccessToken: \(KeyChainModule.read(key: .accessToken)?.prefix(20) ?? "없음")...")
         debugPrint("🔄 - RefreshToken: \(refreshToken.prefix(20))...")
         
-        // 토큰 갱신 시도
-        let refreshSuccess = await refreshTokenIfNeeded()
+        // TokenManager를 통한 토큰 갱신 시도 (동시성 제어됨)
+        let refreshSuccess = await TokenManager.shared.ensureValidToken()
         
         if refreshSuccess {
             debugPrint("✅ 토큰 갱신 성공! 원래 요청 재시도")
@@ -265,134 +265,6 @@ extension NetworkManager {
         } else {
             debugPrint("❌ 토큰 갱신 실패 - 로그인이 필요합니다")
             throw NetworkError.unauthorized
-        }
-    }
-    
-    /// 필요 시 토큰 갱신 시도
-    private func refreshTokenIfNeeded() async -> Bool {
-        guard let refreshToken = KeyChainModule.read(key: .refreshToken),
-              !refreshToken.isEmpty else {
-            debugPrint("🔴 RefreshToken이 없어서 토큰 갱신 불가")
-            return false
-        }
-        
-        do {
-            let builder = RefreshTokenBuilder(refreshToken: refreshToken)
-            let response = try await fetchRefreshToken(builder)
-            debugPrint("✅ 토큰 갱신 성공")
-            return true
-        } catch {
-            debugPrint("🔴 토큰 갱신 실패: \(error)")
-            // 갱신 실패 시 안전한 토큰 정리
-            safelyCleanupTokens()
-            return false
-        }
-    }
-    
-    /// 토큰을 안전하게 정리 (연쇄 삭제 방지)
-    private func safelyCleanupTokens() {
-        debugPrint("🧹 안전한 토큰 정리 시작")
-        
-        // 각 토큰을 개별적으로 삭제하고 에러 무시
-        do {
-            debugPrint("🧹 AccessToken 삭제 시도")
-            KeyChainModule.delete(key: .accessToken)
-        }
-        
-        do {
-            debugPrint("🧹 RefreshToken 삭제 시도")
-            KeyChainModule.delete(key: .refreshToken)
-        }
-        
-        // AccountStorage도 안전하게 리셋
-        do {
-            debugPrint("🧹 AccountStorage 리셋 시도")
-            AccountStorage.shared.safeReset()
-        }
-        
-        debugPrint("🧹 토큰 정리 완료")
-    }
-    
-    /// 토큰 갱신 전용 네트워크 요청 (로그인과 동일한 방식으로 헤더에서 토큰 추출)
-    private func fetchRefreshToken<Builder: BuilderProtocol>(_ builder: Builder) async throws -> Builder.Response {
-        let request = try await makeRequest(builder)
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        // 응답 데이터 로깅
-        if let responseString = String(data: data, encoding: .utf8) {
-            debugPrint("📥 Token Refresh Response Data: \(responseString)")
-        } else {
-            debugPrint("📥 Token Refresh Response Data: [Binary Data - \(data.count) bytes]")
-        }
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            debugPrint("🔴 Token Refresh HTTP Response를 가져올 수 없음")
-            throw NetworkError.responseNotFound
-        }
-
-        // 상세 응답 정보 로깅
-        debugPrint("📊 Token Refresh HTTP Status Code: \(httpResponse.statusCode)")
-        debugPrint("📊 Token Refresh HTTP Headers: \(httpResponse.allHeaderFields)")
-        
-        switch httpResponse.statusCode {
-        case 200...299:
-            // 성공 시 헤더에서 새로운 토큰 추출 및 저장
-            if let newAccessToken = httpResponse.value(forHTTPHeaderField: "Authorization"),
-               let newRefreshToken = httpResponse.value(forHTTPHeaderField: "Refresh-Token") {
-                
-                // 기존 토큰 삭제 후 새 토큰 저장
-                KeyChainModule.update(key: .accessToken, data: newAccessToken)
-                KeyChainModule.update(key: .refreshToken, data: newRefreshToken)
-                
-                debugPrint("🔑 새로운 토큰 저장 완료")
-                debugPrint("🔑 - New Access: \(newAccessToken.prefix(20))...")
-                debugPrint("🔑 - New Refresh: \(newRefreshToken.prefix(20))...")
-                
-            } else {
-                debugPrint("⚠️ 토큰 갱신 응답 헤더에서 새로운 토큰을 찾을 수 없음")
-                throw NetworkError.unauthorized
-            }
-            
-            debugPrint("✅ 토큰 갱신 성공: \(httpResponse.statusCode)")
-            return try await builder.deserializer.deserialize(data)
-            
-        case 401:
-            debugPrint("🔴 토큰 갱신 401 Unauthorized - RefreshToken 만료")
-            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
-            throw NetworkError.unauthorized
-            
-        case 400:
-            debugPrint("🔴 토큰 갱신 400 Bad Request")
-            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
-            throw NetworkError.badRequest
-            
-        case 403:
-            debugPrint("🔴 토큰 갱신 403 Forbidden")
-            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
-            throw NetworkError.forBidden
-            
-        case 404:
-            debugPrint("🔴 토큰 갱신 404 Not Found")
-            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
-            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
-            throw NetworkError.responseNotFound
-            
-        case 500:
-            debugPrint("🔴 토큰 갱신 500 Internal Server Error")
-            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
-            debugPrint("🔴 요청 Method: \(request.httpMethod ?? "nil")")
-            debugPrint("🔴 요청 Headers: \(request.allHTTPHeaderFields ?? [:])")
-            if let body = request.httpBody {
-                debugPrint("🔴 요청 Body: \(String(data: body, encoding: .utf8) ?? "[Binary Data - \(body.count) bytes]")")
-            }
-            debugPrint("🔴 서버 응답: \(String(data: data, encoding: .utf8) ?? "nil")")
-            throw NetworkError.unknown(httpResponse.statusCode)
-            
-        default:
-            debugPrint("🔴 토큰 갱신 예상하지 못한 HTTP 상태 코드: \(httpResponse.statusCode)")
-            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
-            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
-            throw NetworkError.unknown(httpResponse.statusCode)
         }
     }
 }

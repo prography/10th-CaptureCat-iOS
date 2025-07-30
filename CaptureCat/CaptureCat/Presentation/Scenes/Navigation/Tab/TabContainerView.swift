@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Combine
 
 struct TabContainerView: View {
     @State private var selectedTab: Tab = .home
+    @State private var isKeyboardVisible: Bool = false
     
     private var networkManager: NetworkManager
     
@@ -17,7 +19,7 @@ struct TabContainerView: View {
     }
     
     var body: some View {
-        ZStack {
+        VStack(spacing: 0) {
             // 1) 탭별 화면 분기
             switch selectedTab {
             case .temporaryStorage:
@@ -30,11 +32,16 @@ struct TabContainerView: View {
                 SearchView(viewModel: viewModel)
             }
             
-            // 2) 화면 아래에 탭 바
-            VStack {
-                Spacer()
+            // 2) 화면 아래에 탭 바 - 키보드 상태에 따라 조건부 표시
+            if !isKeyboardVisible {
                 CustomTabView(selectedTab: $selectedTab)
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            isKeyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            isKeyboardVisible = false
         }
     }
 }
