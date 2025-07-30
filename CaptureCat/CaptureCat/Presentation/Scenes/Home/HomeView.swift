@@ -11,6 +11,7 @@ import Photos
 struct HomeView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: HomeViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
     @State private var isDragging = false
@@ -46,6 +47,11 @@ struct HomeView: View {
                         Text("로그인 하면 스크린샷을 저장할 수 있어요! ")
                             .foregroundStyle(.text03)
                             .CFont(.body01Regular)
+                        Button("로그인하기") {
+                            authViewModel.authenticationState = .initial
+                        }
+                        .primaryStyle(fillWidth: false)
+                        .padding(.top, 16)
                     } else {
                         Text("임시보관함에서 스크린샷을 저장할 수 있어요!")
                             .foregroundStyle(.text03)
