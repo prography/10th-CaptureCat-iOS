@@ -63,7 +63,7 @@ struct AddTagSheet: View {
                             if selectedTags.contains(tag) {
                                 Button {
                                     // selectedTags에서 제거
-                                    selectedTags.remove(tag)
+//                                    selectedTags.remove(tag)
                                     // 실제 태그 삭제 콜백 호출
                                     onDeleteTag?(tag)
                                 } label: {

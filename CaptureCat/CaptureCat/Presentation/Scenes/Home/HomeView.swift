@@ -158,17 +158,6 @@ struct HomeView: View {
         .opacity(opacity)
         .offset(x: xOffset, y: 0)
         .zIndex(zIndex)
-        .onAppear {
-            // ✅ ScreenshotItemView가 자동으로 썸네일을 로드하므로
-            // 카로셀에서는 필요시에만 추가 처리
-            // 중복 로딩 방지를 위해 이미 로드된 경우 스킵
-//            if asset.thumbnail == nil && asset.fullImage == nil && !asset.isLoadingImage {
-//                Task {
-//                    // 카로셀에서는 조금 더 큰 크기로 로드 (선택적)
-//                    await asset.loadThumbnail(size: CGSize(width: 200, height: 300))
-//                }
-//            }
-        }
     }
     
     private var dragGesture: some Gesture {
