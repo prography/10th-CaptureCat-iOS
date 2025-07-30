@@ -190,6 +190,26 @@ struct SearchView: View {
                                         .padding(6)
                                 }
                             }
+                            .onAppear {
+                                // 마지막 아이템에 도달했을 때 더 많은 데이터 로드
+                                if viewModel.shouldLoadMore(currentItem: item) {
+                                    viewModel.loadMoreScreenshots()
+                                }
+                            }
+                        }
+                        
+                        // 추가 로딩 인디케이터
+                        if viewModel.isLoadingMore {
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 10)
+                            }
+                            .frame(maxWidth: .infinity)
                         }
                     }
                     .padding(.horizontal, 16)
