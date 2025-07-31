@@ -466,19 +466,44 @@ extension ScreenshotRepository {
     
     /// 즐겨찾기 상태 토글 (로그인 상태에 따라 분기)
     func toggleFavorite(id: String) async throws {
-        // 현재 상태 확인
+        // 현재 상태 확인 - 더 안전한 방법 사용
         let currentFavoriteState: Bool
         
         if AccountStorage.shared.isGuest ?? true {
             currentFavoriteState = SwiftDataManager.shared.isFavorite(imageId: id)
         } else {
-            currentFavoriteState = vms[id]?.isFavorite ?? false
+            // 🔧 InMemoryScreenshotCache에서 상태 확인으로 변경 (더 정확함)
+            if let cachedItem = InMemoryScreenshotCache.shared.retrieve(id: id) {
+                currentFavoriteState = cachedItem.isFavorite
+            } else {
+                // 캐시에 없으면 vms에서 확인
+                currentFavoriteState = vms[id]?.isFavorite ?? false
+                debugPrint("⚠️ 캐시에서 찾을 수 없어 vms에서 상태 확인: \(id) -> \(currentFavoriteState)")
+            }
         }
+        
+        debugPrint("🔍 현재 즐겨찾기 상태: \(id) -> \(currentFavoriteState)")
         
         // 상태에 따라 추가/제거
         if currentFavoriteState {
+            debugPrint("🗑️ 즐겨찾기 삭제 실행: \(id)")
             try await deleteFavorite(id: id)
         } else {
+            debugPrint("❤️ 즐겨찾기 추가 실행: \(id)")
+            try await uploadFavorite(id: id)
+        }
+    }
+    
+    /// 즐겨찾기 상태 토글 (현재 상태를 명시적으로 전달받는 버전)
+    func toggleFavorite(id: String, currentState: Bool) async throws {
+        debugPrint("🔍 전달받은 현재 즐겨찾기 상태: \(id) -> \(currentState)")
+        
+        // 상태에 따라 추가/제거
+        if currentState {
+            debugPrint("🗑️ 즐겨찾기 삭제 실행: \(id)")
+            try await deleteFavorite(id: id)
+        } else {
+            debugPrint("❤️ 즐겨찾기 추가 실행: \(id)")
             try await uploadFavorite(id: id)
         }
     }

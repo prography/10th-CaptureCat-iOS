@@ -435,6 +435,12 @@ final class HomeViewModel: ObservableObject {
             debugPrint("✅ HomeView - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
         }
         
+        // 🔧 캐시도 함께 업데이트 (로그인 모드인 경우)
+        if !(AccountStorage.shared.isGuest ?? true) {
+            InMemoryScreenshotCache.shared.updateFavorite(id: favoriteInfo.imageId, isFavorite: favoriteInfo.isFavorite)
+            debugPrint("✅ HomeView - 캐시 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
+        }
+        
         // favoriteItemVMs에서 해당 아이템 처리
         if let favoriteIndex = favoriteItemVMs.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
             if favoriteInfo.isFavorite {
