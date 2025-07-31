@@ -16,11 +16,13 @@ struct PHAssetView: View {
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Group {
+            GeometryReader { proxy in
                 if let image {
                     Image(uiImage: image)
                         .resizable()
-                        .aspectRatio(45 / 76, contentMode: .fill)
+                        .scaledToFill()
+                        .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
+                        .clipped()
                 } else {
                     Color(white: 0.9)
                         .onAppear { loadImage() }
@@ -34,6 +36,9 @@ struct PHAssetView: View {
                 .opacity(isSelected ? 1 : 0.6)
             
         }
+        .frame(maxWidth: .infinity)
+        .aspectRatio(45/76, contentMode: .fit)
+        .clipped()
         .overlay(
             RoundedRectangle(cornerSize: .zero)
                 .stroke(isSelected ? Color.primary01 : Color.clear, lineWidth: 2)
