@@ -260,7 +260,7 @@ class AuthViewModel: ObservableObject {
     }
     
     /// 로컬에 동기화할 데이터가 있는지 확인
-    private func hasLocalData() -> Bool {
+    func hasLocalData() -> Bool {
         do {
             let localCount = try SwiftDataManager.shared.fetchAllEntities().count
             debugPrint("📱 로컬 스크린샷 개수: \(localCount)개")

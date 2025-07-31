@@ -40,6 +40,10 @@ struct AuthenticatedView: View {
         }
         .task {
             authViewModel.checkAutoLogin()
+            
+            if authViewModel.hasLocalData() {
+                authViewModel.authenticationState = .syncing
+            }
         }
     }
 }
