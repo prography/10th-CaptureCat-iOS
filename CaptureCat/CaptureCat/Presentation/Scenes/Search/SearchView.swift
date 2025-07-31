@@ -52,11 +52,20 @@ struct SearchView: View {
                                 } label: {
                                     Text(tag)
                                 }
-                                .chipStyle(isSelected: true, selectedBackground: .white, selectedForeground: .primary01, selectedBorderColor: .primary01, icon: Image(.xmark))
+                                .chipStyle(
+                                    isSelected: true,
+                                    selectedBackground: .clear,
+                                    selectedForeground: .primary01,
+                                    selectedBorderColor: .primary01,
+                                    icon: Image(.xmark),
+                                    horizontalPadding: 10,
+                                    verticalPadding: 5.5
+                                )
                             }
                             Spacer()
                         }
                     }
+                    .padding(.leading, 12)
                     .padding(.vertical, 4)
                     .background(Color.gray03)
                     .cornerRadius(8)
