@@ -31,8 +31,8 @@ struct UploadCompleteView: View {
             tabs.go(.home)
             KeyChainModule.create(key: .didStarted, data: "true")
             
-            // TagEditCompleted 알림 대신 홈에서 직접 새로고침을 위한 플래그 설정
-            UserDefaults.standard.set(true, forKey: "needsRefreshAfterUpload")
+            // 낙관적 업데이트는 이미 TagView에서 완료되었으므로 추가 알림 불필요
+            // HomeView는 자동으로 낙관적 업데이트 완료 알림을 받아서 처리함
         } label: {
             Text("다음")
         }

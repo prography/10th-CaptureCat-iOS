@@ -92,18 +92,23 @@ struct HomeView: View {
                 }
             }
         }
-        .task {
-            // 초기 데이터 로딩 (중복 방지)
-            await viewModel.loadScreenshots()
-            
-            // ✅ 첫 화면에 보이는 이미지들만 병렬로 미리 로드 (선택적)
-            await loadInitialVisibleImages()
-            
-            // ✅ 업로드 완료 후 새로고침이 필요한지 확인
-            if UserDefaults.standard.bool(forKey: "needsRefreshAfterUpload") {
-                UserDefaults.standard.removeObject(forKey: "needsRefreshAfterUpload")
-                debugPrint("🔄 업로드 완료 후 데이터 새로고침 시작")
-                await viewModel.refreshScreenshots()
+        .onAppear {
+            Task { @MainActor in
+                // 초기 데이터 로딩 (중복 방지)
+                await viewModel.loadScreenshots()
+                
+                // 데이터가 로드된 후에만 이미지 미리 로드 실행
+                if !viewModel.itemVMs.isEmpty {
+                    await loadInitialVisibleImages()
+                }
+            }
+        }
+        .onChange(of: viewModel.itemVMs.count) { oldCount, newCount in
+            // 데이터가 새로 채워졌을 때 (빈 상태에서 데이터가 들어온 경우)
+            if oldCount == 0 && newCount > 0 {
+                Task {
+                    await loadInitialVisibleImages()
+                }
             }
         }
         .refreshable {
@@ -241,18 +246,38 @@ struct HomeView: View {
     
     // MARK: - Image Loading Helpers
     
-    /// 첫 화면에 보이는 이미지들을 병렬로 미리 로드
+    /// 첫 화면에 보이는 이미지들을 병렬로 미리 로드 (안전한 버전)
     private func loadInitialVisibleImages() async {
-        let visibleCount = min(6, viewModel.itemVMs.count) // 첫 화면에 보이는 6개 정도
+        // 빈 배열 체크 + 이중 검증
+        guard !viewModel.itemVMs.isEmpty, viewModel.itemVMs.count > 0 else {
+            debugPrint("📷 로드할 이미지가 없음 (count: \(viewModel.itemVMs.count))")
+            return
+        }
         
-        // ✅ 병렬 로딩으로 여러 이미지를 동시에 다운로드
+        let visibleCount = min(6, viewModel.itemVMs.count)
+        debugPrint("📷 초기 이미지 로딩 시작: \(visibleCount)개 (전체: \(viewModel.itemVMs.count)개)")
+        
+        // enumerated()를 사용해서 안전하게 접근
+        let itemsToLoad = Array(viewModel.itemVMs.prefix(visibleCount))
+        
+        // 로드할 아이템이 실제로 있는지 한번 더 확인
+        guard !itemsToLoad.isEmpty else {
+            debugPrint("📷 prefix로 가져온 아이템이 없음")
+            return
+        }
+        
+        // 각 이미지를 개별 Task로 로딩
         await withTaskGroup(of: Void.self) { group in
-            for i in 0..<visibleCount {
-                group.addTask {
-                    await viewModel.itemVMs[i].loadFullImage()
+            for (index, item) in itemsToLoad.enumerated() {
+                group.addTask { [item] in
+                    debugPrint("📷 이미지 로딩 시작: \(index) - ID: \(item.id)")
+                    await item.loadFullImage()
+                    debugPrint("✅ 이미지 로딩 완료: \(index) - ID: \(item.id)")
                 }
             }
         }
+        
+        debugPrint("✅ 초기 이미지 로딩 전체 완료")
     }
     
     /// 새로운 페이지의 이미지들을 병렬로 로드
