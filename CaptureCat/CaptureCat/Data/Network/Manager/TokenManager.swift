@@ -70,6 +70,11 @@ actor TokenManager {
             debugPrint("🔴 [TokenManager] 토큰 갱신 실패: \(error)")
             // 갱신 실패 시 안전한 토큰 정리
             await safelyCleanupTokens()
+            // 토큰 갱신 실패 알림 발송 (메인 스레드에서)
+            await MainActor.run {
+                NotificationCenter.default.post(name: .tokenRefreshFailed, object: nil)
+                debugPrint("📢 토큰 갱신 실패 알림 발송됨")
+            }
             return false
         }
     }
@@ -134,6 +139,11 @@ actor TokenManager {
         case 401:
             debugPrint("🔴 토큰 갱신 401 Unauthorized - RefreshToken 만료")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            // 401 오류 시 토큰 갱신 실패 알림 발송
+            await MainActor.run {
+                NotificationCenter.default.post(name: .tokenRefreshFailed, object: nil)
+                debugPrint("📢 RefreshToken 만료로 인한 토큰 갱신 실패 알림 발송됨")
+            }
             throw NetworkError.unauthorized
             
         default:

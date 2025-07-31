@@ -38,6 +38,7 @@ class AuthViewModel: ObservableObject {
     
     init(service: AuthService) {
         self.authService = service
+        setupNotificationObservers()
     }
     
     func checkAutoLogin() {
@@ -67,13 +68,16 @@ class AuthViewModel: ObservableObject {
                     debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
                     self?.authenticationState = .signIn //문제의 원인
                 case .revoked:
-                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리")
+                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 로그인 화면 표시")
                     self?.cleanupAppleTokens()
+                    self?.authenticationState = .initial
                 case .notFound:
-                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리")
+                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리 후 로그인 화면 표시")
                     self?.cleanupAppleTokens()
+                    self?.authenticationState = .initial
                 default:
-                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue)")
+                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue) - 로그인 화면 표시")
+                    self?.authenticationState = .initial
                 }
             }
         }
@@ -92,7 +96,8 @@ class AuthViewModel: ObservableObject {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
                     self?.authenticationState = .signIn //문제 원인
                 } else {
-                    debugPrint("🟡⚠️ 카카오 토큰 정보 없음")
+                    debugPrint("🟡⚠️ 카카오 토큰 정보 없음 - 로그인 화면 표시")
+                    self?.authenticationState = .initial
                 }
             }
         }
@@ -109,10 +114,14 @@ class AuthViewModel: ObservableObject {
             if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
                 debugPrint("🍏💾 기존 서버 토큰 발견 - 자동 로그인 시도")
                 self.authenticationState = .signIn // 문제 원인
+            } else {
+                debugPrint("🍏⚠️ 기존 서버 토큰 없음 - 로그인 화면 표시")
+                self.authenticationState = .initial
             }
         } else {
-            debugPrint("🍏🧹 Apple 인증 오류 - 토큰 정리")
+            debugPrint("🍏🧹 Apple 인증 오류 - 토큰 정리 후 로그인 화면 표시")
             cleanupAppleTokens()
+            self.authenticationState = .initial
         }
     }
     
@@ -127,10 +136,14 @@ class AuthViewModel: ObservableObject {
             if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
                 debugPrint("🟡💾 기존 서버 토큰 발견 - 자동 로그인 시도")
                 self.authenticationState = .signIn
+            } else {
+                debugPrint("🟡⚠️ 기존 서버 토큰 없음 - 로그인 화면 표시")
+                self.authenticationState = .initial
             }
         } else {
-            debugPrint("🟡🧹 카카오 인증 오류 - 토큰 정리")
+            debugPrint("🟡🧹 카카오 인증 오류 - 토큰 정리 후 로그인 화면 표시")
             cleanupKakaoTokens()
+            self.authenticationState = .initial
         }
     }
     
@@ -308,5 +321,42 @@ class AuthViewModel: ObservableObject {
         }
         
         debugPrint("🧹 모든 캐시 데이터 정리 완료")
+    }
+    
+    // MARK: - Notification Observers
+    
+    /// NotificationCenter 관찰자 설정
+    private func setupNotificationObservers() {
+        // 토큰 갱신 실패 알림 관찰
+        NotificationCenter.default.addObserver(
+            forName: .tokenRefreshFailed,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleTokenRefreshFailure()
+        }
+    }
+    
+    /// 토큰 갱신 실패 처리
+    private func handleTokenRefreshFailure() {
+        debugPrint("🔴📢 토큰 갱신 실패 알림 수신 - 로그인 화면으로 이동")
+        
+        // 현재 상태가 이미 initial이 아닌 경우에만 처리 (무한 루프 방지)
+        guard authenticationState != .initial else {
+            debugPrint("⚠️ 이미 로그인 화면 상태이므로 처리 스킵")
+            return
+        }
+        
+        // 모든 캐시 데이터 정리
+        clearAllCacheData()
+        
+        // 로그인 화면 표시
+        self.authenticationState = .initial
+        
+        debugPrint("✅ 토큰 갱신 실패로 인한 로그인 화면 전환 완료")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
