@@ -64,6 +64,15 @@ enum LogIn: String, CaseIterable {
             15
         }
     }
+    
+    var value: String {
+        switch self {
+        case .kakao:
+            "kakao"
+        case .apple:
+            "spple"
+        }
+    }
 }
 
 struct LoginButton: View {

@@ -37,9 +37,9 @@ struct AuthenticatedView: View {
                 LogInView()
             }
         }
-        .transaction { transaction in
-            transaction.disablesAnimations = true
-        }
+//        .transaction { transaction in
+//            transaction.disablesAnimations = true
+//        }
         .task {
             authViewModel.checkAutoLogin()
             

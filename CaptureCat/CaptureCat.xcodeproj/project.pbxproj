@@ -10,6 +10,7 @@
 		92153D962E27D63A00187360 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 92153D952E27D63A00187360 /* KakaoSDKAuth */; };
 		92153D982E27D63A00187360 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 92153D972E27D63A00187360 /* KakaoSDKCommon */; };
 		92153D9A2E27D63A00187360 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 92153D992E27D63A00187360 /* KakaoSDKUser */; };
+		925182FF2E3BB5E300AEE8D3 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 925182FE2E3BB5E300AEE8D3 /* Mixpanel */; };
 		92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 92AC185D2DF197FA00A1D83B /* .swiftlint.yml */; };
 		92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 		92AC188A2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
@@ -110,6 +111,7 @@
 			files = (
 				92153D982E27D63A00187360 /* KakaoSDKCommon in Frameworks */,
 				92153D962E27D63A00187360 /* KakaoSDKAuth in Frameworks */,
+				925182FF2E3BB5E300AEE8D3 /* Mixpanel in Frameworks */,
 				92153D9A2E27D63A00187360 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -177,6 +179,7 @@
 				92153D952E27D63A00187360 /* KakaoSDKAuth */,
 				92153D972E27D63A00187360 /* KakaoSDKCommon */,
 				92153D992E27D63A00187360 /* KakaoSDKUser */,
+				925182FE2E3BB5E300AEE8D3 /* Mixpanel */,
 			);
 			productName = CaptureCat;
 			productReference = 92AC15A72DEE873C00A1D83B /* CaptureCat.app */;
@@ -264,6 +267,7 @@
 			packageReferences = (
 				92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */,
 				92153D942E27D63A00187360 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				925182FD2E3BB5E300AEE8D3 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 92AC15A82DEE873C00A1D83B /* Products */;
@@ -686,6 +690,14 @@
 				minimumVersion = 2.24.5;
 			};
 		};
+		925182FD2E3BB5E300AEE8D3 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mixpanel/mixpanel-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/SwiftLint.git";
@@ -711,6 +723,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 92153D942E27D63A00187360 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKUser;
+		};
+		925182FE2E3BB5E300AEE8D3 /* Mixpanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 925182FD2E3BB5E300AEE8D3 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
+			productName = Mixpanel;
 		};
 		92AC186A2DF19D8800A1D83B /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;

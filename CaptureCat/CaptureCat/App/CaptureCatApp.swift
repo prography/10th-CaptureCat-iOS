@@ -5,10 +5,11 @@
 //  Created by minsong kim on 6/3/25.
 //
 
-import SwiftUI
-import SwiftData
 import KakaoSDKCommon
 import KakaoSDKAuth
+import Mixpanel
+import SwiftUI
+import SwiftData
 
 @main
 struct CaptureCatApp: App {
@@ -26,6 +27,7 @@ struct CaptureCatApp: App {
     init() {
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
         UITextField.appearance().tintColor = .gray09
+        Mixpanel.initialize(token: Bundle.main.mixpanelToken ?? "", trackAutomaticEvents: true)
         setupMemoryWarningNotification()
     }
     

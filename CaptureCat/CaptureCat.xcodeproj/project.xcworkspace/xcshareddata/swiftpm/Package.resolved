@@ -1,5 +1,5 @@
 {
-  "originHash" : "caf3cd0f7ca0fca1fc3493e14e7182bccedaa3c5a1f8a5f0a13b8a438abc54e8",
+  "originHash" : "1b0664837b2b5694003e323cdb8894c0895c4001fdd02faa07da9f2ce8f8fbd0",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -35,6 +35,15 @@
       "state" : {
         "revision" : "394ccfc67b206894f55dcaf2dd15e06bf451c4d3",
         "version" : "2.24.5"
+      }
+    },
+    {
+      "identity" : "mixpanel-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mixpanel/mixpanel-swift.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "e8c8783d94f5fa2680f3e6eac202964c3db4d410"
       }
     },
     {
