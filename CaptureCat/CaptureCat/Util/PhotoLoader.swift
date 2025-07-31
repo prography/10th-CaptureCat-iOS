@@ -219,6 +219,19 @@ final class PhotoLoader {
         debugPrint("🗑️ 모든 서버 이미지 캐시 삭제 완료")
     }
     
+    /// 모든 로컬 이미지 메모리 캐시 삭제
+    func clearAllLocalImageCache() {
+        cache.removeAllObjects()
+        debugPrint("🗑️ 모든 로컬 이미지 메모리 캐시 삭제 완료")
+    }
+    
+    /// 모든 캐시 삭제 (서버 + 로컬)
+    func clearAllCache() {
+        clearAllServerImageCache()
+        clearAllLocalImageCache()
+        debugPrint("🗑️ 모든 이미지 캐시 삭제 완료")
+    }
+    
     /// 캐시 상태 정보
     func cacheInfo() {
         debugPrint("📊 캐시 정보:")

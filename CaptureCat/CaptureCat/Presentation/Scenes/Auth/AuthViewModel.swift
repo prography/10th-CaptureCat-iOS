@@ -198,11 +198,8 @@ class AuthViewModel: ObservableObject {
         // 안전한 토큰 정리
         safelyCleanupAllTokens()
         
-        // 메모리 캐시 클리어
-        ScreenshotRepository.shared.clearMemoryCache()
-        
-        // 서버 이미지 캐시 클리어
-        PhotoLoader.shared.clearAllServerImageCache()
+        // 모든 캐시 정리
+        clearAllCacheData()
         
         self.authenticationState = .initial
     }
@@ -216,10 +213,9 @@ class AuthViewModel: ObservableObject {
             case .success (_):
                 // 안전한 토큰 정리 (회원탈퇴 성공 시)
                 safelyCleanupAllTokens()
-                ScreenshotRepository.shared.clearMemoryCache()
                 
-                // 서버 이미지 캐시 클리어
-                PhotoLoader.shared.clearAllServerImageCache()
+                // 모든 캐시 정리
+                clearAllCacheData()
                 
                 self.authenticationState = .initial
             case .failure (let error):
@@ -291,5 +287,26 @@ class AuthViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
         UserDefaults.standard.synchronize()
         debugPrint("🧹 UserDefaults 안전 정리 완료")
+    }
+    
+    /// 모든 캐시 데이터 정리 (로그아웃/회원탈퇴 시 사용)
+    private func clearAllCacheData() {
+        debugPrint("🧹 모든 캐시 데이터 정리 시작")
+        
+        // 1. 메모리 캐시 클리어 (InMemoryScreenshotCache)
+        ScreenshotRepository.shared.clearMemoryCache()
+        
+        // 2. 모든 이미지 캐시 클리어 (서버 + 로컬)
+        PhotoLoader.shared.clearAllCache()
+        
+        // 3. SwiftData 로컬 데이터베이스 정리
+        do {
+            try SwiftDataManager.shared.deleteAllScreenshots()
+            debugPrint("✅ SwiftData 로컬 데이터 정리 완료")
+        } catch {
+            debugPrint("⚠️ SwiftData 로컬 데이터 정리 실패: \(error.localizedDescription)")
+        }
+        
+        debugPrint("🧹 모든 캐시 데이터 정리 완료")
     }
 }
