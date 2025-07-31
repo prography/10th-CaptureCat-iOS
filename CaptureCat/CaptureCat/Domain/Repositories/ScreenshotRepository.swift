@@ -275,7 +275,10 @@ final class ScreenshotRepository {
     private func syncViewModel(_ viewModel: ScreenshotItemViewModel, with model: ScreenshotItem) {
         viewModel.fileName = model.fileName
         viewModel.createDate = model.createDate
-        viewModel.tags = model.tags
+        // 태그가 비어있지 않을 때만 업데이트 (즐겨찾기 API에서 태그 정보 유실 방지)
+        if !model.tags.isEmpty {
+            viewModel.tags = model.tags
+        }
         viewModel.isFavorite = model.isFavorite
     }
     
