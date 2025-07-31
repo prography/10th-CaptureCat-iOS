@@ -7,24 +7,15 @@
 
 import Foundation
 
-/// 토큰 갱신의 동시성을 제어하는 Actor
+// 토큰 갱신의 동시성을 제어하는 Actor
 actor TokenManager {
-    
-    // MARK: - Singleton
-    
     static let shared = TokenManager()
-    
-    // MARK: - Properties
-    
-    /// 현재 진행 중인 토큰 갱신 Task
+    // 현재 진행 중인 토큰 갱신 Task
     private var currentRefreshTask: Task<Bool, Never>?
-    
-    // MARK: - Initialization
     
     private init() {}
     
     // MARK: - Public Methods
-    
     /// 유효한 토큰 확보 (동시성 제어됨)
     /// - Returns: 토큰 갱신 성공 여부
     func ensureValidToken() async -> Bool {
@@ -155,24 +146,9 @@ actor TokenManager {
     /// 토큰을 안전하게 정리 (연쇄 삭제 방지)
     private func safelyCleanupTokens() async {
         debugPrint("🧹 안전한 토큰 정리 시작")
-        
-        // 각 토큰을 개별적으로 삭제하고 에러 무시
-        do {
-            debugPrint("🧹 AccessToken 삭제 시도")
-            KeyChainModule.delete(key: .accessToken)
-        }
-        
-        do {
-            debugPrint("🧹 RefreshToken 삭제 시도")
-            KeyChainModule.delete(key: .refreshToken)
-        }
-        
-        // AccountStorage도 안전하게 리셋
-        do {
-            debugPrint("🧹 AccountStorage 리셋 시도")
-            AccountStorage.shared.safeReset()
-        }
-        
+        KeyChainModule.delete(key: .accessToken)
+        KeyChainModule.delete(key: .refreshToken)
+        AccountStorage.shared.safeReset()
         debugPrint("🧹 토큰 정리 완료")
     }
     
