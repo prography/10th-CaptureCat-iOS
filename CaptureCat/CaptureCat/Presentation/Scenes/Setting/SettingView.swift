@@ -64,6 +64,7 @@ struct SettingsView: View {
             confirmTitle: "로그아웃"
         ) {
             authViewModel.logOut()
+            router.pop()
         }
         .popUp(
             isPresented: $authViewModel.isSignOutPresented,

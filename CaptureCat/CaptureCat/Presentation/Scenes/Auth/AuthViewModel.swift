@@ -208,12 +208,8 @@ class AuthViewModel: ObservableObject {
     }
     
     func logOut() {
-        // 안전한 토큰 정리
         safelyCleanupAllTokens()
-        
-        // 모든 캐시 정리
         clearAllCacheData()
-        
         self.authenticationState = .initial
     }
     
@@ -224,12 +220,8 @@ class AuthViewModel: ObservableObject {
             
             switch result {
             case .success (_):
-                // 안전한 토큰 정리 (회원탈퇴 성공 시)
                 safelyCleanupAllTokens()
-                
-                // 모든 캐시 정리
                 clearAllCacheData()
-                
                 self.authenticationState = .initial
             case .failure (let error):
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
