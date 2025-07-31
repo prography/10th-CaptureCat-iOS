@@ -10,7 +10,7 @@ import Photos
 
 final class Router: ObservableObject {
     enum Route: Hashable {
-//        case startGetScreenshot
+        case startGetScreenshot
         case tag(ids: [String])
         case setting
         case favorite

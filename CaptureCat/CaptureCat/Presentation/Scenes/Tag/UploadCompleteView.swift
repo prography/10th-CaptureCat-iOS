@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UploadCompleteView: View {
+    @Environment(TabSelection.self) private var tabs
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var router: Router
     let count: Int
@@ -26,11 +27,12 @@ struct UploadCompleteView: View {
         Image(.cleanComplete)
         Spacer()
         Button {
-            if authViewModel.authenticationState == .guest {
-                authViewModel.activeSheet = nil
-            } else {
-                router.popToRoot()
-            }
+            router.popToRoot()
+            tabs.go(.home)
+            KeyChainModule.create(key: .didStarted, data: "true")
+            
+            // TagEditCompleted 알림 대신 홈에서 직접 새로고침을 위한 플래그 설정
+            UserDefaults.standard.set(true, forKey: "needsRefreshAfterUpload")
         } label: {
             Text("다음")
         }

@@ -87,7 +87,7 @@ extension TagViewModel {
                      id: viewModel.id,
                      fileName: viewModel.fileName,
                      createDate: viewModel.createDate,
-                     tags: viewModel.tags,  // ✅ ViewModel의 태그 전달
+                     tags: viewModel.tags.map { $0.name },  // ✅ ViewModel의 태그 전달
                      isFavorite: viewModel.isFavorite,
                      imageData: imageData
                  )

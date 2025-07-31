@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct RecommandLoginView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
             Button {
-                if KeyChainModule.read(key: .didStarted) == "true" {
-                    viewModel.activeSheet = nil
-                } else {
-                    viewModel.activeSheet = .start
-                }
+                viewModel.isLoginPresented = false
             } label: {
                 Image(systemName: "xmark")
                     .foregroundStyle(.text01)
@@ -39,18 +36,14 @@ struct RecommandLoginView: View {
                 Spacer()
                 
                 Button {
-                    viewModel.authenticationState = .initial
+                    dismiss()
                 } label: {
                     Text("로그인하기")
                 }
                 .primaryStyle()
                 .padding(.horizontal, 16)
                 Button {
-                    if KeyChainModule.read(key: .didStarted) == "true" {
-                        viewModel.activeSheet = nil
-                    } else {
-                        viewModel.activeSheet = .start
-                    }
+                    viewModel.isLoginPresented = false
                 } label: {
                     Text("나중에 하기")
                         .CFont(.caption02Regular)

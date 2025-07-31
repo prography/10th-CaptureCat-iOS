@@ -36,8 +36,8 @@ class DetailViewModel: ObservableObject {
     // MARK: - Setup Methods
     private func setupInitialTags() {
         guard let item = item else { return }
-        tags = item.tags
-        tempSelectedTags = Set(item.tags)
+        tags = item.tags.map { $0.name }
+        tempSelectedTags = Set(tags)
     }
     
     func onAppear() {
@@ -84,8 +84,8 @@ class DetailViewModel: ObservableObject {
         guard let item = item else { return }
         
         // 빈 문자열이나 이미 존재하는 태그는 추가하지 않음
-        guard !newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !item.tags.contains(newTag) else { return }
+        guard !newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+              /*!item.tags.contains(newTag)*/ else { return }
         
         // 최대 4개 태그 제한
         guard item.tags.count < 4 else {
@@ -105,9 +105,12 @@ class DetailViewModel: ObservableObject {
     
     func deleteTag(_ tag: String) {
         guard let item = item else { return }
-        guard let tagIndex = item.tags.firstIndex(of: tag) else {
-            debugPrint("⚠️ 삭제하려는 태그를 찾을 수 없음: \(tag)")
-            return
+        var tagIndex: Int = 0
+        let tagNames = item.tags.map { $0.name }
+        if AccountStorage.shared.isGuest ?? true {
+            tagIndex = tagNames.firstIndex(of: tag) ?? 0
+        } else if let tagId = item.tags.first(where: {$0.name == tag}) {
+            tagIndex = tagId.id
         }
         
         // UI 상태 업데이트
@@ -118,7 +121,7 @@ class DetailViewModel: ObservableObject {
         // 서버에 삭제 요청
         Task {
             do {
-                try await ScreenshotRepository.shared.deleteTag(imageId: item.id, tagId: String(tagIndex + 1))
+                try await ScreenshotRepository.shared.deleteTag(imageId: item.id, tagId: String(tagIndex))
                 debugPrint("✅ 태그 삭제 완료: \(tag)")
                 
                 // 다른 뷰들에게 태그 변경 알림
@@ -235,4 +238,3 @@ class DetailViewModel: ObservableObject {
         errorMessage = nil
     }
 }
-

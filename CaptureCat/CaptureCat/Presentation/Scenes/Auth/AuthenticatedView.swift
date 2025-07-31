@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AuthenticatedView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    private let tabSelection = TabSelection()
     
     var networkManager: NetworkManager
     
@@ -28,26 +29,23 @@ struct AuthenticatedView: View {
                 RouterView(networkManager: networkManager) {
                     TabContainerView(networkManager: networkManager)
                 }
+                .environment(tabSelection)
             }
         }
-        .fullScreenCover(item: $authViewModel.activeSheet) { sheet in
-          switch sheet {
-            case .login:
-              LogInView()
-            case .recommend:
-              RecommandLoginView()
-            case .start:
-              NavigationStack {
-                  let viewModel = SelectMainTagViewModel(networkManager: networkManager)
-                  SelectMainTagView(networkManager: networkManager, viewModel: viewModel)
-              }
-          }
+        .fullScreenCover(isPresented: $authViewModel.isLoginPresented) {
+            NavigationStack {
+                LogInView()
+            }
         }
         .transaction { transaction in
             transaction.disablesAnimations = true
         }
         .task {
             authViewModel.checkAutoLogin()
+            
+            if authViewModel.hasLocalData() {
+                authViewModel.authenticationState = .syncing
+            }
         }
     }
 }

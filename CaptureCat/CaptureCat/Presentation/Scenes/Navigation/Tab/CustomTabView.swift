@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-enum Tab {
-    case temporaryStorage
-    case home
-    case search
-}
+//enum Tab {
+//    case temporaryStorage
+//    case home
+//    case search
+//}
 
 struct CustomTabView: View {
     @Binding var selectedTab: Tab

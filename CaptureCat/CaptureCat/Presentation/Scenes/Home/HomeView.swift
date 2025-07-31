@@ -43,7 +43,7 @@ struct HomeView: View {
                     Text("아직 스크린샷이 없어요.")
                         .foregroundStyle(.text01)
                         .CFont(.headline02Bold)
-                    if AccountStorage.shared.isGuest ?? false {
+                    if authViewModel.authenticationState == .guest {
                         Text("로그인 하면 스크린샷을 저장할 수 있어요! ")
                             .foregroundStyle(.text03)
                             .CFont(.body01Regular)
@@ -70,7 +70,7 @@ struct HomeView: View {
                                 router.push(.detail(id: item.id))
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
-                                    TagFlowLayout(tags: item.tags, maxLines: 2)
+                                    TagFlowLayout(tags: item.tags.map { $0.name }, maxLines: 2)
                                         .padding(6)
                                 }
                             }
@@ -98,6 +98,13 @@ struct HomeView: View {
             
             // ✅ 첫 화면에 보이는 이미지들만 병렬로 미리 로드 (선택적)
             await loadInitialVisibleImages()
+            
+            // ✅ 업로드 완료 후 새로고침이 필요한지 확인
+            if UserDefaults.standard.bool(forKey: "needsRefreshAfterUpload") {
+                UserDefaults.standard.removeObject(forKey: "needsRefreshAfterUpload")
+                debugPrint("🔄 업로드 완료 후 데이터 새로고침 시작")
+                await viewModel.refreshScreenshots()
+            }
         }
         .refreshable {
             // Pull to refresh (중복 실행 방지 적용)

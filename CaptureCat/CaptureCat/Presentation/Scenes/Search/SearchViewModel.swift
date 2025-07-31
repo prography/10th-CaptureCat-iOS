@@ -185,7 +185,7 @@ final class SearchViewModel: ObservableObject {
         switch result {
         case .success(let response):
             let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                let mappedTags = serverItem.tags.map { $0.name }
+                let mappedTags = serverItem.tags
                 
                 let screenshotItem = ScreenshotItem(
                     id: String(serverItem.id),

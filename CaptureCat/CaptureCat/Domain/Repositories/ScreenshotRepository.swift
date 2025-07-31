@@ -118,7 +118,9 @@ final class ScreenshotRepository {
                 imageData: Data(),
                 fileName: ent.fileName,
                 createDate: ent.createDate,
-                tags: ent.tags,
+                tags: ent.tags.enumerated().map { index, tagName in
+                    Tag(id: index, name: tagName)
+                },
                 isFavorite: ent.isFavorite
             )
         }
@@ -133,7 +135,9 @@ final class ScreenshotRepository {
                 imageData: Data(),
                 fileName: ent.fileName,
                 createDate: ent.createDate,
-                tags: ent.tags,
+                tags: ent.tags.enumerated().map { index, tagName in
+                    Tag(id: index, name: tagName)
+                },
                 isFavorite: ent.isFavorite
             )
         }
@@ -148,7 +152,9 @@ final class ScreenshotRepository {
                 imageData: Data(),
                 fileName: ent.fileName,
                 createDate: ent.createDate,
-                tags: ent.tags,
+                tags: ent.tags.enumerated().map { index, tagName in
+                    Tag(id: index, name: tagName)
+                },
                 isFavorite: ent.isFavorite
             )
         }
@@ -163,20 +169,8 @@ final class ScreenshotRepository {
         
         switch result {
         case .success(let response):
-            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                let mappedTags = serverItem.tags.map { $0.name }
-                
-                let screenshotItem = ScreenshotItem(
-                    id: String(serverItem.id),
-                    imageData: Data(), // 서버 URL에서 별도 로드
-                    imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
-                    fileName: serverItem.name,
-                    createDate: serverItem.captureDate,
-                    tags: mappedTags, // ✅ 매핑된 태그 사용
-                    isFavorite: serverItem.isBookmarked
-                )
-                
-                return screenshotItem
+            let serverItems = response.data.items.map { serverItem in
+                ScreenshotItem(serverItem: serverItem)  // 새로운 생성자 사용
             }
             
             let viewModels = serverItems.map(viewModel(for:))
@@ -196,20 +190,8 @@ final class ScreenshotRepository {
         
         switch result {
         case .success(let response):
-            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                let mappedTags = serverItem.tags.map { $0.name }
-                
-                let screenshotItem = ScreenshotItem(
-                    id: String(serverItem.id),
-                    imageData: Data(), // 서버 URL에서 별도 로드
-                    imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
-                    fileName: serverItem.name,
-                    createDate: serverItem.captureDate,
-                    tags: mappedTags, // ✅ 매핑된 태그 사용
-                    isFavorite: serverItem.isBookmarked
-                )
-                
-                return screenshotItem
+            let serverItems = response.data.items.map { serverItem in
+                ScreenshotItem(serverItem: serverItem)  // 새로운 생성자 사용
             }
             
             let viewModels = serverItems.map(viewModel(for:))
@@ -293,7 +275,10 @@ final class ScreenshotRepository {
     private func syncViewModel(_ viewModel: ScreenshotItemViewModel, with model: ScreenshotItem) {
         viewModel.fileName = model.fileName
         viewModel.createDate = model.createDate
-        viewModel.tags = model.tags
+        // 태그가 비어있지 않을 때만 업데이트 (즐겨찾기 API에서 태그 정보 유실 방지)
+        if !model.tags.isEmpty {
+            viewModel.tags = model.tags
+        }
         viewModel.isFavorite = model.isFavorite
     }
     
@@ -328,7 +313,9 @@ final class ScreenshotRepository {
             imageData: Data(),
             fileName: entity.fileName,
             createDate: entity.createDate,
-            tags: entity.tags,
+            tags: entity.tags.enumerated().map { index, tagName in
+                Tag(id: index, name: tagName)
+            },
             isFavorite: entity.isFavorite
         )
         
@@ -341,17 +328,7 @@ final class ScreenshotRepository {
         
         switch result {
         case .success(let response):
-            let mappedTags = response.data.tags.map { $0.name }
-            
-            let screenshotItem = ScreenshotItem(
-                id: String(response.data.id),
-                imageData: Data(), // 서버 URL에서 별도 로드
-                imageURL: response.data.url, // ✅ 서버 이미지 URL 포함
-                fileName: response.data.name,
-                createDate: response.data.captureDate,
-                tags: mappedTags,
-                isFavorite: response.data.isBookmarked
-            )
+            let screenshotItem = ScreenshotItem(serverImageData: response.data)  // 새로운 생성자 사용
             
             let viewModel = viewModel(for: screenshotItem)
             
@@ -405,20 +382,20 @@ final class ScreenshotRepository {
         }
     }
     
-    func renameTag(from oldName: String, to newName: String) async throws {
-        if AccountStorage.shared.isGuest ?? true {
-            try SwiftDataManager.shared.renameTag(from: oldName, to: newName)
-        } else {
-            // 로그인 모드에서는 메모리 캐시 업데이트만
-            let items = InMemoryScreenshotCache.shared.retrieveAll()
-            for item in items {
-                if item.tags.contains(oldName) {
-                    item.removeTag(oldName)
-                    item.addTag(newName)
-                }
-            }
-        }
-    }
+//    func renameTag(from oldName: String, to newName: String) async throws {
+//        if AccountStorage.shared.isGuest ?? true {
+//            try SwiftDataManager.shared.renameTag(from: oldName, to: newName)
+//        } else {
+//            // 로그인 모드에서는 메모리 캐시 업데이트만
+//            let items = InMemoryScreenshotCache.shared.retrieveAll()
+//            for item in items {
+//                if item.tags.contains(oldName) {
+//                    item.removeTag(oldName)
+//                    item.addTag(newName)
+//                }
+//            }
+//        }
+//    }
 }
 
 // MARK: - Favorite Management
@@ -518,7 +495,9 @@ extension ScreenshotRepository {
                     imageURL: nil, // 게스트 모드에서는 로컬 이미지
                     fileName: entity.fileName,
                     createDate: entity.createDate,
-                    tags: entity.tags,
+                    tags: entity.tags.enumerated().map { index, tagName in
+                        Tag(id: index, name: tagName)
+                    },
                     isFavorite: entity.isFavorite
                 )
             }
@@ -533,18 +512,8 @@ extension ScreenshotRepository {
         
         switch result {
         case .success(let response):
-            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                let screenshotItem = ScreenshotItem(
-                    id: String(serverItem.id),
-                    imageData: Data(), // 서버 URL에서 별도 로드
-                    imageURL: serverItem.url, // ✅ 서버 이미지 URL 포함
-                    fileName: serverItem.name,
-                    createDate: serverItem.captureDate,
-                    tags: [],
-                    isFavorite: serverItem.isBookmarked
-                )
-                
-                return screenshotItem
+            let serverItems = response.data.items.map { favoriteItem in
+                ScreenshotItem(favoriteItem: favoriteItem)  // 새로운 생성자 사용
             }
             
             let viewModels = serverItems.map(viewModel(for:))

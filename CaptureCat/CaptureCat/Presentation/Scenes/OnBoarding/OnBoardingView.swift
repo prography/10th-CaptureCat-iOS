@@ -41,5 +41,24 @@ struct OnBoardingView: View {
             .primaryStyle()
             .padding(.horizontal, 16)
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    let threshold: CGFloat = 30
+                    
+                    // 오른쪽에서 왼쪽으로 스와이프 (다음 페이지)
+                    if value.translation.width < -threshold {
+                        withAnimation {
+                            viewModel.increasePage()
+                        }
+                    }
+                    // 왼쪽에서 오른쪽으로 스와이프 (이전 페이지)
+                    else if value.translation.width > threshold {
+                        withAnimation {
+                            viewModel.decreasePage()
+                        }
+                    }
+                }
+        )
     }
 }

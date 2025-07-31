@@ -1106,6 +1106,7 @@
       }
     },
     "표시할 아이템이 없습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

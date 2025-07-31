@@ -31,7 +31,7 @@ struct Item: Decodable {
 }
 
 // MARK: - Tag
-struct Tag: Decodable {
+struct Tag: Decodable, Equatable, Hashable {
     let id: Int
     let name: String
 }

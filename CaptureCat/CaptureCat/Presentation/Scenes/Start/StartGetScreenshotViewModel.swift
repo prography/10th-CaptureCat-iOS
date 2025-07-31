@@ -80,7 +80,6 @@ final class StartGetScreenshotViewModel: ObservableObject {
     func tutorialCompleted() {
         Task {
             let result = await service.turorialComplete()
-            KeyChainModule.create(key: .didStarted, data: "true")
             
             switch result {
             case .success:

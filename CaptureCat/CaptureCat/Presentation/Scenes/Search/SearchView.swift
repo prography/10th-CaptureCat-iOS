@@ -186,7 +186,7 @@ struct SearchView: View {
                                 router.push(.detail(id: item.id))
                             } label: {
                                 ScreenshotItemView(viewModel: item, cornerRadius: 4) {
-                                    TagFlowLayout(tags: item.tags, maxLines: 2)
+                                    TagFlowLayout(tags: item.tags.map { $0.name }, maxLines: 2)
                                         .padding(6)
                                 }
                             }
