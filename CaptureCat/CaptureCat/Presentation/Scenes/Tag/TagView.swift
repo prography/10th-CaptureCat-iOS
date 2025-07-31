@@ -9,9 +9,9 @@ import SwiftUI
 import Photos
 
 struct TagView: View {
-    @StateObject var viewModel: TagViewModel
     @EnvironmentObject private var authViewModel: AuthViewModel
     @EnvironmentObject private var router: Router
+    @StateObject var viewModel: TagViewModel
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
     @State private var isDragging = false
@@ -59,19 +59,15 @@ struct TagView: View {
     private var navigationBarView: some View {
         CustomNavigationBar(
             title: viewModel.mode == .batch ? "태그하기" : "태그하기 \(viewModel.progressText)",
-            onBack: { router.pop() },
+            onBack: {
+                router.pop()
+            },
             actionTitle: "저장",
             onAction: {
                 Task {
-                    if authViewModel.authenticationState == .guest {
-                        await viewModel.save(isGuest: true)
-                        
-                        viewModel.pushNext = true
-                    } else {
-                        await viewModel.save(isGuest: false)
-                        
-                        router.push(.completeSave(count: viewModel.itemVMs.count))
-                    }
+                    await viewModel.save(isGuest: authViewModel.authenticationState == .guest)
+                    
+                    router.push(.completeSave(count: viewModel.itemVMs.count))
                     NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
                 }
             },
@@ -115,10 +111,6 @@ struct TagView: View {
                 ScreenshotItemView(viewModel: viewModel.itemVMs[0]) {
                     EmptyView()
                 }
-            } else {
-                Text("표시할 아이템이 없습니다.")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .padding(.horizontal, 40)

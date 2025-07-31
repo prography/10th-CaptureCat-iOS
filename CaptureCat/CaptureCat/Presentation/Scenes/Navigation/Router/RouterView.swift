@@ -25,6 +25,9 @@ struct RouterView<Content: View>: View {
             content
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
+                    case .startGetScreenshot:
+                        let viewModel = StartGetScreenshotViewModel(service: TutorialService(networkManager: networkManager))
+                        StartGetScreenshotView(viewModel: viewModel)
                     case .tag(let ids):
                         let viewModel = TagViewModel(itemsIds: ids, networkManager: networkManager, router: router)
                         TagView(viewModel: viewModel)

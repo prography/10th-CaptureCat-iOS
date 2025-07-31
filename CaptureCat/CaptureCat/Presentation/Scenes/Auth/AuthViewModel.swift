@@ -23,25 +23,13 @@ class AuthViewModel: ObservableObject {
     
     @Published var authenticationState: AuthenticationState = .initial {
         didSet {
-            switch authenticationState {
-            case .initial:
-                activeSheet = .login
-            default:
-                activeSheet = nil
+            if authenticationState == .initial {
+                isLoginPresented = true
             }
         }
     }
     
-    enum ActiveSheet: Identifiable {
-        case login
-        case recommend
-        case start
-        
-        var id: ActiveSheet { self }
-    }
-    
-    @Published var activeSheet: ActiveSheet?
-    @Published var isStartedGetScreenshot: Bool = false
+    @Published var isLoginPresented: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
     @Published var errorToast: Bool = false
@@ -149,14 +137,11 @@ class AuthViewModel: ObservableObject {
     private func cleanupAppleTokens() {
         debugPrint("🍏🧹 Apple 토큰 정리 시작")
         KeyChainModule.delete(key: .appleToken)
-        // 서버 토큰도 Apple 로그인으로 얻은 것이라면 정리
-        // 하지만 카카오 로그인 토큰일 수도 있으므로 신중하게 처리
     }
     
     private func cleanupKakaoTokens() {
         debugPrint("🟡🧹 카카오 토큰 정리 시작")
         KeyChainModule.delete(key: .kakaoToken)
-        // 서버 토큰도 카카오 로그인으로 얻은 것이라면 정리
     }
     
     @MainActor
@@ -174,8 +159,8 @@ class AuthViewModel: ObservableObject {
                     case .success(let success):
                         nickname = success.data.nickname
                         KeyChainModule.create(key: .kakaoToken, data: "true")
-                        // 토큰 저장 완료 후 동기화 시작
-                        await handleLoginSuccess(tutorialCompleted: success.data.tutorialCompleted)
+                        KeyChainModule.create(key: .didStarted, data: "\(success.data.tutorialCompleted)")
+                        await handleLoginSuccess()
                     case .failure(let failure):
                         debugPrint("🟡🔴 카카오 로그인 완전 실패 \(failure.localizedDescription) 🟡🔴")
                         self.authenticationState = .initial
@@ -197,8 +182,8 @@ class AuthViewModel: ObservableObject {
                     switch appleSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
-                        // 토큰 저장 완료 후 동기화 시작
-                        await handleLoginSuccess(tutorialCompleted: success.data.tutorialCompleted)
+                        KeyChainModule.create(key: .didStarted, data: "\(success.data.tutorialCompleted)")
+                        await handleLoginSuccess()
                     case .failure(let failure):
                         debugPrint("🔴🍎 apple sign in 함수 실패 \(failure.localizedDescription)🔴🍎")
                     }
@@ -207,11 +192,6 @@ class AuthViewModel: ObservableObject {
                 }
             }
         }
-    }
-    
-    func guestMode() {
-        self.authenticationState = .guest
-        self.activeSheet = .recommend
     }
     
     func logOut() {
@@ -228,6 +208,7 @@ class AuthViewModel: ObservableObject {
     }
     
     func withdraw() {
+        KeyChainModule.delete(key: .didStarted)
         Task {
             let result = await authService.withdraw()
             
@@ -251,23 +232,16 @@ class AuthViewModel: ObservableObject {
     // MARK: - 동기화 관련 메서드
     
     /// 로그인 성공 시 동기화 로직 처리
-    private func handleLoginSuccess(tutorialCompleted: Bool) async {
+    private func handleLoginSuccess() async {
         // 토큰 저장이 완전히 완료될 때까지 잠시 대기
         await waitForTokenSaved()
         
-        if tutorialCompleted {
-            // 튜토리얼 완료한 사용자
-            if hasLocalData() {
-                debugPrint("🔄 로그인 성공 + 로컬 데이터 존재 → 동기화 시작")
-                self.authenticationState = .syncing
-            } else {
-                debugPrint("🔄 로그인 성공 + 로컬 데이터 없음 → 바로 메인화면")
-                self.authenticationState = .signIn
-            }
+        if hasLocalData() {
+            debugPrint("🔄 로그인 성공 + 로컬 데이터 존재 → 동기화 시작")
+            self.authenticationState = .syncing
         } else {
-            // 튜토리얼 미완료 사용자
-            debugPrint("🔄 로그인 성공 + 튜토리얼 미완료 → 시작하기 화면")
-            self.activeSheet = .start
+            debugPrint("🔄 로그인 성공 + 로컬 데이터 없음 → 바로 메인화면")
+            self.authenticationState = .signIn
         }
     }
     
@@ -301,38 +275,12 @@ class AuthViewModel: ObservableObject {
     private func safelyCleanupAllTokens() {
         debugPrint("🧹 모든 토큰 안전 정리 시작")
         
-        // 각 토큰을 개별적으로 삭제하고 에러 무시
-        do {
-            debugPrint("🧹 AccessToken 삭제 시도")
-            KeyChainModule.delete(key: .accessToken)
-        }
-        
-        do {
-            debugPrint("🧹 RefreshToken 삭제 시도")
-            KeyChainModule.delete(key: .refreshToken)
-        }
-        
-        do {
-            debugPrint("🧹 AppleToken 삭제 시도")
-            KeyChainModule.delete(key: .appleToken)
-        }
-        
-        do {
-            debugPrint("🧹 KakaoToken 삭제 시도")
-            KeyChainModule.delete(key: .kakaoToken)
-        }
-        
-        // AccountStorage도 안전하게 리셋
-        do {
-            debugPrint("🧹 AccountStorage 안전 리셋 시도")
-            AccountStorage.shared.safeReset()
-        }
-        
-        // UserDefaults도 안전하게 정리
-        do {
-            debugPrint("🧹 UserDefaults 정리 시도")
-            safelyCleanupUserDefaults()
-        }
+        KeyChainModule.delete(key: .accessToken)
+        KeyChainModule.delete(key: .refreshToken)
+        KeyChainModule.delete(key: .appleToken)
+        KeyChainModule.delete(key: .kakaoToken)
+        AccountStorage.shared.safeReset()
+        safelyCleanupUserDefaults()
         
         debugPrint("🧹 모든 토큰 및 데이터 안전 정리 완료")
     }
@@ -340,22 +288,8 @@ class AuthViewModel: ObservableObject {
     /// UserDefaults를 안전하게 정리 (에러 무시)
     private func safelyCleanupUserDefaults() {
         debugPrint("🧹 UserDefaults 안전 정리 시작")
-        
-        // selectedTopics (사용자 선택 태그) 삭제
-        do {
-            debugPrint("🧹 selectedTopics 삭제 시도")
-            UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
-        }
-        
-        // 다른 UserDefaults 키가 추가될 경우를 대비한 일괄 정리
-        // 앱별 도메인 전체를 정리하는 방법도 있지만, 신중하게 접근
-        
-        // UserDefaults 동기화 (변경사항 즉시 반영)
-        do {
-            debugPrint("🧹 UserDefaults 동기화 시도")
-            UserDefaults.standard.synchronize()
-        }
-        
+        UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
+        UserDefaults.standard.synchronize()
         debugPrint("🧹 UserDefaults 안전 정리 완료")
     }
 }

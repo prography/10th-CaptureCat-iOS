@@ -30,18 +30,10 @@ struct AuthenticatedView: View {
                 }
             }
         }
-        .fullScreenCover(item: $authViewModel.activeSheet) { sheet in
-          switch sheet {
-            case .login:
-              LogInView()
-            case .recommend:
-              RecommandLoginView()
-            case .start:
-              NavigationStack {
-                  let viewModel = SelectMainTagViewModel(networkManager: networkManager)
-                  SelectMainTagView(networkManager: networkManager, viewModel: viewModel)
-              }
-          }
+        .fullScreenCover(isPresented: $authViewModel.isLoginPresented) {
+            NavigationStack {
+                LogInView()
+            }
         }
         .transaction { transaction in
             transaction.disablesAnimations = true

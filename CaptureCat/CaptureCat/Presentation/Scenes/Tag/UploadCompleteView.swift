@@ -26,11 +26,8 @@ struct UploadCompleteView: View {
         Image(.cleanComplete)
         Spacer()
         Button {
-            if authViewModel.authenticationState == .guest {
-                authViewModel.activeSheet = nil
-            } else {
-                router.popToRoot()
-            }
+            router.popToRoot()
+            KeyChainModule.create(key: .didStarted, data: "true")
         } label: {
             Text("다음")
         }

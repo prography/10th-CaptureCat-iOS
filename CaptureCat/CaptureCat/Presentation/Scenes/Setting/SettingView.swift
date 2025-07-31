@@ -23,6 +23,7 @@ struct SettingsView: View {
                 onAction: nil,
                 isSaveEnabled: false
             )
+            
             if authViewModel.authenticationState == .guest {
                 guestCard
                     .background(Color(.gray02))
@@ -90,7 +91,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
             
             Button(action: {
-                authViewModel.activeSheet = .login
+                authViewModel.isLoginPresented = true
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)
@@ -177,9 +178,10 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.gray02)
             
-            if AccountStorage.shared.isGuest == true {
+            if authViewModel.authenticationState == .guest {
                 Button {
                     debugPrint("초기화")
+                    KeyChainModule.delete(key: .didStarted)
                     withAnimation {
                         showInitPopUp = true
                     }

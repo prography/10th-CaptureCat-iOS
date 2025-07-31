@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct StartGetScreenshotView: View {
+    @EnvironmentObject var router: Router
     @StateObject var viewModel: StartGetScreenshotViewModel
-    @State private var pushNext = false
-    var networkManager: NetworkManager
-
+    
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
     var body: some View {
@@ -30,11 +29,6 @@ struct StartGetScreenshotView: View {
             message: "최대 10장까지 선택할 수 있어요.",
             textColor: .error
         )
-        .navigationDestination(isPresented: $pushNext) {
-            TagView(viewModel: TagViewModel(itemsIds: Array(viewModel.selectedIDs), networkManager: networkManager))
-                .navigationBarBackButtonHidden()
-                .toolbar(.hidden, for: .navigationBar)
-        }
     }
 
     // MARK: Sub-views
@@ -90,7 +84,7 @@ struct StartGetScreenshotView: View {
     private var actionButton: some View {
         Button("정리하기 \(viewModel.selectedIDs.count)/10") {
             viewModel.tutorialCompleted()
-            pushNext = true
+            router.push(.tag(ids: Array(viewModel.selectedIDs)))
         }
         .primaryStyle()
         .disabled(viewModel.selectedIDs.isEmpty)
