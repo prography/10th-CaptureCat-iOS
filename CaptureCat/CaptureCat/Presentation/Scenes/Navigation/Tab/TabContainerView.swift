@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 struct TabContainerView: View {
-    @State private var selectedTab: Tab = .home
+    @Environment(TabSelection.self) private var tabs
     @State private var isKeyboardVisible: Bool = false
     @State private var showTutorial: Bool = false
     
@@ -26,7 +26,7 @@ struct TabContainerView: View {
                 SelectMainTagView(viewModel: viewModel)
             } else {
                 // 1) 탭별 화면 분기
-                switch selectedTab {
+                switch tabs.current {
                 case .temporaryStorage:
                     let viewModel = StorageViewModel(networkManager: networkManager)
                     StorageView(viewModel: viewModel)
@@ -39,7 +39,12 @@ struct TabContainerView: View {
                 
                 // 2) 화면 아래에 탭 바 - 키보드 상태에 따라 조건부 표시
                 if !isKeyboardVisible {
-                    CustomTabView(selectedTab: $selectedTab)
+                    CustomTabView(
+                        selectedTab: Binding(
+                            get: { tabs.current },
+                            set: { tabs.current = $0 }
+                        )
+                    )
                 }
             }
         }
@@ -57,4 +62,20 @@ struct TabContainerView: View {
             isKeyboardVisible = false
         }
     }
+}
+
+import Observation
+
+enum Tab: Hashable {
+    case temporaryStorage
+    case home
+    case search
+}
+
+@Observable
+@MainActor
+final class TabSelection {
+    var current: Tab = .home
+    // 필요하면 helper
+    func go(_ tab: Tab) { current = tab }
 }

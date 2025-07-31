@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AuthenticatedView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    private let tabSelection = TabSelection()
     
     var networkManager: NetworkManager
     
@@ -28,6 +29,7 @@ struct AuthenticatedView: View {
                 RouterView(networkManager: networkManager) {
                     TabContainerView(networkManager: networkManager)
                 }
+                .environment(tabSelection)
             }
         }
         .fullScreenCover(isPresented: $authViewModel.isLoginPresented) {

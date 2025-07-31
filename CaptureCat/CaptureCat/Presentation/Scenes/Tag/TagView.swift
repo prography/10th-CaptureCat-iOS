@@ -68,7 +68,7 @@ struct TagView: View {
                     await viewModel.save(isGuest: authViewModel.authenticationState == .guest)
                     
                     router.push(.completeSave(count: viewModel.itemVMs.count))
-                    NotificationCenter.default.post(name: .tagEditCompleted, object: nil)
+                    // TagEditCompleted 알림은 홈으로 돌아간 후에 발생시키도록 UploadCompleteView로 이동
                 }
             },
             isSaveEnabled: viewModel.hasChanges && !viewModel.isUploading

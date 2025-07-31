@@ -98,6 +98,13 @@ struct HomeView: View {
             
             // ✅ 첫 화면에 보이는 이미지들만 병렬로 미리 로드 (선택적)
             await loadInitialVisibleImages()
+            
+            // ✅ 업로드 완료 후 새로고침이 필요한지 확인
+            if UserDefaults.standard.bool(forKey: "needsRefreshAfterUpload") {
+                UserDefaults.standard.removeObject(forKey: "needsRefreshAfterUpload")
+                debugPrint("🔄 업로드 완료 후 데이터 새로고침 시작")
+                await viewModel.refreshScreenshots()
+            }
         }
         .refreshable {
             // Pull to refresh (중복 실행 방지 적용)
