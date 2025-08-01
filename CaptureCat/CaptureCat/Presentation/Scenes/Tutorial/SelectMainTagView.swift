@@ -51,11 +51,15 @@ struct SelectMainTagView: View {
             
             Button(viewModel.selectionText) {
                 viewModel.saveTopicLocal()
-                router.push(.startGetScreenshot)
+                MixpanelManager.shared.trackInterestTag(viewModel.selected.map { $0.title })
+                router.push(.permission)
             }
             .primaryStyle()
             .disabled(viewModel.selected.isEmpty)
             .padding(.horizontal, 16)
+        }
+        .task {
+            MixpanelManager.shared.trackStartView()
         }
     }
 }
