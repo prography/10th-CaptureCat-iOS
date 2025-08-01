@@ -56,6 +56,9 @@ struct DetailView: View {
                 await handleDelete()
             }
         }
+        .task {
+            MixpanelManager.shared.trackDetailView(id: imageId)
+        }
         .onAppear {
             viewModel.onAppear()
         }

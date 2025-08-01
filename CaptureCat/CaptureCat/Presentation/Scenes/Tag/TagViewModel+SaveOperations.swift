@@ -26,9 +26,11 @@ extension TagViewModel {
         if isGuest {
             // 게스트 모드: 로컬 전용 저장
             await saveToLocal()
+            MixpanelManager.shared.trackImageSave(entry: .start, tagging: mode, tagCount: itemVMs.reduce(0) { partial, item in partial + item.tags.count }, screenshotCount: itemVMs.count)
         } else {
             // 로그인 모드: 낙관적 업데이트 적용
             await optimisticSaveToServer()
+            MixpanelManager.shared.trackImageSave(entry: .inbox, tagging: mode, tagCount: itemVMs.reduce(0) { partial, item in partial + item.tags.count }, screenshotCount: itemVMs.count)
         }
     }
     

@@ -27,12 +27,18 @@ struct MixpanelManager {
         mixpanel.track(event: "view_start_inbox")
     }
     
-    func trackImageSave(entry: SaveImageEntry, tagging: TaggingMode, tagCount: Int, screenshotCount: Int) {
+    func trackImageSave(entry: SaveImageEntry, tagging: Mode, tagCount: Int, screenshotCount: Int) {
         mixpanel.track(event: "click_save_image", properties: [
             "entry_point" : entry.value,
             "tagging_mode" : tagging.value,
             "tag_count_total": tagCount,
             "screenshot_count": screenshotCount
+        ])
+    }
+    
+    func trackDetailView(id: String) {
+        mixpanel.track(event: "view_image_detail", properties: [
+            "image_id": "img_\(id)"
         ])
     }
     
@@ -54,20 +60,6 @@ enum SaveImageEntry {
             "start_inbox"
         case .inbox:
             "inbox"
-        }
-    }
-}
-
-enum TaggingMode {
-    case batch
-    case single
-    
-    var value: String {
-        switch self {
-        case .batch:
-            "batch"
-        case .single:
-            "single"
         }
     }
 }

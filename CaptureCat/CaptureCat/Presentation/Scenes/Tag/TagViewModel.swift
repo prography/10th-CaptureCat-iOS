@@ -11,6 +11,15 @@ import Photos
 enum Mode: Int {
     case batch = 0    // 한 번에
     case single = 1   // 한 장씩
+    
+    var value: String {
+        switch self {
+        case .batch:
+            "batch"
+        case .single:
+            "single"
+        }
+    }
 }
 
 /// 한 번에(Batch) 혹은 한 장씩(Single) 모드에서 태그 편집을 담당하는 ViewModel
