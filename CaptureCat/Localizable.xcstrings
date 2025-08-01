@@ -27,11 +27,30 @@
             "state" : "new",
             "value" : "%1$lld/%2$lld 완료"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld/%2$lld 완료"
+          }
         }
       }
     },
     "%lld/20" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/20"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/20"
+          }
+        }
+      }
     },
     "%lld%% 완료" : {
       "localizations" : {
@@ -77,6 +96,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld장의 스크린샷이 있어요."
+          }
+        }
+      }
+    },
+    "CFBundleDisplayNAme" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡처캣"
           }
         }
       }
@@ -229,23 +259,6 @@
         }
       }
     },
-    "계속하기" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keep going"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "계속하기"
-          }
-        }
-      }
-    },
     "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요." : {
       "localizations" : {
         "en" : {
@@ -358,23 +371,6 @@
         }
       }
     },
-    "동기화 결과를 불러올 수 없습니다" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unable to load sync results"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "동기화 결과를 불러올 수 없습니다"
-          }
-        }
-      }
-    },
     "로그아웃" : {
       "localizations" : {
         "en" : {
@@ -392,7 +388,20 @@
       }
     },
     "로그인 하면 스크린샷을 저장할 수 있어요! " : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in to save screenshots!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 하면 스크린샷을 저장할 수 있어요! "
+          }
+        }
+      }
     },
     "로그인 후 이용하기" : {
       "localizations" : {
@@ -459,7 +468,20 @@
       }
     },
     "모든 사진에 대한 접근 허용을 해도\n캡처캣은 스크린샷만 불러와요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Even if you grant access to all photos, CaptureCat only loads screenshots."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 사진에 대한 접근 허용을 해도\n캡처캣은 스크린샷만 불러와요"
+          }
+        }
+      }
     },
     "모든 스크린샷 동기화 완료!" : {
       "localizations" : {
@@ -526,10 +548,36 @@
       }
     },
     "사진 접근 불가!" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo access denied!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 접근 불가!"
+          }
+        }
+      }
     },
     "사진 접근 허용으로 스크린샷만 쏙!" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant photo access—only screenshots are retrieved!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 접근 허용으로 스크린샷만 쏙!"
+          }
+        }
+      }
     },
     "삭제" : {
       "localizations" : {
@@ -644,10 +692,36 @@
       }
     },
     "설정으로" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to Settings"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정으로"
+          }
+        }
+      }
     },
     "스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo access is required to load screenshots."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다."
+          }
+        }
+      }
     },
     "스크린샷을 태그해 정리해보세요!" : {
       "localizations" : {
@@ -1119,23 +1193,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "태그는 최대 4개까지 지정할 수 있어요"
-          }
-        }
-      }
-    },
-    "표시할 아이템이 없습니다." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No items to display"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "표시할 아이템이 없습니다."
           }
         }
       }

@@ -11,6 +11,7 @@
 		92153D982E27D63A00187360 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 92153D972E27D63A00187360 /* KakaoSDKCommon */; };
 		92153D9A2E27D63A00187360 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 92153D992E27D63A00187360 /* KakaoSDKUser */; };
 		925182FF2E3BB5E300AEE8D3 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 925182FE2E3BB5E300AEE8D3 /* Mixpanel */; };
+		9292005B2E3D21B200FC65F4 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 9292005A2E3D21B200FC65F4 /* InfoPlist.xcstrings */; };
 		92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 92AC185D2DF197FA00A1D83B /* .swiftlint.yml */; };
 		92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 		92AC188A2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9292005A2E3D21B200FC65F4 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		92AC15A72DEE873C00A1D83B /* CaptureCat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaptureCat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC15B42DEE873E00A1D83B /* CaptureCatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC15BE2DEE873E00A1D83B /* CaptureCatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,6 +138,7 @@
 		92AC159E2DEE873C00A1D83B = {
 			isa = PBXGroup;
 			children = (
+				9292005A2E3D21B200FC65F4 /* InfoPlist.xcstrings */,
 				92AC18882DFA636C00A1D83B /* Localizable.xcstrings */,
 				92AC185D2DF197FA00A1D83B /* .swiftlint.yml */,
 				92AC15A92DEE873C00A1D83B /* CaptureCat */,
@@ -255,7 +258,7 @@
 				};
 			};
 			buildConfigurationList = 92AC15A22DEE873C00A1D83B /* Build configuration list for PBXProject "CaptureCat" */;
-			developmentRegion = en;
+			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -287,6 +290,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */,
+				9292005B2E3D21B200FC65F4 /* InfoPlist.xcstrings in Resources */,
 				92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -494,8 +498,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CaptureCat/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "캡처캣";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "캡처캣이 이미지를 저장하기 위해 사진 라이브러리 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "캡처캣이 스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다. 선택하지 않는 한 서버에 올라가지 않습니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
@@ -534,8 +540,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CaptureCat/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "캡처캣";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "캡처캣이 이미지를 저장하기 위해 사진 라이브러리 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "캡처캣이 스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다. 선택하지 않는 한 서버에 올라가지 않습니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
