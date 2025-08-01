@@ -24,11 +24,21 @@ struct StartGetScreenshotView: View {
 
             actionButton
         }
+        .task {
+            viewModel.checkPhotoPermission()
+        }
         .toast(
             isShowing: $viewModel.showOverlimitToast,
             message: "최대 10장까지 선택할 수 있어요.",
             textColor: .error
         )
+        .alert("사진 접근 불가!", isPresented: $viewModel.showPermissionAlert) {
+            Button("설정으로") {
+                viewModel.openAppSettings()
+            }
+        } message: {
+            Text("스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다.")
+        }
     }
 
     // MARK: Sub-views

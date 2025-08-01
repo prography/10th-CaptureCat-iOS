@@ -94,4 +94,35 @@ final class StartGetScreenshotViewModel: ObservableObject {
     private func triggerCountToast() {
         withAnimation { showOverlimitToast = true }
     }
+    
+    @Published var showPermissionAlert = false
+    @Published var permissionGranted = false
+    
+    func checkPhotoPermission() {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        switch status {
+        case .notDetermined:
+            // 최초 요청
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { newStatus in
+                if newStatus == .denied || newStatus == .restricted {
+                    DispatchQueue.main.async {
+                        self.showPermissionAlert = true
+                    }
+                }
+                // authorized/limited 이면 viewModel.assets 로직 실행됨
+            }
+        case .denied, .restricted:
+            showPermissionAlert = true
+        case .authorized, .limited:
+            MixpanelManager.shared.trackStartStorage()
+            permissionGranted = true
+        @unknown default:
+            break
+        }
+    }
+    
+    func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
+    }
 }

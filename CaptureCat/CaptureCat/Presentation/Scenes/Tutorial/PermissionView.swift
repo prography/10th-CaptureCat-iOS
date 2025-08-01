@@ -9,7 +9,6 @@ import SwiftUI
 
 struct PermissionView: View {
     @EnvironmentObject var router: Router
-    @State var viewModel: PermissionViewModel = PermissionViewModel()
     
     var body: some View {
         VStack {
@@ -27,23 +26,11 @@ struct PermissionView: View {
             Spacer()
             actionButton
         }
-        .onChange(of: viewModel.permissionGranted) { granted in
-            if granted {
-                router.push(.startGetScreenshot)
-            }
-        }
-        .alert("사진 접근 불가!", isPresented: $viewModel.showPermissionAlert) {
-            Button("설정으로") {
-                viewModel.openAppSettings()
-            }
-        } message: {
-            Text("스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다.")
-        }
     }
     
     private var actionButton: some View {
         Button("다음") {
-            viewModel.checkPhotoPermission()
+            router.push(.startGetScreenshot)
         }
         .primaryStyle()
         .padding(.horizontal, 16)
