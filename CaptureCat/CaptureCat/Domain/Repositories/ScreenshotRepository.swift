@@ -84,11 +84,15 @@ final class ScreenshotRepository {
         }
     }
     
-    func updateTag(id: String, tags: [String]) async throws {
+    func updateTag(id: String, tags: [String]) async throws -> Result<TagListDTO, Error>? {
         if AccountStorage.shared.isGuest ?? true {
             try SwiftDataManager.shared.updateTag(id: id, tags: tags)
+            
+            return nil
         } else {
-            try await updateTagToServer(id: id, tags: tags)
+            let result = await updateTagToServer(id: id, tags: tags)
+            
+            return result
         }
     }
     
@@ -248,16 +252,18 @@ final class ScreenshotRepository {
     }
     
      /// 특정 이미지에 태그 업데이트
-    func updateTagToServer(id: String, tags: [String]) async throws {
+    func updateTagToServer(id: String, tags: [String]) async /*throws*/ -> Result<TagListDTO, Error> {
         let result = await TagService.shared.updateTag(imageId: id, tags: tags)
         
-        switch result {
-        case .success:
-            debugPrint("✅ 서버에 태그 추가 성공: \(tags)")
-        case .failure(let error):
-            debugPrint("❌ 서버에 태그 추가 실패: \(error)")
-            throw error
-        }
+//        switch result {
+//        case .success:
+//            debugPrint("✅ 서버에 태그 추가 성공: \(tags)")
+//        case .failure(let error):
+//            debugPrint("❌ 서버에 태그 추가 실패: \(error)")
+//            throw error
+//        }
+        
+        return result
     }
     
     // MARK: - Common Operations

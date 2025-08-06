@@ -37,12 +37,12 @@ final class TagService {
         }
     }
     
-    func updateTag(imageId: String, tags: [String]) async -> Result<ResponseDTO, Error> {
+    func updateTag(imageId: String, tags: [String]) async -> Result<TagListDTO, Error> {
         let builder = UpdateTagBuilder(imageId: imageId, tags: tags)
         
         do {
             let result = try await networkManager.fetchData(builder)
-            return Result<ResponseDTO, Error>.success(result)
+            return Result<TagListDTO, Error>.success(result)
         } catch {
             return .failure(error)
         }
