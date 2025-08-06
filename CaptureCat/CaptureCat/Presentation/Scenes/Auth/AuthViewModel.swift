@@ -66,7 +66,7 @@ class AuthViewModel: ObservableObject {
                 switch state {
                 case .authorized:
                     debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn //문제의 원인
+                    self?.authenticationState = .signIn
                 case .revoked:
                     debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 로그인 화면 표시")
                     self?.cleanupAppleTokens()
@@ -166,7 +166,7 @@ class AuthViewModel: ObservableObject {
                 switch result {
                 case .success(let token):
                     debugPrint("🟡 카카오에서 토큰 값 가져오기 성공 \(token) 🟡")
-                    let kakaoSignIn = await authService.login(social: "kakao", idToken: token, nickname: nil)
+                    let kakaoSignIn = await authService.login(social: "kakao", idToken: token.idToken, authToken: token.authToken, nickname: nil)
                     
                     switch kakaoSignIn {
                     case .success(let success):
@@ -190,7 +190,7 @@ class AuthViewModel: ObservableObject {
                 
                 switch result {
                 case .success(let token):
-                    let appleSignIn = await authService.login(social: "apple", idToken: token.0, nickname: token.1)
+                    let appleSignIn = await authService.login(social: "apple", idToken: nil, authToken: token.0, nickname: token.1)
                     
                     switch appleSignIn {
                     case .success(let success):

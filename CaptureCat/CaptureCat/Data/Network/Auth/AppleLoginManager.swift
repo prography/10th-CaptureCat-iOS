@@ -36,18 +36,17 @@ extension AppleLoginManager: ASAuthorizationControllerDelegate {
             // 🍏 Apple 로그인 정보 출력
             debugPrint("🍏 ===== Apple Login Info =====")
             
-            // idToken 출력
-            if let token = credential.identityToken,
+            if let token = credential.authorizationCode,
                let tokenString = String(data: token, encoding: .utf8) {
-                debugPrint("🍏 idToken: \(token)")
-                debugPrint("🍏 idTokenString: \(tokenString)")
+                debugPrint("🍏 authCode: \(token)")
+                debugPrint("🍏 authCodeString: \(tokenString)")
             }
             
             let userID = credential.user
             KeyChainModule.create(key: .appleToken, data: userID)
             
             if let fullName = credential.fullName,
-               let token = credential.identityToken,
+               let token = credential.authorizationCode,
                let tokenString = String(data: token, encoding: .utf8) {
                 let firstName = fullName.givenName ?? ""
                 let lastName = fullName.familyName ?? ""

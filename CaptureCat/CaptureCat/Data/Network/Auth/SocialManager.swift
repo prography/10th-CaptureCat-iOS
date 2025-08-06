@@ -11,12 +11,13 @@ import KakaoSDKAuth
 import KakaoSDKUser
 
 struct SocialManager {
-    func kakaoLogin() async -> Result<String, NetworkError> {
+    func kakaoLogin() async -> Result<(authToken: String?, idToken: String), NetworkError> {
         let result = await kakaoSignIn()
         
         switch result {
         case .success(let success):
-            AccountStorage.shared.kakaoToken = success
+            AccountStorage.shared.kakaoToken = success.1
+//            AccountStorage.shared.kakaoIdToken = success.1
             return .success(success)
         case .failure(let failure):
             debugPrint("카카오 토큰 가져오기 실패 \(failure.localizedDescription)")
@@ -41,14 +42,18 @@ struct SocialManager {
 extension SocialManager {
     
     @MainActor
-    func kakaoSignIn() async -> Result<String, NetworkError> {
+    func kakaoSignIn() async -> Result<(String?, String), NetworkError> {
         let result = await trySignInWithKakoa()
         
-        guard let result else {
+        guard let idToken = result.1 else {
             return .failure(.badRequest)
         }
         
-        return .success(result)
+        if let accessToken = result.0 {
+            return .success((accessToken, idToken))
+        }
+        
+        return .success((nil, idToken))
     }
     
     func appleSignIn() async -> Result<(token: String, nickname: String), NetworkError> {
@@ -67,7 +72,7 @@ extension SocialManager {
 
 extension SocialManager {
     @MainActor
-    func trySignInWithKakoa() async -> String? {
+    func trySignInWithKakoa() async -> (String?, String?) {
         do {
             if UserApi.isKakaoTalkLoginAvailable() {
                 return try await withCheckedThrowingContinuation { continuation in
@@ -75,7 +80,7 @@ extension SocialManager {
                         if let error = error {
                             continuation.resume(throwing: error)
                         } else if let oauthToken = oautoken {
-                            continuation.resume(returning: oauthToken.idToken)
+                            continuation.resume(returning: (oauthToken.accessToken, oauthToken.idToken))
                         }
                     }
                 }
@@ -87,14 +92,14 @@ extension SocialManager {
                             debugPrint("🍀 error \(error.localizedDescription)")
                             continuation.resume(throwing: error)
                         } else if let oauthToken = oauthtoken {
-                            continuation.resume(returning: oauthToken.idToken)
+                            continuation.resume(returning: (oauthToken.accessToken, oauthToken.idToken))
                         }
                     }
                 }
             }
         } catch {
             debugPrint("🟡 카카오 로그인 서비스 완전 사용 불가 🟡")
-            return nil
+            return (nil, nil)
         }
     }
 }
