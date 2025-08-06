@@ -66,7 +66,7 @@ class AuthViewModel: ObservableObject {
                 switch state {
                 case .authorized:
                     debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn
+                    Task { await self?.handleLoginSuccess() }
                 case .revoked:
                     debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 로그인 화면 표시")
                     self?.cleanupAppleTokens()
@@ -94,7 +94,7 @@ class AuthViewModel: ObservableObject {
                 
                 if info != nil {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn //문제 원인
+                    Task { await self?.handleLoginSuccess() }
                 } else {
                     debugPrint("🟡⚠️ 카카오 토큰 정보 없음 - 로그인 화면 표시")
                     self?.authenticationState = .initial
@@ -113,7 +113,7 @@ class AuthViewModel: ObservableObject {
             // 네트워크 오류시 기존 서버 토큰이 있으면 사용
             if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
                 debugPrint("🍏💾 기존 서버 토큰 발견 - 자동 로그인 시도")
-                self.authenticationState = .signIn // 문제 원인
+                Task { await self.handleLoginSuccess() }
             } else {
                 debugPrint("🍏⚠️ 기존 서버 토큰 없음 - 로그인 화면 표시")
                 self.authenticationState = .initial

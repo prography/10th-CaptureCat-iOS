@@ -94,8 +94,17 @@ struct HomeView: View {
         }
         .onAppear {
             Task { @MainActor in
-                // 초기 데이터 로딩 (중복 방지)
-                await viewModel.loadScreenshots()
+                // 로그인 상태 확인 후 데이터 로딩
+                let isGuest = AccountStorage.shared.isGuest ?? true
+                debugPrint("🏠 HomeView onAppear - 게스트 모드: \(isGuest)")
+                
+                if !isGuest {
+                    // 로그인 상태에서만 데이터 로딩
+                    await viewModel.loadScreenshots()
+                } else {
+                    // 게스트 모드에서는 로컬 데이터만 로드
+                    await viewModel.loadLocalDataOnly()
+                }
                 
                 // 데이터가 로드된 후에만 이미지 미리 로드 실행
                 if !viewModel.itemVMs.isEmpty {

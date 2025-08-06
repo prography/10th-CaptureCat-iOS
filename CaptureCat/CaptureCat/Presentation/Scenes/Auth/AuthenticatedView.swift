@@ -42,10 +42,7 @@ struct AuthenticatedView: View {
 //        }
         .task {
             authViewModel.checkAutoLogin()
-            
-            if authViewModel.hasLocalData() {
-                authViewModel.authenticationState = .syncing
-            }
+            // 동기화 체크는 로그인 성공 후에만 수행하도록 AuthViewModel에서 처리
         }
     }
 }

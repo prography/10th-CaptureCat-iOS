@@ -48,7 +48,7 @@ struct LogInView: View {
                 Text("가입하면 캡쳐캣의")
                     .CFont(.caption02Regular)
                     .foregroundStyle(.text03)
-                HStack(spacing: 0) {
+                HStack(spacing: 2) {
                     Button {
                         showTerms = true
                     } label: {

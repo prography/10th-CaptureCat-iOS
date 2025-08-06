@@ -40,7 +40,7 @@ final class HomeViewModel: ObservableObject {
     init(networkManager: NetworkManager) {
         self.netwworkManager = networkManager
         setupNotificationObservers()
-        Task { await loadScreenshots() }
+        // 로그인 후에 명시적으로 호출하도록 변경 - 자동 로딩 제거
     }
     
     deinit {
@@ -73,6 +73,21 @@ final class HomeViewModel: ObservableObject {
         }
         
         await loadFavorite()
+    }
+    
+    /// 게스트 모드 전용: 로컬 데이터만 로드 (서버 호출 없음)
+    func loadLocalDataOnly() async {
+        guard !isInitialLoading else { 
+            debugPrint("⚠️ 이미 초기 로딩 중 - loadLocalDataOnly 스킵")
+            return 
+        }
+        
+        isInitialLoading = true
+        defer { isInitialLoading = false }
+        
+        debugPrint("🔍 게스트 모드 - 로컬 데이터만 로드")
+        loadScreenshotFromLocal()
+        // 게스트 모드에서는 즐겨찾기 기능이 서버 기반이므로 로드하지 않음
     }
     
     /// 강제 새로고침 (삭제 후 등에 사용) - 중복 실행 방지
@@ -110,12 +125,25 @@ final class HomeViewModel: ObservableObject {
         canLoadMorePages = true
         itemVMs = []
         
-        await loadScreenshots()
+        // 로그인 상태에 따라 적절한 로딩 방식 선택
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if !isGuest {
+            await loadScreenshots()
+        } else {
+            await loadLocalDataOnly()
+        }
         
         debugPrint("✅ 전체 새로고침 완료")
     }
     
     func loadNextPageServer() async {
+        // 게스트 모드에서는 서버 페이징 불가
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if isGuest {
+            debugPrint("🔍 게스트 모드 - 서버 페이징 스킵")
+            return
+        }
+        
         guard !isLoadingPage, canLoadMorePages else { return }
         isLoadingPage = true
         defer { isLoadingPage = false }
@@ -180,6 +208,13 @@ final class HomeViewModel: ObservableObject {
     }
     
     func loadFavorite() async {
+        // 게스트 모드에서는 즐겨찾기 로드하지 않음
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if isGuest {
+            debugPrint("🔍 게스트 모드 - 즐겨찾기 로드 스킵")
+            return
+        }
+        
         do {
             let serverItems = try await repository.loadFavoriteFromServerOnly(page: 0, size: 20)
             
@@ -205,6 +240,13 @@ final class HomeViewModel: ObservableObject {
     
     /// 즐겨찾기 다음 페이지 로드
     func loadNextFavoritePage() async {
+        // 게스트 모드에서는 즐겨찾기 페이징 불가
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if isGuest {
+            debugPrint("🔍 게스트 모드 - 즐겨찾기 페이징 스킵")
+            return
+        }
+        
         guard !isLoadingFavoritePage, canLoadMoreFavoritePages else { return }
         isLoadingFavoritePage = true
         defer { isLoadingFavoritePage = false }

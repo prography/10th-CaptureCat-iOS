@@ -93,6 +93,12 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     
     // MARK: – User Actions
     func toggleFavorite() {
+        // 게스트 모드에서는 즐겨찾기 기능 비활성화
+        if AccountStorage.shared.isGuest ?? true {
+            debugPrint("🔍 게스트 모드 - 즐겨찾기 기능 비활성화")
+            return
+        }
+        
         // Repository를 통해 즐겨찾기 상태 토글 (현재 상태를 명시적으로 전달)
         Task {
             do {

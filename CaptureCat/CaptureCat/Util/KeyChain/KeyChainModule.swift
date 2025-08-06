@@ -14,6 +14,7 @@ final class KeyChainModule {
         case kakaoToken
         case appleToken
         case didStarted
+        case didOnboarding
     }
     
     static func create(key: Key, data: String) {
