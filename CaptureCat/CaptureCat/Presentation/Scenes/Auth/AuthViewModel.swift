@@ -34,7 +34,6 @@ class AuthViewModel: ObservableObject {
     @Published var isSignOutPresented: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
-    @Published var syncResult: SyncResult? // 동기화 결과 저장
     
     init(service: AuthService) {
         self.authService = service
@@ -42,18 +41,16 @@ class AuthViewModel: ObservableObject {
     }
     
     func checkAutoLogin() {
-        checkAppleLoginStatus()
-        checkKakaoLoginStatus()
+        if let appleId = KeyChainModule.read(key: .appleToken),
+           !appleId.isEmpty {
+            checkAppleLoginStatus(appleId: appleId)
+        } else {
+            debugPrint("⚠️ Apple ID가 저장되어 있지 않음 - Apple 자동로그인 스킵")
+            checkKakaoLoginStatus()
+        }
     }
     
-    private func checkAppleLoginStatus() {
-        // Apple ID가 저장되어 있는지 확인
-        guard let appleId = KeyChainModule.read(key: .appleToken),
-                !appleId.isEmpty else {
-            debugPrint("⚠️ Apple ID가 저장되어 있지 않음 - Apple 자동로그인 스킵")
-            return
-        }
-        
+    private func checkAppleLoginStatus(appleId: String) {
         let provider = ASAuthorizationAppleIDProvider()
         provider.getCredentialState(forUserID: appleId) { [weak self] state, error in
             DispatchQueue.main.async {
@@ -88,13 +85,14 @@ class AuthViewModel: ObservableObject {
             DispatchQueue.main.async {
                 if let error = error {
                     debugPrint("🟡❌ 카카오 토큰 확인 실패: \(error.localizedDescription)")
-                    self?.handleKakaoLoginFallback(error: error)
+//                    self?.handleKakaoLoginFallback(error: error)
+                    self?.authenticationState = .initial
                     return
                 }
                 
                 if info != nil {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
-                    Task { await self?.handleLoginSuccess() }
+                    self?.authenticationState = .signIn
                 } else {
                     debugPrint("🟡⚠️ 카카오 토큰 정보 없음 - 로그인 화면 표시")
                     self?.authenticationState = .initial
@@ -144,6 +142,7 @@ class AuthViewModel: ObservableObject {
             debugPrint("🟡🧹 카카오 인증 오류 - 토큰 정리 후 로그인 화면 표시")
             cleanupKakaoTokens()
             self.authenticationState = .initial
+            self.isLoginPresented = true
         }
     }
     
@@ -166,7 +165,12 @@ class AuthViewModel: ObservableObject {
                 switch result {
                 case .success(let token):
                     debugPrint("🟡 카카오에서 토큰 값 가져오기 성공 \(token) 🟡")
-                    let kakaoSignIn = await authService.login(social: "kakao", idToken: token.idToken, authToken: token.authToken, nickname: nil)
+                    let kakaoSignIn = await authService.login(
+                        social: "kakao",
+                        idToken: token.idToken,
+                        authToken: token.authToken,
+                        nickname: nil
+                    )
                     
                     switch kakaoSignIn {
                     case .success(let success):
@@ -190,7 +194,12 @@ class AuthViewModel: ObservableObject {
                 
                 switch result {
                 case .success(let token):
-                    let appleSignIn = await authService.login(social: "apple", idToken: nil, authToken: token.0, nickname: token.1)
+                    let appleSignIn = await authService.login(
+                        social: "apple",
+                        idToken: nil,
+                        authToken: token.0,
+                        nickname: token.1
+                    )
                     
                     switch appleSignIn {
                     case .success(let success):
@@ -236,14 +245,7 @@ class AuthViewModel: ObservableObject {
     private func handleLoginSuccess() async {
         // 토큰 저장이 완전히 완료될 때까지 잠시 대기
         await waitForTokenSaved()
-        
-        if hasLocalData() {
-            debugPrint("🔄 로그인 성공 + 로컬 데이터 존재 → 동기화 시작")
-            self.authenticationState = .syncing
-        } else {
-            debugPrint("🔄 로그인 성공 + 로컬 데이터 없음 → 바로 메인화면")
-            self.authenticationState = .signIn
-        }
+        self.authenticationState = .signIn
     }
     
     /// 토큰이 저장될 때까지 대기
@@ -258,18 +260,6 @@ class AuthViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
         }
         debugPrint("⚠️ 토큰 저장 확인 실패 - 타임아웃")
-    }
-    
-    /// 로컬에 동기화할 데이터가 있는지 확인
-    func hasLocalData() -> Bool {
-        do {
-            let localCount = try SwiftDataManager.shared.fetchAllEntities().count
-            debugPrint("📱 로컬 스크린샷 개수: \(localCount)개")
-            return localCount > 0
-        } catch {
-            debugPrint("❌ 로컬 데이터 확인 실패: \(error)")
-            return false
-        }
     }
     
     /// 모든 토큰을 안전하게 정리 (연쇄 삭제 방지)

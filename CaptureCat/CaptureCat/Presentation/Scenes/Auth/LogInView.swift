@@ -33,7 +33,7 @@ struct LogInView: View {
             Spacer()
             Image(.logInLogo)
             Spacer()
-            ForEach(LogIn.allCases, id:\.self) { type in
+            ForEach(LogIn.allCases, id: \.self) { type in
                 LoginButton(type: type)
                     .onTapGesture {
                         switch type {

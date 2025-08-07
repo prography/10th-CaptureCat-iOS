@@ -12,6 +12,7 @@ struct TabContainerView: View {
     @Environment(TabSelection.self) private var tabs
     @State private var isKeyboardVisible: Bool = false
     @State private var showTutorial: Bool = false
+    @State private var showSync: Bool = false
     
     private var networkManager: NetworkManager
     
@@ -24,6 +25,9 @@ struct TabContainerView: View {
             if showTutorial {
                 let viewModel = SelectMainTagViewModel(networkManager: networkManager)
                 SelectMainTagView(viewModel: viewModel)
+//            } else {
+            } else if showSync {
+                SyncProgressView()
             } else {
                 // 1) 탭별 화면 분기
                 switch tabs.current {
@@ -53,6 +57,13 @@ struct TabContainerView: View {
                 showTutorial = false
             } else {
                 showTutorial = true
+            }
+            
+            if let localCount = try? SwiftDataManager.shared.fetchAllEntities().count,
+               localCount != 0, (AccountStorage.shared.isGuest ?? true) != true {
+                showSync = true
+            } else {
+                showSync = false
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in

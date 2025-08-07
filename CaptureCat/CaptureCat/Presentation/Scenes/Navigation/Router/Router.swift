@@ -17,6 +17,7 @@ final class Router: ObservableObject {
         case favorite
         case detail(id: String)
         case completeSave(count: Int)
+        case completeSync(result: SyncResult)
     }
 
     @Published var path = NavigationPath()

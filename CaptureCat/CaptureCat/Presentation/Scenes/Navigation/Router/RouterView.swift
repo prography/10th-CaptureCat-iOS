@@ -56,6 +56,8 @@ struct RouterView<Content: View>: View {
                         UploadCompleteView(count: count)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .completeSync(let result):
+                        SyncCompletedView(syncResult: result)
                     }
                 }
         }
