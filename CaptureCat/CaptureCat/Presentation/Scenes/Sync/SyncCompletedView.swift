@@ -34,6 +34,8 @@ struct SyncCompletedView: View {
                 Button("다음") {
                     debugPrint("🚀 SyncCompletedView: 동기화 완료 알림 발송 및 메인 화면으로 이동")
                     NotificationCenter.default.post(name: .syncCompleted, object: nil)
+                    NotificationCenter.default.post(name: .imageSaveCompleted, object: nil)
+                    debugPrint("📢 이미지 저장 완료 notification 전송")
                     router.popToRoot()
                     tabs.go(.home)
                 }

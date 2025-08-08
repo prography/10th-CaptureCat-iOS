@@ -112,6 +112,7 @@
       }
     },
     "Hello, world!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ko" : {
           "stringUnit" : {
@@ -924,6 +925,9 @@
           }
         }
       }
+    },
+    "자동 로그인 중..." : {
+
     },
     "자주 캡쳐하는 이미지가 있으신가요?" : {
       "localizations" : {

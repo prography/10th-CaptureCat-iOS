@@ -479,6 +479,25 @@ final class HomeViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
+        
+        // 로그인 성공 알림 (홈화면 데이터 새로고침)
+        NotificationCenter.default.publisher(for: .loginSuccessCompleted)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleLoginSuccessCompleted()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 이미지 저장 완료 알림 (홈화면 데이터 새로고침)
+        NotificationCenter.default.publisher(for: .imageSaveCompleted)
+            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main) // 500ms 디바운싱
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleImageSaveCompleted()
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func updateFavoriteStatus(_ favoriteInfo: FavoriteStatusInfo) {
@@ -604,5 +623,49 @@ final class HomeViewModel: ObservableObject {
         }
         
         debugPrint("✅ 서버 동기화 실패 후 UI 복원 완료")
+    }
+    
+    /// 로그인 성공 후 홈화면 데이터 새로고침
+    @MainActor
+    private func handleLoginSuccessCompleted() async {
+        debugPrint("📢 로그인 성공 알림 수신 - 홈화면 데이터 새로고침 시작")
+        
+        // 기존 데이터 상태 초기화
+        page = 0
+        favoritePage = 0
+        canLoadMorePages = true
+        canLoadMoreFavoritePages = true
+        itemVMs = []
+        favoriteItemVMs = []
+        currentFavoriteIndex = 0
+        
+        // 로그인 상태로 전체 데이터 새로고침
+        await loadScreenshots()
+        
+        debugPrint("✅ 로그인 성공 후 홈화면 데이터 새로고침 완료")
+    }
+    
+    /// 이미지 저장 완료 후 홈화면 데이터 새로고침
+    @MainActor
+    private func handleImageSaveCompleted() async {
+        debugPrint("📢 이미지 저장 완료 알림 수신 - 홈화면 데이터 새로고침 시작")
+        
+        // 게스트 모드인지 확인
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        
+        if isGuest {
+            // 게스트 모드: 로컬 데이터만 새로고침
+            debugPrint("🔍 게스트 모드 - 로컬 데이터만 새로고침")
+            loadScreenshotFromLocal()
+        } else {
+            // 로그인 모드: 서버 데이터 새로고침 (첫 페이지만)
+            debugPrint("🔍 로그인 모드 - 서버 첫 페이지 새로고침")
+            page = 0
+            canLoadMorePages = true
+            await loadFromServerOnly()
+            await loadFavorite() // 즐겨찾기도 함께 새로고침
+        }
+        
+        debugPrint("✅ 이미지 저장 완료 후 홈화면 데이터 새로고침 완료")
     }
 }

@@ -35,7 +35,16 @@ struct HomeView: View {
             
             Spacer()
             
-            if viewModel.isInitialLoading || viewModel.isRefreshing {
+            if authViewModel.isAutoLoginInProgress {
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("자동 로그인 중...")
+                        .foregroundStyle(.text02)
+                        .CFont(.body01Regular)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.isInitialLoading || viewModel.isRefreshing {
                 ProgressView(viewModel.isRefreshing ? "새로고침 중..." : "로딩 중...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.itemVMs.isEmpty {
@@ -94,23 +103,15 @@ struct HomeView: View {
             }
         }
         .task {
-            // 로그인 상태 확인 후 데이터 로딩
-            let isGuest = (KeyChainModule.read(key: .accessToken) == nil)
-            debugPrint("🏠 HomeView onAppear - 게스트 모드: \(isGuest)")
-            
-            if isGuest == false {
-                // 로그인 상태에서만 데이터 로딩
-                await viewModel.loadScreenshots()
-            } else {
-                // 게스트 모드에서는 로컬 데이터만 로드
-                await viewModel.loadLocalDataOnly()
+            // authenticationState 기반으로 데이터 로딩 (자동로그인 완료 후 실행되도록)
+            await loadDataBasedOnAuthState()
+        }
+        .onChange(of: authViewModel.authenticationState) { _, newState in
+            // 인증 상태 변경 시 데이터 새로고침
+            debugPrint("🏠 HomeView - authenticationState 변경됨: \(newState)")
+            Task {
+                await loadDataBasedOnAuthState()
             }
-            
-            // 데이터가 로드된 후에만 이미지 미리 로드 실행
-            if !viewModel.itemVMs.isEmpty {
-                await loadInitialVisibleImages()
-            }
-//            }
         }
         .onChange(of: viewModel.itemVMs.count) { oldCount, newCount in
             // 데이터가 새로 채워졌을 때 (빈 상태에서 데이터가 들어온 경우)
@@ -287,6 +288,32 @@ struct HomeView: View {
         }
         
         debugPrint("✅ 초기 이미지 로딩 전체 완료")
+    }
+    
+    /// 인증 상태에 따른 데이터 로딩
+    private func loadDataBasedOnAuthState() async {
+        let authState = authViewModel.authenticationState
+        debugPrint("🏠 HomeView - 현재 인증 상태: \(authState)")
+        
+        switch authState {
+        case .signIn:
+            // 로그인 상태: 서버 데이터 로드
+            debugPrint("🏠 로그인 상태 - 서버 데이터 로딩")
+            await viewModel.loadScreenshots()
+        case .guest:
+            // 게스트 상태: 로컬 데이터만 로드
+            debugPrint("🏠 게스트 상태 - 로컬 데이터 로딩")
+            await viewModel.loadLocalDataOnly()
+        case .initial:
+            // 초기 상태: 자동로그인 진행 중이므로 대기
+            debugPrint("🏠 초기 상태 - 자동로그인 진행 중, 데이터 로딩 대기")
+            return
+        }
+        
+        // 데이터 로딩 완료 후 이미지 미리 로드
+        if !viewModel.itemVMs.isEmpty {
+            await loadInitialVisibleImages()
+        }
     }
     
     /// 새로운 페이지의 이미지들을 병렬로 로드

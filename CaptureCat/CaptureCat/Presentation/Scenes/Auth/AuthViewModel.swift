@@ -22,6 +22,7 @@ class AuthViewModel: ObservableObject {
     var nickname: String = "캐치님"
     
     @Published var authenticationState: AuthenticationState = .initial
+    @Published var isAutoLoginInProgress: Bool = false
     
     @Published var isLoginPresented: Bool = false
     @Published var isLogOutPresented: Bool = false
@@ -35,18 +36,43 @@ class AuthViewModel: ObservableObject {
     }
     
     func checkAutoLogin() {
-        if let appleId = KeyChainModule.read(key: .appleToken),
-           !appleId.isEmpty {
-            checkAppleLoginStatus(appleId: appleId)
-        } else {
-            debugPrint("⚠️ Apple ID가 저장되어 있지 않음 - Apple 자동로그인 스킵")
+        isAutoLoginInProgress = true
+        debugPrint("🔄 자동로그인 시작")
+        
+        // 병렬로 토큰 체크하여 속도 최적화
+        let hasAppleToken = KeyChainModule.read(key: .appleToken)?.isEmpty == false
+        let hasKakaoToken = KeyChainModule.read(key: .kakaoToken)?.isEmpty == false
+        
+        if hasAppleToken {
+            debugPrint("🍏 Apple 토큰 발견 - Apple 자동로그인 시도")
+            if let appleId = KeyChainModule.read(key: .appleToken) {
+                checkAppleLoginStatus(appleId: appleId)
+            }
+        } else if hasKakaoToken {
+            debugPrint("🟡 카카오 토큰 발견 - 카카오 자동로그인 시도")
             checkKakaoLoginStatus()
+        } else {
+            debugPrint("⚠️ 저장된 토큰 없음 - 게스트 모드로 전환")
+            DispatchQueue.main.async {
+                self.authenticationState = .initial
+                self.isAutoLoginInProgress = false
+            }
         }
     }
     
     private func checkAppleLoginStatus(appleId: String) {
         let provider = ASAuthorizationAppleIDProvider()
+        
+        // 타임아웃 설정 (3초 후 카카오 fallback)
+        let timeoutTask = DispatchWorkItem { [weak self] in
+            debugPrint("⏰ Apple ID 상태 확인 타임아웃 - 카카오 로그인으로 fallback")
+            self?.checkKakaoLoginStatus()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: timeoutTask)
+        
         provider.getCredentialState(forUserID: appleId) { [weak self] state, error in
+            // 타임아웃 작업 취소
+            timeoutTask.cancel()
             DispatchQueue.main.async {
                 if let error = error {
                     debugPrint("🍏❌ Apple ID 상태 확인 실패: \(error.localizedDescription)")
@@ -59,16 +85,19 @@ class AuthViewModel: ObservableObject {
                     debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
                     self?.handleLoginSuccess()
                 case .revoked:
-                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 로그인 화면 표시")
+                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 게스트 모드로 전환")
                     self?.cleanupAppleTokens()
-                    self?.authenticationState = .initial
+                    self?.authenticationState = .guest
+                    self?.isAutoLoginInProgress = false
                 case .notFound:
-                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리 후 로그인 화면 표시")
+                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리 후 게스트 모드로 전환")
                     self?.cleanupAppleTokens()
-                    self?.authenticationState = .initial
+                    self?.authenticationState = .guest
+                    self?.isAutoLoginInProgress = false
                 default:
-                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue) - 로그인 화면 표시")
-                    self?.authenticationState = .initial
+                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue) - 게스트 모드로 전환")
+                    self?.authenticationState = .guest
+                    self?.isAutoLoginInProgress = false
                 }
             }
         }
@@ -81,6 +110,7 @@ class AuthViewModel: ObservableObject {
                     debugPrint("🟡❌ 카카오 토큰 확인 실패: \(error.localizedDescription)")
 //                    self?.handleKakaoLoginFallback(error: error)
                     self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                     return
                 }
                 
@@ -90,6 +120,7 @@ class AuthViewModel: ObservableObject {
                 } else {
                     debugPrint("🟡⚠️ 카카오 토큰 정보 없음 - 로그인 화면 표시")
                     self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                 }
             }
         }
@@ -109,11 +140,13 @@ class AuthViewModel: ObservableObject {
             } else {
                 debugPrint("🍏⚠️ 기존 서버 토큰 없음 - 로그인 화면 표시")
                 self.authenticationState = .initial
+                self.isAutoLoginInProgress = false
             }
         } else {
             debugPrint("🍏🧹 Apple 인증 오류 - 토큰 정리 후 로그인 화면 표시")
             cleanupAppleTokens()
             self.authenticationState = .initial
+            self.isAutoLoginInProgress = false
         }
     }
     
@@ -242,9 +275,15 @@ class AuthViewModel: ObservableObject {
         DispatchQueue.main.async {
             debugPrint("🔄 authenticationState 변경 전: \(self.authenticationState)")
             self.authenticationState = .signIn
+            self.isAutoLoginInProgress = false
             debugPrint("🔄 authenticationState 변경 후: \(self.authenticationState)")
             self.isLoginPresented = false
             debugPrint("🔄 isLoginPresented 변경: \(self.isLoginPresented)")
+            debugPrint("✅ 자동로그인 완료")
+            
+            // 로그인 성공 후 홈화면 리프레시를 위한 notification 전송
+            NotificationCenter.default.post(name: .loginSuccessCompleted, object: nil)
+            debugPrint("📢 로그인 성공 notification 전송 완료")
         }
     }
     

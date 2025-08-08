@@ -37,7 +37,7 @@ extension TagViewModel {
     /// 낙관적 업데이트로 서버 저장 (즉시 로컬 업데이트 + 백그라운드 서버 동기화)
     private func optimisticSaveToServer() async {
         // 1️⃣ 즉시 로컬 상태 업데이트 (낙관적 업데이트)
-        await updateLocalStateOptimistically()
+//        await updateLocalStateOptimistically()
         
         // 2️⃣ 백그라운드에서 서버 업로드 시작
         Task.detached { [weak self] in
@@ -52,29 +52,29 @@ extension TagViewModel {
         }
     }
     
-    /// 로컬 상태를 즉시 업데이트 (낙관적 업데이트)
-    private func updateLocalStateOptimistically() async {
-        let totalItems = itemVMs.count
-        
-        for (index, viewModel) in itemVMs.enumerated() {
-            // 진행률 업데이트
-            let progress = Double(index + 1) / Double(totalItems)
-            await MainActor.run {
-                uploadProgress = progress * 0.5  // 로컬 업데이트는 50%까지
-                uploadedCount = index + 1
-                debugPrint("📊 낙관적 로컬 업데이트 진행률: \(Int(progress * 50))% (\(uploadedCount)/\(totalItems))")
-            }
-            
-            // 즉시 로컬에 저장 (사용자가 즉시 볼 수 있도록)
-            await viewModel.saveToLocal()
-            
-            // 홈뷰에서 사용할 수 있도록 NotificationCenter로 즉시 알림
-            NotificationCenter.default.post(name: .optimisticUpdateCompleted, object: nil)
-        }
-        
-        debugPrint("✅ 낙관적 로컬 업데이트 완료: \(itemVMs.count)개")
-    }
-    
+//    /// 로컬 상태를 즉시 업데이트 (낙관적 업데이트)
+//    private func updateLocalStateOptimistically() async {
+//        let totalItems = itemVMs.count
+//        
+//        for (index, viewModel) in itemVMs.enumerated() {
+//            // 진행률 업데이트
+//            let progress = Double(index + 1) / Double(totalItems)
+//            await MainActor.run {
+//                uploadProgress = progress * 0.5  // 로컬 업데이트는 50%까지
+//                uploadedCount = index + 1
+//                debugPrint("📊 낙관적 로컬 업데이트 진행률: \(Int(progress * 50))% (\(uploadedCount)/\(totalItems))")
+//            }
+//            
+//            // 즉시 로컬에 저장 (사용자가 즉시 볼 수 있도록)
+//            await viewModel.saveToLocal()
+//            
+//            // 홈뷰에서 사용할 수 있도록 NotificationCenter로 즉시 알림
+//            NotificationCenter.default.post(name: .optimisticUpdateCompleted, object: nil)
+//        }
+//        
+//        debugPrint("✅ 낙관적 로컬 업데이트 완료: \(itemVMs.count)개")
+//    }
+//    
     /// 백그라운드에서 실제 서버 업로드 수행
     private func performServerUploadInBackground() async {
         debugPrint("🚀 백그라운드 서버 업로드 시작")
@@ -252,6 +252,10 @@ extension TagViewModel {
                  uploadProgress = 1.0
                  uploadedCount = imageDatas.count
                  debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
+                 
+                 // 이미지 저장 완료 notification 전송
+                 NotificationCenter.default.post(name: .imageSaveCompleted, object: nil)
+                 debugPrint("📢 이미지 저장 완료 notification 전송")
              }
              
          case .failure(let error):

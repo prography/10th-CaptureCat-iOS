@@ -43,7 +43,9 @@ struct AuthenticatedView: View {
                 debugPrint("🔄 AccessToken 발견 - 자동로그인 시작")
                 authViewModel.checkAutoLogin()
             } else {
-                debugPrint("🔄 AccessToken 없음 - 자동로그인 스킵")
+                debugPrint("🔄 AccessToken 없음 - 게스트 모드로 설정")
+                authViewModel.authenticationState = .guest
+                authViewModel.isAutoLoginInProgress = false
             }
             // 동기화 체크는 로그인 성공 후에만 수행하도록 AuthViewModel에서 처리
         }

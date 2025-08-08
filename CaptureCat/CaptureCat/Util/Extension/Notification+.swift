@@ -20,6 +20,10 @@ extension Notification.Name {
     static let serverSyncFailed = Notification.Name("serverSyncFailed")
     /// 동기화 완료 알림
     static let syncCompleted = Notification.Name("syncCompleted")
+    /// 로그인 성공 알림 (홈화면 리프레시용)
+    static let loginSuccessCompleted = Notification.Name("loginSuccessCompleted")
+    /// 이미지 저장 완료 알림 (홈화면 리프레시용)
+    static let imageSaveCompleted = Notification.Name("imageSaveCompleted")
 }
 
 /// 즐겨찾기 상태 변경 정보
