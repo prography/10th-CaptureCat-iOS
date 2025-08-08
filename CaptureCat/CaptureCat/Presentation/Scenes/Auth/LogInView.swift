@@ -18,8 +18,7 @@ struct LogInView: View {
         VStack {
             HStack {
                 Spacer()
-                Button{
-                    viewModel.authenticationState = .guest
+                Button {
                     pushGuest = true
                 } label: {
                     Text("나중에 하기")

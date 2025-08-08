@@ -23,7 +23,14 @@ struct AuthenticatedView: View {
             TabContainerView(networkManager: networkManager)
         }
         .environment(tabSelection)
-        .fullScreenCover(isPresented: $authViewModel.isLoginPresented) {
+        .fullScreenCover(isPresented: Binding(
+            get: { 
+                let shouldShow = authViewModel.authenticationState == .initial
+                debugPrint("🔍 AuthenticatedView - authenticationState: \(authViewModel.authenticationState), shouldShow: \(shouldShow)")
+                return shouldShow
+            },
+            set: { _ in }
+        )) {
             NavigationStack {
                 LogInView()
             }
@@ -32,8 +39,16 @@ struct AuthenticatedView: View {
             transaction.disablesAnimations = true
         }
         .task {
-            authViewModel.checkAutoLogin()
+            if KeyChainModule.read(key: .accessToken) != nil {
+                debugPrint("🔄 AccessToken 발견 - 자동로그인 시작")
+                authViewModel.checkAutoLogin()
+            } else {
+                debugPrint("🔄 AccessToken 없음 - 자동로그인 스킵")
+            }
             // 동기화 체크는 로그인 성공 후에만 수행하도록 AuthViewModel에서 처리
+        }
+        .onChange(of: authViewModel.authenticationState) { oldValue, newValue in
+            debugPrint("🔄 AuthenticatedView - authenticationState 변경: \(oldValue) -> \(newValue)")
         }
     }
 }
