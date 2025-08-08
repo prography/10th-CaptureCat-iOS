@@ -642,7 +642,43 @@ final class HomeViewModel: ObservableObject {
         // 로그인 상태로 전체 데이터 새로고침
         await loadScreenshots()
         
+        // 데이터 로딩 완료 후 첫 화면 이미지들 미리 로드
+        if !itemVMs.isEmpty {
+            await loadInitialVisibleImagesForNotification()
+        }
+        
         debugPrint("✅ 로그인 성공 후 홈화면 데이터 새로고침 완료")
+    }
+    
+    /// Notification으로 트리거된 이미지 미리 로딩 (HomeView의 loadInitialVisibleImages와 동일한 로직)
+    private func loadInitialVisibleImagesForNotification() async {
+        guard !itemVMs.isEmpty, itemVMs.count > 0 else {
+            debugPrint("📷 Notification - 로드할 이미지가 없음 (count: \(itemVMs.count))")
+            return
+        }
+        
+        let visibleCount = min(6, itemVMs.count)
+        debugPrint("📷 Notification - 초기 이미지 로딩 시작: \(visibleCount)개 (전체: \(itemVMs.count)개)")
+        
+        let itemsToLoad = Array(itemVMs.prefix(visibleCount))
+        
+        guard !itemsToLoad.isEmpty else {
+            debugPrint("📷 Notification - prefix로 가져온 아이템이 없음")
+            return
+        }
+        
+        // 각 이미지를 개별 Task로 로딩
+        await withTaskGroup(of: Void.self) { group in
+            for (index, item) in itemsToLoad.enumerated() {
+                group.addTask { [item] in
+                    debugPrint("📷 Notification - 이미지 로딩 시작: \(index) - ID: \(item.id)")
+                    await item.loadFullImage()
+                    debugPrint("✅ Notification - 이미지 로딩 완료: \(index) - ID: \(item.id)")
+                }
+            }
+        }
+        
+        debugPrint("✅ Notification - 초기 이미지 로딩 전체 완료")
     }
     
     /// 이미지 저장 완료 후 홈화면 데이터 새로고침

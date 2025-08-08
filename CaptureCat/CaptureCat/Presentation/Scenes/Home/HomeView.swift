@@ -107,7 +107,12 @@ struct HomeView: View {
             await loadDataBasedOnAuthState()
         }
         .onChange(of: authViewModel.authenticationState) { _, newState in
-            // 인증 상태 변경 시 데이터 새로고침
+            // 자동로그인 중이 아닐 때만 인증 상태 변경에 따른 데이터 새로고침
+            guard !authViewModel.isAutoLoginInProgress else {
+                debugPrint("🏠 HomeView - 자동로그인 중이므로 authenticationState 변경 무시")
+                return
+            }
+            
             debugPrint("🏠 HomeView - authenticationState 변경됨: \(newState)")
             Task {
                 await loadDataBasedOnAuthState()
@@ -124,6 +129,15 @@ struct HomeView: View {
         .refreshable {
             // Pull to refresh (중복 실행 방지 적용)
             await viewModel.refreshScreenshots()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .loginSuccessCompleted)) { _ in
+            // 로그인 성공 알림을 받으면 즉시 데이터 새로고침
+            debugPrint("🏠 HomeView - 로그인 성공 notification 수신, 데이터 새로고침 시작")
+            Task {
+                // 약간의 지연을 두어 인증 상태가 완전히 안정화된 후 실행
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
+                await loadDataBasedOnAuthState()
+            }
         }
     }
     

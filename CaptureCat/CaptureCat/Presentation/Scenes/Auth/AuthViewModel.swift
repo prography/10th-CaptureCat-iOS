@@ -281,9 +281,11 @@ class AuthViewModel: ObservableObject {
             debugPrint("🔄 isLoginPresented 변경: \(self.isLoginPresented)")
             debugPrint("✅ 자동로그인 완료")
             
-            // 로그인 성공 후 홈화면 리프레시를 위한 notification 전송
-            NotificationCenter.default.post(name: .loginSuccessCompleted, object: nil)
-            debugPrint("📢 로그인 성공 notification 전송 완료")
+            // 모든 상태 업데이트가 완료된 후 notification 전송
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                NotificationCenter.default.post(name: .loginSuccessCompleted, object: nil)
+                debugPrint("📢 로그인 성공 notification 전송 완료")
+            }
         }
     }
     
