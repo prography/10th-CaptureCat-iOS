@@ -32,7 +32,8 @@ struct SyncCompletedView: View {
             // 계속하기 버튼
             VStack(spacing: 12) {
                 Button("다음") {
-                    debugPrint("🚀 SyncCompletedView: 메인 화면으로 이동")
+                    debugPrint("🚀 SyncCompletedView: 동기화 완료 알림 발송 및 메인 화면으로 이동")
+                    NotificationCenter.default.post(name: .syncCompleted, object: nil)
                     router.popToRoot()
                     tabs.go(.home)
                 }

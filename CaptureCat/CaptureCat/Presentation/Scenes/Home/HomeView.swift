@@ -49,6 +49,7 @@ struct HomeView: View {
                             .CFont(.body01Regular)
                         Button("로그인하기") {
                             authViewModel.authenticationState = .initial
+//                            authViewModel.isLoginPresented = true
                         }
                         .primaryStyle(fillWidth: false)
                         .padding(.top, 16)
@@ -92,25 +93,24 @@ struct HomeView: View {
                 }
             }
         }
-        .onAppear {
-            Task { @MainActor in
-                // 로그인 상태 확인 후 데이터 로딩
-                let isGuest = AccountStorage.shared.isGuest ?? true
-                debugPrint("🏠 HomeView onAppear - 게스트 모드: \(isGuest)")
-                
-                if !isGuest {
-                    // 로그인 상태에서만 데이터 로딩
-                    await viewModel.loadScreenshots()
-                } else {
-                    // 게스트 모드에서는 로컬 데이터만 로드
-                    await viewModel.loadLocalDataOnly()
-                }
-                
-                // 데이터가 로드된 후에만 이미지 미리 로드 실행
-                if !viewModel.itemVMs.isEmpty {
-                    await loadInitialVisibleImages()
-                }
+        .task {
+            // 로그인 상태 확인 후 데이터 로딩
+            let isGuest = (KeyChainModule.read(key: .accessToken) == nil)
+            debugPrint("🏠 HomeView onAppear - 게스트 모드: \(isGuest)")
+            
+            if isGuest == false {
+                // 로그인 상태에서만 데이터 로딩
+                await viewModel.loadScreenshots()
+            } else {
+                // 게스트 모드에서는 로컬 데이터만 로드
+                await viewModel.loadLocalDataOnly()
             }
+            
+            // 데이터가 로드된 후에만 이미지 미리 로드 실행
+            if !viewModel.itemVMs.isEmpty {
+                await loadInitialVisibleImages()
+            }
+//            }
         }
         .onChange(of: viewModel.itemVMs.count) { oldCount, newCount in
             // 데이터가 새로 채워졌을 때 (빈 상태에서 데이터가 들어온 경우)

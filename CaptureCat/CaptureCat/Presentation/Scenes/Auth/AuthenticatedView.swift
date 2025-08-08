@@ -20,7 +20,7 @@ struct AuthenticatedView: View {
     
     var body: some View {
         RouterView(networkManager: networkManager) {
-            TabContainerView(networkManager: networkManager)
+            SyncView(networkManager: networkManager)
         }
         .environment(tabSelection)
         .fullScreenCover(isPresented: Binding(

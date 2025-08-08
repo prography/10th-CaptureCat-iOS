@@ -61,17 +61,7 @@ final class HomeViewModel: ObservableObject {
         isInitialLoading = true
         defer { isInitialLoading = false }
         
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        debugPrint("🔍 - 최종 게스트 여부: \(isGuest)")
-        
-        if isGuest {
-            // 게스트 모드: 로컬에서만 로드
-            loadScreenshotFromLocal()
-        } else {
-            // 로그인 모드: 서버에서만 로드
-            await loadFromServerOnly()
-        }
-        
+        await loadFromServerOnly()
         await loadFavorite()
     }
     

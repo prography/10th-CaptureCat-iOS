@@ -58,6 +58,8 @@ struct RouterView<Content: View>: View {
                             .toolbar(.hidden, for: .navigationBar)
                     case .completeSync(let result):
                         SyncCompletedView(syncResult: result)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }
