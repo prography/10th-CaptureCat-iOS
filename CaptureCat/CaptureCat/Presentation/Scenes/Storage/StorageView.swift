@@ -20,6 +20,7 @@ struct StorageView: View {
                 header
                 ScrollView {
                     selectionBar
+                        .zIndex(1)
                     screenshotGrid
                 }
                 .disabled(AccountStorage.shared.isGuest == true)
