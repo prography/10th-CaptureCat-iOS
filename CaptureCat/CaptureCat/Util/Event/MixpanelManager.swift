@@ -48,6 +48,36 @@ struct MixpanelManager {
             "user_type_before": before.value
         ])
     }
+    
+    //이미 계정이 있고, 로그인 시
+    func identifyUser(userId: String) {
+        // Simplified ID Merge인 경우 identify만으로 익명 행동이 붙는다.
+        mixpanel.identify(distinctId: userId)
+        
+        // people profile 설정 (한 번만 세팅하고 싶으면 setOnce)
+        mixpanel.people.set(properties: [
+            "$user_id": userId, // 내부 고유 ID
+            "last_login": Date()
+        ])
+    }
+    
+    //로그아웃
+    func logout() {
+        mixpanel.reset() // 익명 상태로 초기화, super properties도 지워짐
+    }
+    
+    func withdraw() {
+        mixpanel.people.deleteUser()
+        mixpanel.flush()
+        mixpanel.reset()
+    }
+    
+    //회원 가입 직후
+    func signIn(userId: String) {
+        mixpanel.createAlias(userId, distinctId: mixpanel.distinctId)
+        mixpanel.identify(distinctId: userId)
+    }
+
 }
 
 enum SaveImageEntry {
