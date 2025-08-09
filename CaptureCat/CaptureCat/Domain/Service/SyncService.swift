@@ -29,11 +29,11 @@ final class SyncService: ObservableObject {
         debugPrint("🔄 동기화 시작")
         
         // 0. 토큰 상태 확인
-        guard let accessToken = AccountStorage.shared.accessToken, !accessToken.isEmpty else {
-            debugPrint("❌ 동기화 실패: 유효한 액세스 토큰이 없습니다")
-            return SyncResult(totalCount: 0, successCount: 0, failedCount: 0, failedItems: [])
-        }
-        debugPrint("✅ 동기화 토큰 확인 완료: \(accessToken.prefix(20))...")
+//        guard let accessToken = AccountStorage.shared.accessToken, !accessToken.isEmpty else {
+//            debugPrint("❌ 동기화 실패: 유효한 액세스 토큰이 없습니다")
+//            return SyncResult(totalCount: 0, successCount: 0, failedCount: 0, failedItems: [])
+//        }
+//        debugPrint("✅ 동기화 토큰 확인 완료: \(accessToken.prefix(20))...")
         
         // 1. 로컬 스크린샷 조회
         guard let localScreenshots = try? SwiftDataManager.shared.fetchAllEntities(),

@@ -11,6 +11,10 @@ extension Bundle {
     var kakaoKey: String? {
         object(forInfoDictionaryKey: "KAKAO_API_KEY") as? String
     }
+    
+    var mixpanelToken: String? {
+        object(forInfoDictionaryKey: "MIXPANEL_TOKEN") as? String
+    }
 }
 
 extension Bundle {

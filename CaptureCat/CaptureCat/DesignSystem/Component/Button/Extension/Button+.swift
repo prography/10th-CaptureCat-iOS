@@ -16,7 +16,9 @@ extension Button {
         unselectedForeground: Color = .gray09,
         selectedBorderColor: Color? = nil,
         unselectedBorderColor: Color? = .gray04,
-        icon: Image? = nil
+        icon: Image? = nil,
+        horizontalPadding: CGFloat = 16,
+        verticalPadding: CGFloat = 10
     ) -> some View {
         buttonStyle(
             ChipButtonStyle(
@@ -27,7 +29,9 @@ extension Button {
                 unselectedForeground: unselectedForeground,
                 selectedBorderColor: selectedBorderColor,
                 unselectedBorderColor: unselectedBorderColor,
-                icon: icon
+                icon: icon,
+                horizontalPadding: horizontalPadding,
+                verticalPadding: verticalPadding
             )
         )
     }

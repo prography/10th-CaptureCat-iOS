@@ -18,8 +18,7 @@ struct LogInView: View {
         VStack {
             HStack {
                 Spacer()
-                Button{
-                    viewModel.authenticationState = .guest
+                Button {
                     pushGuest = true
                 } label: {
                     Text("나중에 하기")
@@ -33,7 +32,7 @@ struct LogInView: View {
             Spacer()
             Image(.logInLogo)
             Spacer()
-            ForEach(LogIn.allCases, id:\.self) { type in
+            ForEach(LogIn.allCases, id: \.self) { type in
                 LoginButton(type: type)
                     .onTapGesture {
                         switch type {
@@ -48,7 +47,7 @@ struct LogInView: View {
                 Text("가입하면 캡쳐캣의")
                     .CFont(.caption02Regular)
                     .foregroundStyle(.text03)
-                HStack(spacing: 0) {
+                HStack(spacing: 2) {
                     Button {
                         showTerms = true
                     } label: {

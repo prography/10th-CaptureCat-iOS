@@ -92,7 +92,7 @@ struct SettingsView: View {
                 .foregroundColor(.text01)
             
             Button(action: {
-                authViewModel.isLoginPresented = true
+                authViewModel.authenticationState = .initial
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)

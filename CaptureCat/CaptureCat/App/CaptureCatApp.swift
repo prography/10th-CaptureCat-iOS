@@ -5,10 +5,11 @@
 //  Created by minsong kim on 6/3/25.
 //
 
-import SwiftUI
-import SwiftData
 import KakaoSDKCommon
 import KakaoSDKAuth
+import Mixpanel
+import SwiftUI
+import SwiftData
 
 @main
 struct CaptureCatApp: App {
@@ -23,9 +24,19 @@ struct CaptureCatApp: App {
         return NetworkManager(baseURL: url)
     }
     
+    @StateObject private var authViewModel: AuthViewModel = {
+        guard let url = BaseURLType.production.url else {
+            fatalError("Invalid base URL")
+        }
+        let networkManager = NetworkManager(baseURL: url)
+        let service = AuthService(networkManager: networkManager)
+        return AuthViewModel(service: service)
+    }()
+    
     init() {
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
         UITextField.appearance().tintColor = .gray09
+        Mixpanel.initialize(token: Bundle.main.mixpanelToken ?? "", trackAutomaticEvents: true)
         setupMemoryWarningNotification()
     }
     
@@ -34,10 +45,8 @@ struct CaptureCatApp: App {
             if onBoardingViewModel.isOnBoarding {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
-                let service = AuthService(networkManager: networkManager)
-                
                 AuthenticatedView(networkManager: networkManager)
-                    .environmentObject(AuthViewModel(service: service))
+                    .environmentObject(authViewModel)
                     .environmentObject(HomeViewModel(networkManager: networkManager))
                     .modelContainer(SwiftDataManager.shared.modelContainer)
                     .onOpenURL { url in

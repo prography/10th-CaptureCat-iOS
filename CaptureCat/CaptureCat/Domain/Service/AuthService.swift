@@ -14,8 +14,8 @@ final class AuthService {
         self.networkManager = networkManager
     }
     
-    func login(social: String, idToken: String, nickname: String?) async -> Result<LogInResponseDTO, NetworkError> {
-        let builder = AuthBuilder(social: social, idToken: idToken, nickname: nickname)
+    func login(social: String, idToken: String?, authToken: String?, nickname: String?) async -> Result<LogInResponseDTO, NetworkError> {
+        let builder = AuthBuilder(social: social, idToken: idToken, authToken: authToken, nickname: nickname)
         
         do {
             let response = try await networkManager.fetchLoginData(builder)

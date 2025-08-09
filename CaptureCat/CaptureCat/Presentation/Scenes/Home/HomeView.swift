@@ -35,7 +35,16 @@ struct HomeView: View {
             
             Spacer()
             
-            if viewModel.isInitialLoading || viewModel.isRefreshing {
+            if authViewModel.isAutoLoginInProgress {
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("자동 로그인 중...")
+                        .foregroundStyle(.text02)
+                        .CFont(.body01Regular)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.isInitialLoading || viewModel.isRefreshing {
                 ProgressView(viewModel.isRefreshing ? "새로고침 중..." : "로딩 중...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.itemVMs.isEmpty {
@@ -49,6 +58,7 @@ struct HomeView: View {
                             .CFont(.body01Regular)
                         Button("로그인하기") {
                             authViewModel.authenticationState = .initial
+//                            authViewModel.isLoginPresented = true
                         }
                         .primaryStyle(fillWidth: false)
                         .padding(.top, 16)
@@ -93,22 +103,41 @@ struct HomeView: View {
             }
         }
         .task {
-            // 초기 데이터 로딩 (중복 방지)
-            await viewModel.loadScreenshots()
+            // authenticationState 기반으로 데이터 로딩 (자동로그인 완료 후 실행되도록)
+            await loadDataBasedOnAuthState()
+        }
+        .onChange(of: authViewModel.authenticationState) { _, newState in
+            // 자동로그인 중이 아닐 때만 인증 상태 변경에 따른 데이터 새로고침
+            guard !authViewModel.isAutoLoginInProgress else {
+                debugPrint("🏠 HomeView - 자동로그인 중이므로 authenticationState 변경 무시")
+                return
+            }
             
-            // ✅ 첫 화면에 보이는 이미지들만 병렬로 미리 로드 (선택적)
-            await loadInitialVisibleImages()
-            
-            // ✅ 업로드 완료 후 새로고침이 필요한지 확인
-            if UserDefaults.standard.bool(forKey: "needsRefreshAfterUpload") {
-                UserDefaults.standard.removeObject(forKey: "needsRefreshAfterUpload")
-                debugPrint("🔄 업로드 완료 후 데이터 새로고침 시작")
-                await viewModel.refreshScreenshots()
+            debugPrint("🏠 HomeView - authenticationState 변경됨: \(newState)")
+            Task {
+                await loadDataBasedOnAuthState()
+            }
+        }
+        .onChange(of: viewModel.itemVMs.count) { oldCount, newCount in
+            // 데이터가 새로 채워졌을 때 (빈 상태에서 데이터가 들어온 경우)
+            if oldCount == 0 && newCount > 0 {
+                Task {
+                    await loadInitialVisibleImages()
+                }
             }
         }
         .refreshable {
             // Pull to refresh (중복 실행 방지 적용)
             await viewModel.refreshScreenshots()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .loginSuccessCompleted)) { _ in
+            // 로그인 성공 알림을 받으면 즉시 데이터 새로고침
+            debugPrint("🏠 HomeView - 로그인 성공 notification 수신, 데이터 새로고침 시작")
+            Task {
+                // 약간의 지연을 두어 인증 상태가 완전히 안정화된 후 실행
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
+                await loadDataBasedOnAuthState()
+            }
         }
     }
     
@@ -241,17 +270,63 @@ struct HomeView: View {
     
     // MARK: - Image Loading Helpers
     
-    /// 첫 화면에 보이는 이미지들을 병렬로 미리 로드
+    /// 첫 화면에 보이는 이미지들을 병렬로 미리 로드 (안전한 버전)
     private func loadInitialVisibleImages() async {
-        let visibleCount = min(6, viewModel.itemVMs.count) // 첫 화면에 보이는 6개 정도
+        // 빈 배열 체크 + 이중 검증
+        guard !viewModel.itemVMs.isEmpty, viewModel.itemVMs.count > 0 else {
+            debugPrint("📷 로드할 이미지가 없음 (count: \(viewModel.itemVMs.count))")
+            return
+        }
         
-        // ✅ 병렬 로딩으로 여러 이미지를 동시에 다운로드
+        let visibleCount = min(6, viewModel.itemVMs.count)
+        debugPrint("📷 초기 이미지 로딩 시작: \(visibleCount)개 (전체: \(viewModel.itemVMs.count)개)")
+        
+        // enumerated()를 사용해서 안전하게 접근
+        let itemsToLoad = Array(viewModel.itemVMs.prefix(visibleCount))
+        
+        // 로드할 아이템이 실제로 있는지 한번 더 확인
+        guard !itemsToLoad.isEmpty else {
+            debugPrint("📷 prefix로 가져온 아이템이 없음")
+            return
+        }
+        
+        // 각 이미지를 개별 Task로 로딩
         await withTaskGroup(of: Void.self) { group in
-            for i in 0..<visibleCount {
-                group.addTask {
-                    await viewModel.itemVMs[i].loadFullImage()
+            for (index, item) in itemsToLoad.enumerated() {
+                group.addTask { [item] in
+                    debugPrint("📷 이미지 로딩 시작: \(index) - ID: \(item.id)")
+                    await item.loadFullImage()
+                    debugPrint("✅ 이미지 로딩 완료: \(index) - ID: \(item.id)")
                 }
             }
+        }
+        
+        debugPrint("✅ 초기 이미지 로딩 전체 완료")
+    }
+    
+    /// 인증 상태에 따른 데이터 로딩
+    private func loadDataBasedOnAuthState() async {
+        let authState = authViewModel.authenticationState
+        debugPrint("🏠 HomeView - 현재 인증 상태: \(authState)")
+        
+        switch authState {
+        case .signIn:
+            // 로그인 상태: 서버 데이터 로드
+            debugPrint("🏠 로그인 상태 - 서버 데이터 로딩")
+            await viewModel.loadScreenshots()
+        case .guest:
+            // 게스트 상태: 로컬 데이터만 로드
+            debugPrint("🏠 게스트 상태 - 로컬 데이터 로딩")
+            await viewModel.loadLocalDataOnly()
+        case .initial:
+            // 초기 상태: 자동로그인 진행 중이므로 대기
+            debugPrint("🏠 초기 상태 - 자동로그인 진행 중, 데이터 로딩 대기")
+            return
+        }
+        
+        // 데이터 로딩 완료 후 이미지 미리 로드
+        if !viewModel.itemVMs.isEmpty {
+            await loadInitialVisibleImages()
         }
     }
     

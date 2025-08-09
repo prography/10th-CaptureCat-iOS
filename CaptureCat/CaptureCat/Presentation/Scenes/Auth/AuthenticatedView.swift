@@ -19,20 +19,18 @@ struct AuthenticatedView: View {
     }
     
     var body: some View {
-        ZStack {
-            switch authViewModel.authenticationState {
-            case .syncing:
-                SyncProgressView().environmentObject(authViewModel)
-            case .syncCompleted:
-                SyncCompletedView(syncResult: authViewModel.syncResult!).environmentObject(authViewModel)
-            case .initial, .signIn, .guest:
-                RouterView(networkManager: networkManager) {
-                    TabContainerView(networkManager: networkManager)
-                }
-                .environment(tabSelection)
-            }
+        RouterView(networkManager: networkManager) {
+            SyncView(networkManager: networkManager)
         }
-        .fullScreenCover(isPresented: $authViewModel.isLoginPresented) {
+        .environment(tabSelection)
+        .fullScreenCover(isPresented: Binding(
+            get: { 
+                let shouldShow = authViewModel.authenticationState == .initial
+                debugPrint("🔍 AuthenticatedView - authenticationState: \(authViewModel.authenticationState), shouldShow: \(shouldShow)")
+                return shouldShow
+            },
+            set: { _ in }
+        )) {
             NavigationStack {
                 LogInView()
             }
@@ -41,11 +39,18 @@ struct AuthenticatedView: View {
             transaction.disablesAnimations = true
         }
         .task {
-            authViewModel.checkAutoLogin()
-            
-            if authViewModel.hasLocalData() {
-                authViewModel.authenticationState = .syncing
+            if KeyChainModule.read(key: .accessToken) != nil {
+                debugPrint("🔄 AccessToken 발견 - 자동로그인 시작")
+                authViewModel.checkAutoLogin()
+            } else {
+                debugPrint("🔄 AccessToken 없음 - 게스트 모드로 설정")
+                authViewModel.authenticationState = .guest
+                authViewModel.isAutoLoginInProgress = false
             }
+            // 동기화 체크는 로그인 성공 후에만 수행하도록 AuthViewModel에서 처리
+        }
+        .onChange(of: authViewModel.authenticationState) { oldValue, newValue in
+            debugPrint("🔄 AuthenticatedView - authenticationState 변경: \(oldValue) -> \(newValue)")
         }
     }
 }

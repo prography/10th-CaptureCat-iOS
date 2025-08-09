@@ -21,20 +21,14 @@ class AuthViewModel: ObservableObject {
     private let authService: AuthService
     var nickname: String = "캐치님"
     
-    @Published var authenticationState: AuthenticationState = .initial {
-        didSet {
-            if authenticationState == .initial {
-                isLoginPresented = true
-            }
-        }
-    }
+    @Published var authenticationState: AuthenticationState = .initial
+    @Published var isAutoLoginInProgress: Bool = false
     
     @Published var isLoginPresented: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
-    @Published var syncResult: SyncResult? // 동기화 결과 저장
     
     init(service: AuthService) {
         self.authService = service
@@ -42,20 +36,43 @@ class AuthViewModel: ObservableObject {
     }
     
     func checkAutoLogin() {
-        checkAppleLoginStatus()
-        checkKakaoLoginStatus()
+        isAutoLoginInProgress = true
+        debugPrint("🔄 자동로그인 시작")
+        
+        // 병렬로 토큰 체크하여 속도 최적화
+        let hasAppleToken = KeyChainModule.read(key: .appleToken)?.isEmpty == false
+        let hasKakaoToken = KeyChainModule.read(key: .kakaoToken)?.isEmpty == false
+        
+        if hasAppleToken {
+            debugPrint("🍏 Apple 토큰 발견 - Apple 자동로그인 시도")
+            if let appleId = KeyChainModule.read(key: .appleToken) {
+                checkAppleLoginStatus(appleId: appleId)
+            }
+        } else if hasKakaoToken {
+            debugPrint("🟡 카카오 토큰 발견 - 카카오 자동로그인 시도")
+            checkKakaoLoginStatus()
+        } else {
+            debugPrint("⚠️ 저장된 토큰 없음 - 게스트 모드로 전환")
+            DispatchQueue.main.async {
+                self.authenticationState = .initial
+                self.isAutoLoginInProgress = false
+            }
+        }
     }
     
-    private func checkAppleLoginStatus() {
-        // Apple ID가 저장되어 있는지 확인
-        guard let appleId = KeyChainModule.read(key: .appleToken),
-                !appleId.isEmpty else {
-            debugPrint("⚠️ Apple ID가 저장되어 있지 않음 - Apple 자동로그인 스킵")
-            return
-        }
-        
+    private func checkAppleLoginStatus(appleId: String) {
         let provider = ASAuthorizationAppleIDProvider()
+        
+        // 타임아웃 설정 (3초 후 카카오 fallback)
+        let timeoutTask = DispatchWorkItem { [weak self] in
+            debugPrint("⏰ Apple ID 상태 확인 타임아웃 - 카카오 로그인으로 fallback")
+            self?.checkKakaoLoginStatus()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: timeoutTask)
+        
         provider.getCredentialState(forUserID: appleId) { [weak self] state, error in
+            // 타임아웃 작업 취소
+            timeoutTask.cancel()
             DispatchQueue.main.async {
                 if let error = error {
                     debugPrint("🍏❌ Apple ID 상태 확인 실패: \(error.localizedDescription)")
@@ -66,18 +83,21 @@ class AuthViewModel: ObservableObject {
                 switch state {
                 case .authorized:
                     debugPrint("🍏✅ Apple ID 인증 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn //문제의 원인
+                    self?.handleLoginSuccess()
                 case .revoked:
-                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 로그인 화면 표시")
+                    debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 게스트 모드로 전환")
                     self?.cleanupAppleTokens()
                     self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                 case .notFound:
-                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리 후 로그인 화면 표시")
+                    debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리 후 게스트 모드로 전환")
                     self?.cleanupAppleTokens()
                     self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                 default:
-                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue) - 로그인 화면 표시")
+                    debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue) - 게스트 모드로 전환")
                     self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                 }
             }
         }
@@ -88,16 +108,19 @@ class AuthViewModel: ObservableObject {
             DispatchQueue.main.async {
                 if let error = error {
                     debugPrint("🟡❌ 카카오 토큰 확인 실패: \(error.localizedDescription)")
-                    self?.handleKakaoLoginFallback(error: error)
+//                    self?.handleKakaoLoginFallback(error: error)
+                    self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                     return
                 }
                 
                 if info != nil {
                     debugPrint("🟡✅ 카카오 토큰 유효 - 자동 로그인 진행")
-                    self?.authenticationState = .signIn //문제 원인
+                    self?.handleLoginSuccess()
                 } else {
                     debugPrint("🟡⚠️ 카카오 토큰 정보 없음 - 로그인 화면 표시")
                     self?.authenticationState = .initial
+                    self?.isAutoLoginInProgress = false
                 }
             }
         }
@@ -113,15 +136,17 @@ class AuthViewModel: ObservableObject {
             // 네트워크 오류시 기존 서버 토큰이 있으면 사용
             if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
                 debugPrint("🍏💾 기존 서버 토큰 발견 - 자동 로그인 시도")
-                self.authenticationState = .signIn // 문제 원인
+                self.handleLoginSuccess()
             } else {
                 debugPrint("🍏⚠️ 기존 서버 토큰 없음 - 로그인 화면 표시")
                 self.authenticationState = .initial
+                self.isAutoLoginInProgress = false
             }
         } else {
             debugPrint("🍏🧹 Apple 인증 오류 - 토큰 정리 후 로그인 화면 표시")
             cleanupAppleTokens()
             self.authenticationState = .initial
+            self.isAutoLoginInProgress = false
         }
     }
     
@@ -135,7 +160,7 @@ class AuthViewModel: ObservableObject {
             // 네트워크 오류시 기존 서버 토큰이 있으면 사용
             if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
                 debugPrint("🟡💾 기존 서버 토큰 발견 - 자동 로그인 시도")
-                self.authenticationState = .signIn
+                self.handleLoginSuccess()
             } else {
                 debugPrint("🟡⚠️ 기존 서버 토큰 없음 - 로그인 화면 표시")
                 self.authenticationState = .initial
@@ -166,14 +191,18 @@ class AuthViewModel: ObservableObject {
                 switch result {
                 case .success(let token):
                     debugPrint("🟡 카카오에서 토큰 값 가져오기 성공 \(token) 🟡")
-                    let kakaoSignIn = await authService.login(social: "kakao", idToken: token, nickname: nil)
+                    let kakaoSignIn = await authService.login(
+                        social: "kakao",
+                        idToken: token.idToken,
+                        authToken: token.authToken,
+                        nickname: nil
+                    )
                     
                     switch kakaoSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
                         KeyChainModule.create(key: .kakaoToken, data: "true")
-                        KeyChainModule.create(key: .didStarted, data: "\(success.data.tutorialCompleted)")
-                        await handleLoginSuccess()
+                        handleLoginSuccess(/*isTutorial: success.data.tutorialCompleted*/)
                     case .failure(let failure):
                         debugPrint("🟡🔴 카카오 로그인 완전 실패 \(failure.localizedDescription) 🟡🔴")
                         self.authenticationState = .initial
@@ -190,17 +219,23 @@ class AuthViewModel: ObservableObject {
                 
                 switch result {
                 case .success(let token):
-                    let appleSignIn = await authService.login(social: "apple", idToken: token.0, nickname: token.1)
+                    let appleSignIn = await authService.login(
+                        social: "apple",
+                        idToken: nil,
+                        authToken: token.0,
+                        nickname: token.1
+                    )
                     
                     switch appleSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
-                        KeyChainModule.create(key: .didStarted, data: "\(success.data.tutorialCompleted)")
-                        await handleLoginSuccess()
+                        handleLoginSuccess()
                     case .failure(let failure):
+                        self.authenticationState = .initial
                         debugPrint("🔴🍎 apple sign in 함수 실패 \(failure.localizedDescription)🔴🍎")
                     }
                 case .failure(let failure):
+                    self.authenticationState = .initial
                     debugPrint("🔴🍎🔴 애플 토큰 실패 \(failure.localizedDescription) 🔴🍎🔴")
                 }
             }
@@ -210,11 +245,15 @@ class AuthViewModel: ObservableObject {
     func logOut() {
         safelyCleanupAllTokens()
         clearAllCacheData()
-        self.authenticationState = .initial
+        DispatchQueue.main.async {
+            self.authenticationState = .initial
+        }
+//        MixpanelManager.shared.logout()
     }
     
     func withdraw() {
         KeyChainModule.delete(key: .didStarted)
+//        MixpanelManager.shared.withdraw()
         Task {
             let result = await authService.withdraw()
             
@@ -222,53 +261,37 @@ class AuthViewModel: ObservableObject {
             case .success (_):
                 safelyCleanupAllTokens()
                 clearAllCacheData()
-                self.authenticationState = .initial
+                safelyCleanupUserDefaults()
+                DispatchQueue.main.async {
+                    self.authenticationState = .initial
+                }
             case .failure (let error):
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
                 self.errorToast = true
             }
         }
     }
-    
-    // MARK: - 동기화 관련 메서드
-    
-    /// 로그인 성공 시 동기화 로직 처리
-    private func handleLoginSuccess() async {
-        // 토큰 저장이 완전히 완료될 때까지 잠시 대기
-        await waitForTokenSaved()
+
+    private func handleLoginSuccess(/*isTutorial: Bool*/) {
+//        if isTutorial == false {
+//            MixpanelManager.shared.signIn(userId: "")
+//        }
         
-        if hasLocalData() {
-            debugPrint("🔄 로그인 성공 + 로컬 데이터 존재 → 동기화 시작")
-            self.authenticationState = .syncing
-        } else {
-            debugPrint("🔄 로그인 성공 + 로컬 데이터 없음 → 바로 메인화면")
+        debugPrint("🔄 handleLoginSuccess 호출됨")
+        DispatchQueue.main.async {
+            debugPrint("🔄 authenticationState 변경 전: \(self.authenticationState)")
             self.authenticationState = .signIn
-        }
-    }
-    
-    /// 토큰이 저장될 때까지 대기
-    private func waitForTokenSaved() async {
-        // 최대 3초까지 0.1초 간격으로 토큰 확인
-        for _ in 0..<30 {
-            if let accessToken = AccountStorage.shared.accessToken, !accessToken.isEmpty {
-                debugPrint("✅ 토큰 저장 확인 완료: \(accessToken.prefix(20))...")
-                return
+            self.isAutoLoginInProgress = false
+            debugPrint("🔄 authenticationState 변경 후: \(self.authenticationState)")
+            self.isLoginPresented = false
+            debugPrint("🔄 isLoginPresented 변경: \(self.isLoginPresented)")
+            debugPrint("✅ 자동로그인 완료")
+            
+            // 모든 상태 업데이트가 완료된 후 notification 전송
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                NotificationCenter.default.post(name: .loginSuccessCompleted, object: nil)
+                debugPrint("📢 로그인 성공 notification 전송 완료")
             }
-            debugPrint("⏳ 토큰 저장 대기 중...")
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
-        }
-        debugPrint("⚠️ 토큰 저장 확인 실패 - 타임아웃")
-    }
-    
-    /// 로컬에 동기화할 데이터가 있는지 확인
-    func hasLocalData() -> Bool {
-        do {
-            let localCount = try SwiftDataManager.shared.fetchAllEntities().count
-            debugPrint("📱 로컬 스크린샷 개수: \(localCount)개")
-            return localCount > 0
-        } catch {
-            debugPrint("❌ 로컬 데이터 확인 실패: \(error)")
-            return false
         }
     }
     
@@ -343,7 +366,9 @@ class AuthViewModel: ObservableObject {
         clearAllCacheData()
         
         // 로그인 화면 표시
-        self.authenticationState = .initial
+        DispatchQueue.main.async {
+            self.authenticationState = .initial
+        }
         
         debugPrint("✅ 토큰 갱신 실패로 인한 로그인 화면 전환 완료")
     }

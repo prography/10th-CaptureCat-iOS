@@ -8,7 +8,7 @@
 import Foundation
 
 struct UpdateTagBuilder: BuilderProtocol {
-    typealias Response = ResponseDTO
+    typealias Response = TagListDTO
     
     var path: String = PathURLType.imagePages.path()
     var queries: [URLQueryItem]?

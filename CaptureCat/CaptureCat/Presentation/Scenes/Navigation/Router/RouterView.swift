@@ -28,6 +28,12 @@ struct RouterView<Content: View>: View {
                     case .startGetScreenshot:
                         let viewModel = StartGetScreenshotViewModel(service: TutorialService(networkManager: networkManager))
                         StartGetScreenshotView(viewModel: viewModel)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+                    case .permission:
+                        PermissionView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     case .tag(let ids):
                         let viewModel = TagViewModel(itemsIds: ids, networkManager: networkManager, router: router)
                         TagView(viewModel: viewModel)
@@ -48,6 +54,10 @@ struct RouterView<Content: View>: View {
                             .toolbar(.hidden, for: .navigationBar)
                     case .completeSave(let count):
                         UploadCompleteView(count: count)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+                    case .completeSync(let result):
+                        SyncCompletedView(syncResult: result)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     }

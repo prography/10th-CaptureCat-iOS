@@ -21,6 +21,8 @@
 	<array>
 		<string>kakaokompassauth</string>
 	</array>
+	<key>MIXPANEL_TOKEN</key>
+	<string>$(MIXPANEL_TOKEN)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-SemiBold.otf</string>

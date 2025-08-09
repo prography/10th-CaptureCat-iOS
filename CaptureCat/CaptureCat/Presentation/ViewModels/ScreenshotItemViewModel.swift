@@ -93,11 +93,25 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     
     // MARK: – User Actions
     func toggleFavorite() {
-        // Repository를 통해 즐겨찾기 상태 토글 (자동 분기 처리)
+        // 게스트 모드에서는 즐겨찾기 기능 비활성화
+        if AccountStorage.shared.isGuest ?? true {
+            debugPrint("🔍 게스트 모드 - 즐겨찾기 기능 비활성화")
+            return
+        }
+        
+        // Repository를 통해 즐겨찾기 상태 토글 (현재 상태를 명시적으로 전달)
         Task {
             do {
-                try await ScreenshotRepository.shared.toggleFavorite(id: id)
-                debugPrint("✅ 즐겨찾기 상태 토글 완료: \(id)")
+                let previousState = isFavorite
+                // 🔧 현재 상태를 명시적으로 전달하여 더 안전한 토글
+                try await ScreenshotRepository.shared.toggleFavorite(id: id, currentState: isFavorite)
+                
+                // ✅ API 성공 시 UI 상태 업데이트
+                await MainActor.run {
+                    self.isFavorite = !previousState
+                }
+                
+                debugPrint("✅ 즐겨찾기 상태 토글 완료: \(id) (\(previousState) -> \(isFavorite))")
             } catch {
                 debugPrint("❌ 즐겨찾기 상태 토글 실패: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
@@ -196,6 +210,10 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         do {
             try await ScreenshotRepository.shared.saveToServerOnly(self)
             debugPrint("✅ 서버 저장 완료: \(fileName)")
+            
+            // 이미지 저장 완료 notification 전송
+            NotificationCenter.default.post(name: .imageSaveCompleted, object: nil)
+            debugPrint("📢 이미지 저장 완료 notification 전송")
         } catch {
             errorMessage = error.localizedDescription
             debugPrint("❌ 서버 저장 실패: \(error.localizedDescription)")

@@ -71,7 +71,7 @@ struct TagView: View {
                     // TagEditCompleted 알림은 홈으로 돌아간 후에 발생시키도록 UploadCompleteView로 이동
                 }
             },
-            isSaveEnabled: viewModel.hasChanges && !viewModel.isUploading
+            isSaveEnabled: true
         )
     }
     
@@ -400,7 +400,7 @@ struct TagView: View {
     }
     
     func myXOffset(_ item: Int) -> Double {
-        return -distance(item) * 260  // 부호 반전으로 애니메이션 방향 수정
+        return -distance(item) * 280  // 부호 반전으로 애니메이션 방향 수정
     }
     
     /// 아이템 안전 삭제 (큐 시스템 사용)

@@ -40,7 +40,7 @@ final class HomeViewModel: ObservableObject {
     init(networkManager: NetworkManager) {
         self.netwworkManager = networkManager
         setupNotificationObservers()
-        Task { await loadScreenshots() }
+        // 로그인 후에 명시적으로 호출하도록 변경 - 자동 로딩 제거
     }
     
     deinit {
@@ -61,18 +61,23 @@ final class HomeViewModel: ObservableObject {
         isInitialLoading = true
         defer { isInitialLoading = false }
         
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        debugPrint("🔍 - 최종 게스트 여부: \(isGuest)")
-        
-        if isGuest {
-            // 게스트 모드: 로컬에서만 로드
-            loadScreenshotFromLocal()
-        } else {
-            // 로그인 모드: 서버에서만 로드
-            await loadFromServerOnly()
+        await loadFromServerOnly()
+        await loadFavorite()
+    }
+    
+    /// 게스트 모드 전용: 로컬 데이터만 로드 (서버 호출 없음)
+    func loadLocalDataOnly() async {
+        guard !isInitialLoading else { 
+            debugPrint("⚠️ 이미 초기 로딩 중 - loadLocalDataOnly 스킵")
+            return 
         }
         
-        await loadFavorite()
+        isInitialLoading = true
+        defer { isInitialLoading = false }
+        
+        debugPrint("🔍 게스트 모드 - 로컬 데이터만 로드")
+        loadScreenshotFromLocal()
+        // 게스트 모드에서는 즐겨찾기 기능이 서버 기반이므로 로드하지 않음
     }
     
     /// 강제 새로고침 (삭제 후 등에 사용) - 중복 실행 방지
@@ -110,12 +115,25 @@ final class HomeViewModel: ObservableObject {
         canLoadMorePages = true
         itemVMs = []
         
-        await loadScreenshots()
+        // 로그인 상태에 따라 적절한 로딩 방식 선택
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if !isGuest {
+            await loadScreenshots()
+        } else {
+            await loadLocalDataOnly()
+        }
         
         debugPrint("✅ 전체 새로고침 완료")
     }
     
     func loadNextPageServer() async {
+        // 게스트 모드에서는 서버 페이징 불가
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if isGuest {
+            debugPrint("🔍 게스트 모드 - 서버 페이징 스킵")
+            return
+        }
+        
         guard !isLoadingPage, canLoadMorePages else { return }
         isLoadingPage = true
         defer { isLoadingPage = false }
@@ -180,6 +198,13 @@ final class HomeViewModel: ObservableObject {
     }
     
     func loadFavorite() async {
+        // 게스트 모드에서는 즐겨찾기 로드하지 않음
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if isGuest {
+            debugPrint("🔍 게스트 모드 - 즐겨찾기 로드 스킵")
+            return
+        }
+        
         do {
             let serverItems = try await repository.loadFavoriteFromServerOnly(page: 0, size: 20)
             
@@ -205,6 +230,13 @@ final class HomeViewModel: ObservableObject {
     
     /// 즐겨찾기 다음 페이지 로드
     func loadNextFavoritePage() async {
+        // 게스트 모드에서는 즐겨찾기 페이징 불가
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        if isGuest {
+            debugPrint("🔍 게스트 모드 - 즐겨찾기 페이징 스킵")
+            return
+        }
+        
         guard !isLoadingFavoritePage, canLoadMoreFavoritePages else { return }
         isLoadingFavoritePage = true
         defer { isLoadingFavoritePage = false }
@@ -426,6 +458,46 @@ final class HomeViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
+        
+        // 낙관적 업데이트 완료 알림 (즉시 로컬 데이터 새로고침)
+        NotificationCenter.default.publisher(for: .optimisticUpdateCompleted)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleOptimisticUpdateCompleted()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 서버 동기화 실패 알림 (사용자에게 알림 표시)
+        NotificationCenter.default.publisher(for: .serverSyncFailed)
+            .compactMap { notification in
+                notification.userInfo?["error"] as? String
+            }
+            .sink { [weak self] errorMessage in
+                Task { @MainActor in
+                    await self?.handleServerSyncFailure(errorMessage: errorMessage)
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 로그인 성공 알림 (홈화면 데이터 새로고침)
+        NotificationCenter.default.publisher(for: .loginSuccessCompleted)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleLoginSuccessCompleted()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 이미지 저장 완료 알림 (홈화면 데이터 새로고침)
+        NotificationCenter.default.publisher(for: .imageSaveCompleted)
+            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main) // 500ms 디바운싱
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleImageSaveCompleted()
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func updateFavoriteStatus(_ favoriteInfo: FavoriteStatusInfo) {
@@ -433,6 +505,12 @@ final class HomeViewModel: ObservableObject {
         if let itemIndex = itemVMs.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
             itemVMs[itemIndex].isFavorite = favoriteInfo.isFavorite
             debugPrint("✅ HomeView - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
+        }
+        
+        // 🔧 캐시도 함께 업데이트 (로그인 모드인 경우)
+        if !(AccountStorage.shared.isGuest ?? true) {
+            InMemoryScreenshotCache.shared.updateFavorite(id: favoriteInfo.imageId, isFavorite: favoriteInfo.isFavorite)
+            debugPrint("✅ HomeView - 캐시 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
         }
         
         // favoriteItemVMs에서 해당 아이템 처리
@@ -461,5 +539,169 @@ final class HomeViewModel: ObservableObject {
                 await loadFavorite()
             }
         }
+    }
+    
+    // MARK: - Optimistic Update Handling
+    
+    /// 낙관적 업데이트 완료 처리 (즉시 로컬 데이터 새로고침)
+    private func handleOptimisticUpdateCompleted() async {
+        debugPrint("🚀 낙관적 업데이트 완료 - 즉시 로컬 데이터 새로고침")
+        
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        
+        if isGuest {
+            // 게스트 모드: 로컬 데이터 즉시 새로고침
+            loadScreenshotFromLocal()
+        } else {
+            // 로그인 모드: 로컬 + 캐시에서 즉시 새로고침 (서버는 백그라운드에서 동기화)
+            await refreshFromLocalAndCache()
+        }
+        
+        // 즐겨찾기도 함께 새로고침
+        await loadFavorite()
+        
+        debugPrint("✅ 낙관적 업데이트 후 즉시 새로고침 완료")
+    }
+    
+    /// 로컬과 캐시에서 즉시 새로고침 (로그인 모드용)
+    private func refreshFromLocalAndCache() async {
+        debugPrint("🔄 로컬 + 캐시에서 즉시 새로고침")
+        
+        do {
+            // 로컬 SwiftData와 메모리 캐시를 결합해서 최신 데이터 구성
+            let localItems = try SwiftDataManager.shared.fetchAllEntities()
+            let cachedVMs = InMemoryScreenshotCache.shared.retrieveAll()
+            
+            // 로컬 데이터를 ViewModel로 변환
+            let localVMs = localItems.map { ScreenshotItemViewModel(model: ScreenshotItem(entity: $0)) }
+            
+            // 캐시 데이터와 병합 (ID 기준으로 중복 제거)
+            var mergedVMs: [ScreenshotItemViewModel] = []
+            var seenIDs: Set<String> = []
+            
+            // 로컬 데이터 우선 (최신 태그 정보 포함)
+            for vm in localVMs {
+                if !seenIDs.contains(vm.id) {
+                    seenIDs.insert(vm.id)
+                    mergedVMs.append(vm)
+                }
+            }
+            
+            // 캐시 데이터 추가 (로컬에 없는 서버 데이터)
+            for cachedVM in cachedVMs {
+                if !seenIDs.contains(cachedVM.id) {
+                    seenIDs.insert(cachedVM.id)
+                    mergedVMs.append(cachedVM)
+                }
+            }
+            
+            // UI 업데이트
+            await MainActor.run {
+                self.itemVMs = mergedVMs
+                debugPrint("✅ 로컬 + 캐시 즉시 새로고침 완료: \(mergedVMs.count)개")
+            }
+            
+        } catch {
+            debugPrint("❌ 로컬 + 캐시 새로고침 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 서버 동기화 실패 처리 (사용자에게 알림)
+    private func handleServerSyncFailure(errorMessage: String) async {
+        debugPrint("❌ 서버 동기화 실패 알림 수신: \(errorMessage)")
+        
+        // TODO: Toast나 Alert로 사용자에게 알림
+        // 현재는 로그만 출력, 추후 UI 컴포넌트 추가 가능
+        
+        // 로컬 데이터는 이미 롤백되었으므로 UI 새로고침
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        
+        if isGuest {
+            loadScreenshotFromLocal()
+        } else {
+            await refreshFromLocalAndCache()
+        }
+        
+        debugPrint("✅ 서버 동기화 실패 후 UI 복원 완료")
+    }
+    
+    /// 로그인 성공 후 홈화면 데이터 새로고침
+    @MainActor
+    private func handleLoginSuccessCompleted() async {
+        debugPrint("📢 로그인 성공 알림 수신 - 홈화면 데이터 새로고침 시작")
+        
+        // 기존 데이터 상태 초기화
+        page = 0
+        favoritePage = 0
+        canLoadMorePages = true
+        canLoadMoreFavoritePages = true
+        itemVMs = []
+        favoriteItemVMs = []
+        currentFavoriteIndex = 0
+        
+        // 로그인 상태로 전체 데이터 새로고침
+        await loadScreenshots()
+        
+        // 데이터 로딩 완료 후 첫 화면 이미지들 미리 로드
+        if !itemVMs.isEmpty {
+            await loadInitialVisibleImagesForNotification()
+        }
+        
+        debugPrint("✅ 로그인 성공 후 홈화면 데이터 새로고침 완료")
+    }
+    
+    /// Notification으로 트리거된 이미지 미리 로딩 (HomeView의 loadInitialVisibleImages와 동일한 로직)
+    private func loadInitialVisibleImagesForNotification() async {
+        guard !itemVMs.isEmpty, itemVMs.count > 0 else {
+            debugPrint("📷 Notification - 로드할 이미지가 없음 (count: \(itemVMs.count))")
+            return
+        }
+        
+        let visibleCount = min(6, itemVMs.count)
+        debugPrint("📷 Notification - 초기 이미지 로딩 시작: \(visibleCount)개 (전체: \(itemVMs.count)개)")
+        
+        let itemsToLoad = Array(itemVMs.prefix(visibleCount))
+        
+        guard !itemsToLoad.isEmpty else {
+            debugPrint("📷 Notification - prefix로 가져온 아이템이 없음")
+            return
+        }
+        
+        // 각 이미지를 개별 Task로 로딩
+        await withTaskGroup(of: Void.self) { group in
+            for (index, item) in itemsToLoad.enumerated() {
+                group.addTask { [item] in
+                    debugPrint("📷 Notification - 이미지 로딩 시작: \(index) - ID: \(item.id)")
+                    await item.loadFullImage()
+                    debugPrint("✅ Notification - 이미지 로딩 완료: \(index) - ID: \(item.id)")
+                }
+            }
+        }
+        
+        debugPrint("✅ Notification - 초기 이미지 로딩 전체 완료")
+    }
+    
+    /// 이미지 저장 완료 후 홈화면 데이터 새로고침
+    @MainActor
+    private func handleImageSaveCompleted() async {
+        debugPrint("📢 이미지 저장 완료 알림 수신 - 홈화면 데이터 새로고침 시작")
+        
+        // 게스트 모드인지 확인
+        let isGuest = AccountStorage.shared.isGuest ?? true
+        
+        if isGuest {
+            // 게스트 모드: 로컬 데이터만 새로고침
+            debugPrint("🔍 게스트 모드 - 로컬 데이터만 새로고침")
+            loadScreenshotFromLocal()
+        } else {
+            // 로그인 모드: 서버 데이터 새로고침 (첫 페이지만)
+            debugPrint("🔍 로그인 모드 - 서버 첫 페이지 새로고침")
+            page = 0
+            canLoadMorePages = true
+            await loadFromServerOnly()
+            await loadFavorite() // 즐겨찾기도 함께 새로고침
+        }
+        
+        debugPrint("✅ 이미지 저장 완료 후 홈화면 데이터 새로고침 완료")
     }
 }

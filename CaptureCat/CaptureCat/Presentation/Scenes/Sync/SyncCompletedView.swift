@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct SyncCompletedView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
+    @Environment(TabSelection.self) private var tabs
+    @EnvironmentObject var router: Router
     let syncResult: SyncResult
     @State private var showDetailResults = false
     @State private var scaleEffect: CGFloat = 0.8
@@ -31,8 +32,12 @@ struct SyncCompletedView: View {
             // 계속하기 버튼
             VStack(spacing: 12) {
                 Button("다음") {
-                    debugPrint("🚀 SyncCompletedView: 메인 화면으로 이동")
-                    authViewModel.authenticationState = .signIn
+                    debugPrint("🚀 SyncCompletedView: 동기화 완료 알림 발송 및 메인 화면으로 이동")
+                    NotificationCenter.default.post(name: .syncCompleted, object: nil)
+                    NotificationCenter.default.post(name: .imageSaveCompleted, object: nil)
+                    debugPrint("📢 이미지 저장 완료 notification 전송")
+                    router.popToRoot()
+                    tabs.go(.home)
                 }
                 .primaryStyle()
                 .padding(.horizontal, 16)

@@ -50,6 +50,9 @@ struct TabContainerView: View {
         }
         .onAppear {
             if KeyChainModule.read(key: .didStarted) == "true" {
+                Task {
+                    await TutorialService(networkManager: networkManager).turorialComplete()
+                }
                 showTutorial = false
             } else {
                 showTutorial = true

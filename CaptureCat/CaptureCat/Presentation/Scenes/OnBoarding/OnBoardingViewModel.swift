@@ -17,7 +17,7 @@ class OnBoardingViewModel {
     var isOnBoarding: Bool = true
     
     init() {
-        if KeyChainModule.read(key: .didStarted) == "true" {
+        if KeyChainModule.read(key: .didOnboarding) == "true" {
             self.isOnBoarding = false
         }
     }
@@ -27,6 +27,7 @@ class OnBoardingViewModel {
             currentPage += 1
         } else {
             isOnBoarding = false
+            KeyChainModule.create(key: .didOnboarding, data: "true")
         }
     }
 
@@ -38,6 +39,7 @@ class OnBoardingViewModel {
     
     func skipOnBoarding() {
         isOnBoarding = false
+        KeyChainModule.create(key: .didOnboarding, data: "true")
     }
 }
 

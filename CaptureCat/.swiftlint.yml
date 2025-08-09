@@ -10,6 +10,12 @@ disabled_rules:
   - trailing_comma            # 마지막 콤마 있어도 됨
   - explicit_enum_raw_value   # 열거형 원시값 명시적으로 안 넣어줘도 됨
   - missing_docs              # public/open 접근제어자에 문서화 주석 없어도 됨
+  - unused_closure_parameter  # 미사용 클로저 파라미터 _ 대체
+  - syntactic_sugar           # 간결한 표현 (Array 대신 [Int] 등의 표현)
+  - todo                      # TODO, FIXME 주석 제한
+  - closure_parameter_position # 클로저 매개변수 위치 (중괄호와 같은 행)
+  - for_where                 # for where 절 선호 (for 문 내 if 사용 대체)
+  - type_body_length
 
 # 활성화할 옵트인(opt-in) 규칙
 opt_in_rules:

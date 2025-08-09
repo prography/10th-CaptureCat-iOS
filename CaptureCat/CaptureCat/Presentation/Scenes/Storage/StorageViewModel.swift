@@ -16,7 +16,6 @@ final class StorageViewModel: ObservableObject {
     @Published var showDeleteFailurePopup = false
     @Published var askDeletePopUp = false
     @Published var showOverlimitToast = false
-    @Published var showCountToast = false
     @Published var isAllSelected = false
     @Published var showPermissionAlert = false
     
@@ -65,8 +64,6 @@ final class StorageViewModel: ObservableObject {
             selectedIDs.remove(id)
             if isAllSelected {
                 isAllSelected = false
-            } else {
-                triggerCountToast()
             }
             return
         }
@@ -78,7 +75,6 @@ final class StorageViewModel: ObservableObject {
         }
         
         selectedIDs.insert(id)
-        triggerCountToast()
     }
     
     func toggleAllSelection() {
@@ -124,10 +120,6 @@ final class StorageViewModel: ObservableObject {
     }
     
     // MARK: - Private
-    private func triggerCountToast() {
-        withAnimation { showCountToast = true }
-    }
-    
     private func selectAll() {
         manager.selectAll()
         selectedIDs = manager.selectedIDs

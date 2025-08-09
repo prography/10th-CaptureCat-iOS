@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-//enum Tab {
-//    case temporaryStorage
-//    case home
-//    case search
-//}
-
 struct CustomTabView: View {
     @Binding var selectedTab: Tab
     @State private var isTapped: Bool = false

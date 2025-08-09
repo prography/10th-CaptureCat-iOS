@@ -145,7 +145,16 @@ class DetailViewModel: ObservableObject {
         guard let item = item else { return }
         Task {
             do {
-                try await ScreenshotRepository.shared.updateTag(id: item.id, tags: [newTag])
+                let result = try await ScreenshotRepository.shared.updateTag(id: item.id, tags: [newTag])
+                
+                switch result {
+                case .success(let data):
+                    item.tags += data.data
+                case .failure(let error):
+                    print("❌ 태그 추가 실패: \(error)")
+                case .none:
+                    print("💬 로컬: NO Tag ID")
+                }
                 debugPrint("✅ 태그 추가 완료: \(newTag)")
                 
                 // 다른 뷰들에게 태그 변경 알림

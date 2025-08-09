@@ -16,6 +16,8 @@ struct ChipButtonStyle: ButtonStyle {
     let selectedBorderColor: Color?
     let unselectedBorderColor: Color?
     let icon: Image?
+    let horizontalPadding: CGFloat
+    let verticalPadding: CGFloat
     
     func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: icon == nil ? 0 : 6) {
@@ -29,8 +31,8 @@ struct ChipButtonStyle: ButtonStyle {
                     .frame(width: 24, height: 24)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, horizontalPadding)
+        .padding(.vertical, verticalPadding)
         .foregroundColor(isSelected ? selectedForeground : unselectedForeground)
         .background(
             Group {

@@ -11,11 +11,13 @@ import Photos
 final class Router: ObservableObject {
     enum Route: Hashable {
         case startGetScreenshot
+        case permission
         case tag(ids: [String])
         case setting
         case favorite
         case detail(id: String)
         case completeSave(count: Int)
+        case completeSync(result: SyncResult)
     }
 
     @Published var path = NavigationPath()

@@ -21,7 +21,7 @@ struct SyncProgress {
 }
 
 /// 동기화 완료 결과를 나타내는 구조체
-struct SyncResult {
+struct SyncResult: Hashable {
     let totalCount: Int
     let successCount: Int
     let failedCount: Int

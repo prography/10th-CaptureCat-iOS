@@ -131,7 +131,14 @@ class FavoriteViewModel: ObservableObject {
         
         Task {
             do {
-                try await viewModel.toggleFavorite()
+                // 🔧 Repository의 deleteFavorite를 직접 호출 (항상 삭제만 수행)
+                try await ScreenshotRepository.shared.deleteFavorite(id: viewModel.id)
+                
+                // ✅ API 성공 시 ViewModel의 isFavorite 상태 업데이트
+                await MainActor.run {
+                    viewModel.isFavorite = false
+                }
+                
                 debugPrint("✅ 즐겨찾기에서 제거 완료: \(viewModel.id)")
                 
                 // 성공 시 다른 뷰들에게 상태 변경 알림
@@ -143,10 +150,10 @@ class FavoriteViewModel: ObservableObject {
                 )
                 
             } catch {
-                debugPrint("❌ 즐겨찾기 토글 실패: \(error.localizedDescription)")
+                debugPrint("❌ 즐겨찾기 삭제 실패: \(error.localizedDescription)")
                 self.errorMessage = error.localizedDescription
                 
-                // 에러 발생 시 아이템을 다시 추가 (롤백)
+                // 🔄 에러 발생 시 아이템을 다시 추가 (롤백)
                 self.favoriteItems.append(viewModel)
                 debugPrint("🔄 에러로 인해 아이템 롤백: \(viewModel.id)")
             }

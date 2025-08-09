@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SyncProgressView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var router: Router
     @StateObject private var syncService = SyncService.shared
     @State private var animationOffset: CGFloat = 0
     
@@ -70,8 +70,7 @@ struct SyncProgressView: View {
                 debugPrint("✅ SyncProgressView: 동기화 완료")
                 debugPrint("📊 동기화 결과: 총 \(result.totalCount)개, 성공 \(result.successCount)개, 실패 \(result.failedCount)개")
                 
-                authViewModel.syncResult = result
-                authViewModel.authenticationState = .syncCompleted
+                router.push(.completeSync(result: result))
             }
         }
     }

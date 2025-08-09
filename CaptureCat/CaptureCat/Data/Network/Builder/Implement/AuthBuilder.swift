@@ -18,8 +18,8 @@ struct AuthBuilder: BuilderProtocol {
 
     var useAuthorization: Bool { false }
     
-    init(social: String, idToken: String, nickname: String?) {
+    init(social: String, idToken: String?, authToken: String?, nickname: String?) {
         self.path += "/\(social)/login"
-        self.parameters = ["idToken": idToken, "nickname": nickname]
+        self.parameters = ["idToken": idToken, "authToken": authToken, "nickname": nickname ?? ""]
     }
 }

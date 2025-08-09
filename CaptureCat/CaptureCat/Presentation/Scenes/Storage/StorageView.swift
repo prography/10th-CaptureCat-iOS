@@ -20,10 +20,26 @@ struct StorageView: View {
                 header
                 ScrollView {
                     selectionBar
+                        .zIndex(1)
                     screenshotGrid
                 }
                 .disabled(AccountStorage.shared.isGuest == true)
-                
+            }
+            
+            if authViewModel.authenticationState != .guest {
+                VStack {
+                    Spacer()
+                    HStack(alignment: .center, spacing: 13) {
+                        Text("\(viewModel.selectedIDs.count)/20")
+                            .CFont(.subhead02Bold)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(.black.opacity(0.7))
+                    }
+                    .cornerRadius(40)
+                    .padding(.bottom, 16)
+                }
             }
             
             if authViewModel.authenticationState == .guest {
@@ -60,12 +76,6 @@ struct StorageView: View {
             isShowing: $viewModel.showOverlimitToast,
             message: "최대 20장까지 선택할 수 있어요.",
             textColor: .error
-        )
-        .toast(
-            isShowing: $viewModel.showCountToast,
-            message: "\(viewModel.selectedIDs.count)/20",
-            fillWidth: false,
-            cornerRadius: 24
         )
         .singlePopUp(
             isPresented: $viewModel.showDeleteFailurePopup,

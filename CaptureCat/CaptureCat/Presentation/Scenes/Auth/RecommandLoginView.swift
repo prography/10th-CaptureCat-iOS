@@ -14,7 +14,7 @@ struct RecommandLoginView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Button {
-                viewModel.isLoginPresented = false
+                viewModel.authenticationState = .initial
             } label: {
                 Image(systemName: "xmark")
                     .foregroundStyle(.text01)
@@ -43,7 +43,7 @@ struct RecommandLoginView: View {
                 .primaryStyle()
                 .padding(.horizontal, 16)
                 Button {
-                    viewModel.isLoginPresented = false
+                    viewModel.authenticationState = .guest
                 } label: {
                     Text("나중에 하기")
                         .CFont(.caption02Regular)
