@@ -87,16 +87,16 @@ class AuthViewModel: ObservableObject {
                 case .revoked:
                     debugPrint("🍏⚠️ Apple ID 인증 취소됨 - 토큰 정리 후 게스트 모드로 전환")
                     self?.cleanupAppleTokens()
-                    self?.authenticationState = .guest
+                    self?.authenticationState = .initial
                     self?.isAutoLoginInProgress = false
                 case .notFound:
                     debugPrint("🍏⚠️ Apple ID를 찾을 수 없음 - 토큰 정리 후 게스트 모드로 전환")
                     self?.cleanupAppleTokens()
-                    self?.authenticationState = .guest
+                    self?.authenticationState = .initial
                     self?.isAutoLoginInProgress = false
                 default:
                     debugPrint("🍏⚠️ Apple ID 상태 알 수 없음: \(state.rawValue) - 게스트 모드로 전환")
-                    self?.authenticationState = .guest
+                    self?.authenticationState = .initial
                     self?.isAutoLoginInProgress = false
                 }
             }
@@ -202,9 +202,7 @@ class AuthViewModel: ObservableObject {
                     case .success(let success):
                         nickname = success.data.nickname
                         KeyChainModule.create(key: .kakaoToken, data: "true")
-                        KeyChainModule.create(key: .didStarted, data: "\(success.data.tutorialCompleted)")
-                        
-                        handleLoginSuccess()
+                        handleLoginSuccess(/*isTutorial: success.data.tutorialCompleted*/)
                     case .failure(let failure):
                         debugPrint("🟡🔴 카카오 로그인 완전 실패 \(failure.localizedDescription) 🟡🔴")
                         self.authenticationState = .initial
@@ -231,12 +229,13 @@ class AuthViewModel: ObservableObject {
                     switch appleSignIn {
                     case .success(let success):
                         nickname = success.data.nickname
-                        KeyChainModule.create(key: .didStarted, data: "\(success.data.tutorialCompleted)")
                         handleLoginSuccess()
                     case .failure(let failure):
+                        self.authenticationState = .initial
                         debugPrint("🔴🍎 apple sign in 함수 실패 \(failure.localizedDescription)🔴🍎")
                     }
                 case .failure(let failure):
+                    self.authenticationState = .initial
                     debugPrint("🔴🍎🔴 애플 토큰 실패 \(failure.localizedDescription) 🔴🍎🔴")
                 }
             }
@@ -249,10 +248,12 @@ class AuthViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.authenticationState = .initial
         }
+//        MixpanelManager.shared.logout()
     }
     
     func withdraw() {
         KeyChainModule.delete(key: .didStarted)
+//        MixpanelManager.shared.withdraw()
         Task {
             let result = await authService.withdraw()
             
@@ -260,6 +261,7 @@ class AuthViewModel: ObservableObject {
             case .success (_):
                 safelyCleanupAllTokens()
                 clearAllCacheData()
+                safelyCleanupUserDefaults()
                 DispatchQueue.main.async {
                     self.authenticationState = .initial
                 }
@@ -270,7 +272,11 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    private func handleLoginSuccess() {
+    private func handleLoginSuccess(/*isTutorial: Bool*/) {
+//        if isTutorial == false {
+//            MixpanelManager.shared.signIn(userId: "")
+//        }
+        
         debugPrint("🔄 handleLoginSuccess 호출됨")
         DispatchQueue.main.async {
             debugPrint("🔄 authenticationState 변경 전: \(self.authenticationState)")
