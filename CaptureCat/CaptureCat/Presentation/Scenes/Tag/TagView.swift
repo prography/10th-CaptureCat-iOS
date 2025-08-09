@@ -71,7 +71,7 @@ struct TagView: View {
                     // TagEditCompleted 알림은 홈으로 돌아간 후에 발생시키도록 UploadCompleteView로 이동
                 }
             },
-            isSaveEnabled: viewModel.hasChanges && !viewModel.isUploading
+            isSaveEnabled: true
         )
     }
     
