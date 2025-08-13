@@ -77,13 +77,19 @@ struct DetailView: View {
     
     private var contentView: some View {
         VStack {
-            CustomNavigationBar(
-                title: viewModel.item?.createDate ?? "",
-                onBack: {
-                    router.pop()
-                },
-                color: .white
-            )
+            HStack {
+                Button { router.pop() } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.white)
+                }
+                
+                Text(viewModel.item?.createDate ?? "")
+                    .CFont(.headline03Bold)
+                    .foregroundColor(.white)
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
             .padding(.top, 10)
             
             imageSection
@@ -175,12 +181,22 @@ struct DetailView: View {
     
     private var loadingView: some View {
         VStack {
-            CustomNavigationBar(
-                title: viewModel.item?.createDate ?? "",
-                onBack: { router.pop() },
-                color: .white
-            )
+            HStack {
+                Button { router.pop() } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.white)
+                }
+                
+                Text(viewModel.item?.createDate ?? "")
+                    .CFont(.headline03Bold)
+                    .foregroundColor(.white)
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
             .padding(.top, 10)
+            
+            
             
             Spacer()
             

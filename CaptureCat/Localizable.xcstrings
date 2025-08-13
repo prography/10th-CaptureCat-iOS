@@ -68,6 +68,22 @@
         }
       }
     },
+    "%lld개의 항목을 삭제하시겠습니까?\n삭제된 항목은 복구할 수 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete %lld items? Deleted items cannot be restored."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld개의 항목을 삭제하시겠습니까?\n삭제된 항목은 복구할 수 없습니다."
+          }
+        }
+      }
+    },
     "%lld장 정리 완료!" : {
       "localizations" : {
         "en" : {
@@ -96,6 +112,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld장의 스크린샷이 있어요."
+          }
+        }
+      }
+    },
+    "1개의 항목을 삭제하시겠습니까?\n삭제시 복구할 수 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete 1 items? Deleted items cannot be restored."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1개의 항목을 삭제하시겠습니까?\n삭제시 복구할 수 없습니다."
           }
         }
       }
@@ -388,6 +420,22 @@
         }
       }
     },
+    "로그아웃하면" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you log out"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그아웃하면"
+          }
+        }
+      }
+    },
     "로그인 하면 스크린샷을 저장할 수 있어요! " : {
       "localizations" : {
         "en" : {
@@ -548,6 +596,22 @@
         }
       }
     },
+    "사진 접근 권한이 필요합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo access permission is required."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 접근 권한이 필요합니다."
+          }
+        }
+      }
+    },
     "사진 접근 불가!" : {
       "localizations" : {
         "en" : {
@@ -608,6 +672,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "삭제하기 전에 도움을 받아보세요."
+          }
+        }
+      }
+    },
+    "삭제할 이미지를 선택해 주세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please select the images to delete."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제할 이미지를 선택해 주세요."
+          }
+        }
+      }
+    },
+    "삭제할까요?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제할까요?"
           }
         }
       }
@@ -692,6 +789,23 @@
         }
       }
     },
+    "설정" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setting"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정"
+          }
+        }
+      }
+    },
     "설정으로" : {
       "localizations" : {
         "en" : {
@@ -704,6 +818,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정으로"
+          }
+        }
+      }
+    },
+    "설정으로 이동" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to Settings"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정으로 이동"
+          }
+        }
+      }
+    },
+    "스크린샷을 관리하지 못할 수 있어요.\n그래도 로그아웃하시겠어요?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You may not be able to manage screenshots. Do you still want to log out?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷을 관리하지 못할 수 있어요.\n그래도 로그아웃하시겠어요?"
+          }
+        }
+      }
+    },
+    "스크린샷을 불러오기 위해 권한이 필요합니다.\n선택하지 않는 한 서버에 올라가지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permission is required to load screenshots. Unless you select them, they will not be uploaded to the server."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷을 불러오기 위해 권한이 필요합니다.\n선택하지 않는 한 서버에 올라가지 않습니다."
           }
         }
       }
@@ -806,9 +968,15 @@
     },
     "에 동의하게 됩니다." : {
       "localizations" : {
-        "ko" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "에 동의하게 됩니다."
           }
         }
@@ -927,7 +1095,14 @@
       }
     },
     "자동 로그인 중..." : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자동 로그인 중..."
+          }
+        }
+      }
     },
     "자주 캡쳐하는 이미지가 있으신가요?" : {
       "localizations" : {
@@ -941,6 +1116,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "자주 캡쳐하는 이미지가 있으신가요?"
+          }
+        }
+      }
+    },
+    "저장" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장"
           }
         }
       }
@@ -973,6 +1165,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "정리하기 %lld/10"
+          }
+        }
+      }
+    },
+    "즐겨찾기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorite"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "즐겨찾기"
           }
         }
       }
@@ -1021,6 +1229,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "초기화"
+          }
+        }
+      }
+    },
+    "초기화하면" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you reset"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "초기화하면"
           }
         }
       }
@@ -1121,6 +1345,38 @@
         }
       }
     },
+    "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All of your data stored in CaptureCat will be deleted. Do you still want to reset?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?"
+          }
+        }
+      }
+    },
+    "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All of your data stored in CaptureCat will be deleted. Do you still want to delete your account?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
+          }
+        }
+      }
+    },
     "태그 바로가기" : {
       "localizations" : {
         "en" : {
@@ -1201,6 +1457,73 @@
         }
       }
     },
+    "태그하기" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagging"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그하기"
+          }
+        }
+      }
+    },
+    "태그하기 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagging %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그하기 %@"
+          }
+        }
+      }
+    },
+    "한번에" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All at Once"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한번에"
+          }
+        }
+      }
+    },
+    "한장씩" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One by one"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한장씩"
+          }
+        }
+      }
+    },
     "현재 게스트 모드로 사용하고 있어요" : {
       "localizations" : {
         "en" : {
@@ -1261,6 +1584,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "회원 탈퇴"
+          }
+        }
+      }
+    },
+    "회원탈퇴" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Account"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회원탈퇴"
+          }
+        }
+      }
+    },
+    "회원탈퇴하면" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you delete your account"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회원탈퇴하면"
           }
         }
       }

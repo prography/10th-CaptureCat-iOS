@@ -10,9 +10,9 @@ import SwiftUI
 struct SinglePopUpViewModifier: ViewModifier {
     @Binding var isPresented: Bool
     
-    let title: String?
-    let message: String
-    let cancelTitle: String
+    let title: LocalizedStringKey?
+    let message: LocalizedStringKey
+    let cancelTitle: LocalizedStringKey
     
     func body(content: Content) -> some View {
         ZStack {

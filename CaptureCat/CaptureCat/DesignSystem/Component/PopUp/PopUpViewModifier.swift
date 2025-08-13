@@ -10,10 +10,10 @@ import SwiftUI
 struct PopUpViewModifier: ViewModifier {
     @Binding var isPresented: Bool
     
-    let title: String
-    let message: String
-    let cancelTitle: String
-    let confirmTitle: String
+    let title: LocalizedStringKey
+    let message: LocalizedStringKey
+    let cancelTitle: LocalizedStringKey
+    let confirmTitle: LocalizedStringKey
     let confirmAction: () -> Void
     
     func body(content: Content) -> some View {
