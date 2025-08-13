@@ -132,6 +132,22 @@
         }
       }
     },
+    "Apple로 로그인" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Apple"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple로 로그인"
+          }
+        }
+      }
+    },
     "CFBundleDisplayNAme" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -139,17 +155,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "캡처캣"
-          }
-        }
-      }
-    },
-    "Hello, world!" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hello, world!"
           }
         }
       }
@@ -1325,6 +1330,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "취소"
+          }
+        }
+      }
+    },
+    "카카오로 로그인" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Kakao"
           }
         }
       }
