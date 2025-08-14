@@ -32,13 +32,16 @@ extension View {
         isPresented: Binding<Bool>,
         title: LocalizedStringKey? = nil,
         message: LocalizedStringKey,
-        cancelTitle: LocalizedStringKey) -> some View {
+        cancelTitle: LocalizedStringKey,
+        cancelAction: (() -> Void)? = nil
+    ) -> some View {
             modifier(
                 SinglePopUpViewModifier(
                     isPresented: isPresented,
                     title: title,
                     message: message,
-                    cancelTitle: cancelTitle
+                    cancelTitle: cancelTitle,
+                    cancelAction: cancelAction
                 )
             )
         }
