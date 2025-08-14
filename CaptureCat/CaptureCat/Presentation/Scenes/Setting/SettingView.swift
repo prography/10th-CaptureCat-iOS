@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var showInitPopUp: Bool = false
     @State private var showTerms: Bool = false
     @State private var showPersonal: Bool = false
+    @State private var showChannel: Bool = false
     @State private var showUpdate: Bool = false
     
     private let appStoreID = "6749074137"
@@ -97,6 +98,9 @@ struct SettingsView: View {
         .sheet(isPresented: $showTerms, content: {
             SafariView(url: URL(string: WebLink.terms.url)!)
         })
+        .sheet(isPresented: $showChannel) {
+            SafariView(url: KakaoChannelManger.safariURL!)
+        }
     }
     
     private var guestCard: some View {
@@ -207,6 +211,20 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.gray02)
+            
+            Button {
+                debugPrint("불편사항 접수")
+//                KakaoChannelManger.chatChannel()
+                showChannel = true
+            } label: {
+                Text("불편사항 접수")
+                    .CFont(.body01Regular)
+                    .foregroundStyle(Color.text01)
+                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+            }
+            .contentShape(Rectangle())
             
             if authViewModel.authenticationState == .guest {
                 Button {
