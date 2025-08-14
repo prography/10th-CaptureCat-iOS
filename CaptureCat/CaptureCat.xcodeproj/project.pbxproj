@@ -16,6 +16,7 @@
 		92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 		92AC188A2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 		92AC188B2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
+		92B57FC42E4DE2DF006C3446 /* KakaoSDKTalk in Frameworks */ = {isa = PBXBuildFile; productRef = 92B57FC32E4DE2DF006C3446 /* KakaoSDKTalk */; };
 		92B861402E4D844C0079A039 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92B8613F2E4D844C0079A039 /* GoogleService-Info.plist */; };
 		92B861432E4D84B00079A039 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 92B861422E4D84B00079A039 /* FirebaseAnalytics */; };
 		92B861452E4D84B00079A039 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 92B861442E4D84B00079A039 /* FirebaseRemoteConfig */; };
@@ -116,6 +117,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92153D982E27D63A00187360 /* KakaoSDKCommon in Frameworks */,
+				92B57FC42E4DE2DF006C3446 /* KakaoSDKTalk in Frameworks */,
 				92153D962E27D63A00187360 /* KakaoSDKAuth in Frameworks */,
 				925182FF2E3BB5E300AEE8D3 /* Mixpanel in Frameworks */,
 				92B861452E4D84B00079A039 /* FirebaseRemoteConfig in Frameworks */,
@@ -151,6 +153,7 @@
 				92AC15A92DEE873C00A1D83B /* CaptureCat */,
 				92AC15B72DEE873E00A1D83B /* CaptureCatTests */,
 				92AC15C12DEE873E00A1D83B /* CaptureCatUITests */,
+				92B57FC22E4DE2DF006C3446 /* Frameworks */,
 				92AC15A82DEE873C00A1D83B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -163,6 +166,13 @@
 				92AC15BE2DEE873E00A1D83B /* CaptureCatUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		92B57FC22E4DE2DF006C3446 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -192,6 +202,7 @@
 				925182FE2E3BB5E300AEE8D3 /* Mixpanel */,
 				92B861422E4D84B00079A039 /* FirebaseAnalytics */,
 				92B861442E4D84B00079A039 /* FirebaseRemoteConfig */,
+				92B57FC32E4DE2DF006C3446 /* KakaoSDKTalk */,
 			);
 			productName = CaptureCat;
 			productReference = 92AC15A72DEE873C00A1D83B /* CaptureCat.app */;
@@ -524,7 +535,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "mint-raum.CaptureCat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -566,7 +577,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "mint-raum.CaptureCat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -760,6 +771,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		92B57FC32E4DE2DF006C3446 /* KakaoSDKTalk */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92153D942E27D63A00187360 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKTalk;
 		};
 		92B861422E4D84B00079A039 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

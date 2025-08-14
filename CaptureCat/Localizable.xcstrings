@@ -21,7 +21,14 @@
       }
     },
     "%@" : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
     },
     "%lld/%lld 완료" : {
       "localizations" : {
@@ -588,6 +595,38 @@
         }
       }
     },
+    "보내주신 내용은 모두 확인하고 답변드려요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you don’t have KakaoTalk, please contact us at capturecat77@gmail.com."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "보내주신 내용은 모두 확인하고 답변드려요"
+          }
+        }
+      }
+    },
+    "불편사항 접수" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send feedback"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "불편사항 접수"
+          }
+        }
+      }
+    },
     "비슷한 서비스를 이미 사용하고 있어요" : {
       "localizations" : {
         "en" : {
@@ -755,6 +794,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New version available"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "새로운 버전 업데이트"
           }
         }
       }
@@ -1023,6 +1068,12 @@
             "state" : "translated",
             "value" : "Update"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트"
+          }
         }
       }
     },
@@ -1032,6 +1083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update now"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트하기"
           }
         }
       }
@@ -1287,6 +1344,22 @@
         }
       }
     },
+    "채팅으로 오류 제보하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report a bug via chat"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "채팅으로 오류 제보하기"
+          }
+        }
+      }
+    },
     "초기화" : {
       "localizations" : {
         "en" : {
@@ -1406,6 +1479,12 @@
             "state" : "translated",
             "value" : "Sign in with Kakao"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카카오로 로그인"
+          }
         }
       }
     },
@@ -1431,6 +1510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CaptureCat has improved its usability.\nUpdate now and enjoy a smoother experience!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡처캣이 사용성을 개선했어요.\n지금 바로 업데이트하고 편하게 사용해보세요!"
           }
         }
       }

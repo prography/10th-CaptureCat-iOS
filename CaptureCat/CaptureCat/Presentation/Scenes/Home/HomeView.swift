@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
     @State private var isDragging = false
+    @State private var showChannel = false
     
     // Grid 레이아웃
     private let columns = [
@@ -32,6 +33,33 @@ struct HomeView: View {
                 }
             }
             .padding(.horizontal, 16)
+            
+            Button {
+                showChannel = true
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("채팅으로 오류 제보하기")
+                            .CFont(.subhead01Bold)
+                            .foregroundStyle(.primary01)
+                            .padding(.top, 8)
+                        Text("보내주신 내용은 모두 확인하고 답변드려요")
+                            .CFont(.caption02Regular)
+                            .foregroundStyle(.text02)
+                    }
+                    Spacer()
+                    Image(.bannerCatch)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 6)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(.primaryLow)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
             
             Spacer()
             
@@ -137,6 +165,9 @@ struct HomeView: View {
                 try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
                 await loadDataBasedOnAuthState()
             }
+        }
+        .sheet(isPresented: $showChannel) {
+            SafariView(url: KakaoChannelManger.safariURL!)
         }
     }
     
