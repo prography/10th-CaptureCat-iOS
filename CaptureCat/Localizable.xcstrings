@@ -601,6 +601,22 @@
         }
       }
     },
+    "비슷한 서비스를 이미 사용하고 있어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'm already using a similar service."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비슷한 서비스를 이미 사용하고 있어요"
+          }
+        }
+      }
+    },
     "사진 접근 권한이 필요합니다." : {
       "localizations" : {
         "en" : {
@@ -843,6 +859,22 @@
         }
       }
     },
+    "스크린샷 관리가 필요하지 않아요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I don't need to manage screenshots."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷 관리가 필요하지 않아요"
+          }
+        }
+      }
+    },
     "스크린샷을 관리하지 못할 수 있어요.\n그래도 로그아웃하시겠어요?" : {
       "localizations" : {
         "en" : {
@@ -887,6 +919,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "스크린샷을 불러오기 위해 사진 접근 권한이 필요합니다."
+          }
+        }
+      }
+    },
+    "스크린샷을 찾기 어려워요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's hard to find my screenshots."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷을 찾기 어려워요"
           }
         }
       }
@@ -1356,6 +1404,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "캐치님"
+          }
+        }
+      }
+    },
+    "캡쳐캣 사용이 불편해요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's inconvenient to use CaptureCat."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡쳐캣 사용이 불편해요"
           }
         }
       }
