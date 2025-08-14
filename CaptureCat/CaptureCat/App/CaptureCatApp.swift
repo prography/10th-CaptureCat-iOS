@@ -5,16 +5,25 @@
 //  Created by minsong kim on 6/3/25.
 //
 
+import FirebaseCore
 import KakaoSDKCommon
 import KakaoSDKAuth
 import Mixpanel
 import SwiftUI
 import SwiftData
 
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        FirebaseApp.configure()
+        return true
+    }
+}
+
 @main
 struct CaptureCatApp: App {
     @State var onBoardingViewModel: OnBoardingViewModel = OnBoardingViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     private var networkManager: NetworkManager {
         guard let url = BaseURLType.production.url else {
