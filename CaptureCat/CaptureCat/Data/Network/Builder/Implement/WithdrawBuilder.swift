@@ -18,4 +18,7 @@ struct WithdrawBuilder: BuilderProtocol {
 
     var useAuthorization: Bool { true }
     
+    init(reason: String) {
+        self.parameters = ["reason": reason]
+    }
 }

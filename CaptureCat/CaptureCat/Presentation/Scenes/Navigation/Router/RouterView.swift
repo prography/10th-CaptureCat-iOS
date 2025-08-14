@@ -60,6 +60,10 @@ struct RouterView<Content: View>: View {
                         SyncCompletedView(syncResult: result)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .withdraw:
+                        WithdrawView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }

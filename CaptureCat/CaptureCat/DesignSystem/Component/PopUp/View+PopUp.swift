@@ -10,10 +10,10 @@ import SwiftUI
 extension View {
     func popUp(
         isPresented: Binding<Bool>,
-        title: String,
-        message: String,
-        cancelTitle: String,
-        confirmTitle: String,
+        title: LocalizedStringKey,
+        message: LocalizedStringKey,
+        cancelTitle: LocalizedStringKey,
+        confirmTitle: LocalizedStringKey,
         confirmAction: @escaping () -> Void
     ) -> some View {
         modifier(
@@ -30,9 +30,9 @@ extension View {
     
     func singlePopUp(
         isPresented: Binding<Bool>,
-        title: String? = nil,
-        message: String,
-        cancelTitle: String) -> some View {
+        title: LocalizedStringKey? = nil,
+        message: LocalizedStringKey,
+        cancelTitle: LocalizedStringKey) -> some View {
             modifier(
                 SinglePopUpViewModifier(
                     isPresented: isPresented,

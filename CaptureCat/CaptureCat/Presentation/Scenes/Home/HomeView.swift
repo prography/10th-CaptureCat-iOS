@@ -58,7 +58,6 @@ struct HomeView: View {
                             .CFont(.body01Regular)
                         Button("로그인하기") {
                             authViewModel.authenticationState = .initial
-//                            authViewModel.isLoginPresented = true
                         }
                         .primaryStyle(fillWidth: false)
                         .padding(.top, 16)

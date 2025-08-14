@@ -29,7 +29,7 @@ enum LogIn: String, CaseIterable {
         }
     }
     
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .kakao:
             "카카오로 로그인"

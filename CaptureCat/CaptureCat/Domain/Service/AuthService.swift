@@ -26,8 +26,8 @@ final class AuthService {
         }
     }
     
-    func withdraw() async -> Result<ResponseDTO, Error> {
-        let builder = WithdrawBuilder()
+    func withdraw(reason: String) async -> Result<ResponseDTO, Error> {
+        let builder = WithdrawBuilder(reason: reason)
         
         do {
             let response = try await networkManager.fetchData(builder)

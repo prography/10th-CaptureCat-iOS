@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct CustomNavigationBar: View {
-    let title: String
+    let title: LocalizedStringKey
     let onBack: () -> Void
-    let actionTitle: String?
+    let actionTitle: LocalizedStringKey?
     let onAction: (() -> Void)?
     let isSaveEnabled: Bool
     let color: Color
     
     init(
-        title: String,
+        title: LocalizedStringKey,
         onBack: @escaping () -> Void,
-        actionTitle: String? = nil,
+        actionTitle: LocalizedStringKey? = nil,
         onAction: (() -> Void)? = nil,
         isSaveEnabled: Bool = false,
         color: Color = .black

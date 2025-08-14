@@ -251,11 +251,11 @@ class AuthViewModel: ObservableObject {
 //        MixpanelManager.shared.logout()
     }
     
-    func withdraw() {
+    func withdraw(reason: String) {
         KeyChainModule.delete(key: .didStarted)
 //        MixpanelManager.shared.withdraw()
         Task {
-            let result = await authService.withdraw()
+            let result = await authService.withdraw(reason: reason)
             
             switch result {
             case .success (_):
