@@ -16,6 +16,9 @@
 		92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 		92AC188A2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
 		92AC188B2DFA636C00A1D83B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 92AC18882DFA636C00A1D83B /* Localizable.xcstrings */; };
+		92B861402E4D844C0079A039 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92B8613F2E4D844C0079A039 /* GoogleService-Info.plist */; };
+		92B861432E4D84B00079A039 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 92B861422E4D84B00079A039 /* FirebaseAnalytics */; };
+		92B861452E4D84B00079A039 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 92B861442E4D84B00079A039 /* FirebaseRemoteConfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +45,7 @@
 		92AC15BE2DEE873E00A1D83B /* CaptureCatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaptureCatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AC185D2DF197FA00A1D83B /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		92AC18882DFA636C00A1D83B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		92B8613F2E4D844C0079A039 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -114,6 +118,8 @@
 				92153D982E27D63A00187360 /* KakaoSDKCommon in Frameworks */,
 				92153D962E27D63A00187360 /* KakaoSDKAuth in Frameworks */,
 				925182FF2E3BB5E300AEE8D3 /* Mixpanel in Frameworks */,
+				92B861452E4D84B00079A039 /* FirebaseRemoteConfig in Frameworks */,
+				92B861432E4D84B00079A039 /* FirebaseAnalytics in Frameworks */,
 				92153D9A2E27D63A00187360 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -141,6 +147,7 @@
 				9292005A2E3D21B200FC65F4 /* InfoPlist.xcstrings */,
 				92AC18882DFA636C00A1D83B /* Localizable.xcstrings */,
 				92AC185D2DF197FA00A1D83B /* .swiftlint.yml */,
+				92B8613F2E4D844C0079A039 /* GoogleService-Info.plist */,
 				92AC15A92DEE873C00A1D83B /* CaptureCat */,
 				92AC15B72DEE873E00A1D83B /* CaptureCatTests */,
 				92AC15C12DEE873E00A1D83B /* CaptureCatUITests */,
@@ -183,6 +190,8 @@
 				92153D972E27D63A00187360 /* KakaoSDKCommon */,
 				92153D992E27D63A00187360 /* KakaoSDKUser */,
 				925182FE2E3BB5E300AEE8D3 /* Mixpanel */,
+				92B861422E4D84B00079A039 /* FirebaseAnalytics */,
+				92B861442E4D84B00079A039 /* FirebaseRemoteConfig */,
 			);
 			productName = CaptureCat;
 			productReference = 92AC15A72DEE873C00A1D83B /* CaptureCat.app */;
@@ -271,6 +280,7 @@
 				92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */,
 				92153D942E27D63A00187360 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				925182FD2E3BB5E300AEE8D3 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				92B861412E4D84B00079A039 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 92AC15A82DEE873C00A1D83B /* Products */;
@@ -289,6 +299,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92B861402E4D844C0079A039 /* GoogleService-Info.plist in Resources */,
 				92AC185E2DF1980600A1D83B /* .swiftlint.yml in Resources */,
 				9292005B2E3D21B200FC65F4 /* InfoPlist.xcstrings in Resources */,
 				92AC18892DFA636C00A1D83B /* Localizable.xcstrings in Resources */,
@@ -513,7 +524,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "mint-raum.CaptureCat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -555,7 +566,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "mint-raum.CaptureCat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -714,6 +725,14 @@
 				minimumVersion = 0.59.1;
 			};
 		};
+		92B861412E4D84B00079A039 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -741,6 +760,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 92AC18652DF19CAC00A1D83B /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		92B861422E4D84B00079A039 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92B861412E4D84B00079A039 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		92B861442E4D84B00079A039 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92B861412E4D84B00079A039 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
