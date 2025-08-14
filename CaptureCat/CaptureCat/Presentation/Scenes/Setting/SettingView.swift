@@ -74,9 +74,9 @@ struct SettingsView: View {
             confirmTitle: "회원탈퇴"
         ) {
             //TODO: - signOutView 화면으로 이동
-            authViewModel.withdraw()
+            router.push(.withdraw)
         }
-        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
+//        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
         .sheet(isPresented: $showPersonal, content: {
             SafariView(url: URL(string: WebLink.personal.url)!)
         })
