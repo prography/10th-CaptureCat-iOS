@@ -10,9 +10,16 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
+    @EnvironmentObject private var updateViewModel: UpdateViewModel
+    @Environment(\.openURL) private var openURL
+    
     @State private var showInitPopUp: Bool = false
     @State private var showTerms: Bool = false
     @State private var showPersonal: Bool = false
+    @State private var showUpdate: Bool = false
+    
+    private let appStoreID = "6749074137"
+    private var storeURL: URL { URL(string: "https://apps.apple.com/app/id\(appStoreID)")! }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -41,6 +48,13 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.top)
+        .popUp(isPresented: $showUpdate,
+               title: "새로운 버전 업데이트",
+               message: "캡처캣이 사용성을 개선했어요.\n지금 바로 업데이트하고 편하게 사용해보세요!",
+               cancelTitle: "취소",
+               confirmTitle: "업데이트",
+               confirmAction: { openURL(storeURL) }
+        )
         .popUp(
             isPresented: $showInitPopUp,
             title: "초기화하면",
@@ -151,17 +165,32 @@ struct SettingsView: View {
             .contentShape(Rectangle())
             
             Button {
+                showUpdate = true
                 debugPrint("버전 정보")
             } label: {
-                Text("버전 정보 \(Bundle.main.appVersion)")
-                    .CFont(.body01Regular)
-                    .foregroundStyle(Color.text01)
-                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
+                VStack {
+                    HStack {
+                        Text("버전 정보")
+                            .CFont(.body01Regular)
+                            .foregroundStyle(Color.text01)
+                        Spacer()
+                        
+                        if updateViewModel.requiredVersion != Bundle.main.appVersion {
+                            Text("업데이트")
+                                .CFont(.body01Regular)
+                                .foregroundStyle(Color.text01)
+                        }
+                    }
+                    Text("\(Bundle.main.appVersion)")
+                        .CFont(.caption02Regular)
+                        .foregroundStyle(Color.text01)
+                        .frame(maxWidth: .infinity, minHeight: 12, alignment: .leading)
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
             }
             .contentShape(Rectangle())
-            .disabled(true)
+            .disabled(updateViewModel.requiredVersion == Bundle.main.appVersion)
         }
     }
     

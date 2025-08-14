@@ -13,6 +13,7 @@ struct SinglePopUpViewModifier: ViewModifier {
     let title: LocalizedStringKey?
     let message: LocalizedStringKey
     let cancelTitle: LocalizedStringKey
+    let cancelAction: (() -> Void)?
     
     func body(content: Content) -> some View {
         ZStack {
@@ -41,7 +42,12 @@ struct SinglePopUpViewModifier: ViewModifier {
                         .frame(maxWidth: .infinity)
                     
                     Button(action: {
-                        withAnimation { isPresented = false }
+                        withAnimation {
+                            if let action = cancelAction {
+                                action()
+                            }
+                            isPresented = false
+                        }
                     }) {
                         Text(cancelTitle)
                             .frame(maxWidth: .infinity, minHeight: 48)
