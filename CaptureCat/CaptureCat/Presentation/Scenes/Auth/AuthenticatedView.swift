@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AuthenticatedView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-    @StateObject private var updateViewModel = UpdateViewModel()
+    @EnvironmentObject private var updateViewModel: UpdateViewModel
     @Environment(\.openURL) private var openURL
     
     private let tabSelection = TabSelection()

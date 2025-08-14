@@ -42,6 +42,16 @@ struct CaptureCatApp: App {
         return AuthViewModel(service: service)
     }()
     
+    @StateObject private var updateViewModel = UpdateViewModel()
+    @StateObject private var homeViewModel: HomeViewModel = {
+        guard let url = BaseURLType.production.url else {
+            fatalError("Invalid base URL")
+        }
+        let networkManager = NetworkManager(baseURL: url)
+        
+        return HomeViewModel(networkManager: networkManager)
+    }()
+    
     init() {
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
         UITextField.appearance().tintColor = .gray09
@@ -55,8 +65,9 @@ struct CaptureCatApp: App {
                 OnBoardingView(viewModel: $onBoardingViewModel)
             } else {
                 AuthenticatedView(networkManager: networkManager)
+                    .environmentObject(updateViewModel)
                     .environmentObject(authViewModel)
-                    .environmentObject(HomeViewModel(networkManager: networkManager))
+                    .environmentObject(homeViewModel)
                     .modelContainer(SwiftDataManager.shared.modelContainer)
                     .onOpenURL { url in
                         if (AuthApi.isKakaoTalkLoginUrl(url)) {

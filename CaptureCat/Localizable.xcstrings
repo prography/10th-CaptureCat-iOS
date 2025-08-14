@@ -20,6 +20,9 @@
         }
       }
     },
+    "%@" : {
+
+    },
     "%lld/%lld 완료" : {
       "localizations" : {
         "en" : {
@@ -585,22 +588,6 @@
         }
       }
     },
-    "버전 정보 %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version Information %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "버전 정보 %@"
-          }
-        }
-      }
-    },
     "비슷한 서비스를 이미 사용하고 있어요" : {
       "localizations" : {
         "en" : {
@@ -758,6 +745,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "새로고침 중..."
+          }
+        }
+      }
+    },
+    "새로운 버전 업데이트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New version available"
           }
         }
       }
@@ -1015,6 +1012,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "아직 태그가 없어요."
+          }
+        }
+      }
+    },
+    "업데이트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update"
+          }
+        }
+      }
+    },
+    "업데이트하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update now"
           }
         }
       }
@@ -1408,6 +1425,16 @@
         }
       }
     },
+    "캡처캣이 사용성을 개선했어요.\n지금 바로 업데이트하고 편하게 사용해보세요!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CaptureCat has improved its usability.\nUpdate now and enjoy a smoother experience!"
+          }
+        }
+      }
+    },
     "캡쳐캣 사용이 불편해요" : {
       "localizations" : {
         "en" : {
@@ -1445,12 +1472,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All of your data stored in CaptureCat will be deleted. Do you still want to delete your account?"
+            "value" : "All of your data stored in CaptureCat will be deleted. \nDo you still want to delete your account?"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
           }
         }

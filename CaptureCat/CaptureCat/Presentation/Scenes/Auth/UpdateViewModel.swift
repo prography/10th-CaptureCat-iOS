@@ -30,6 +30,7 @@ final class UpdateViewModel: ObservableObject {
             
             showOptional = false
             showForced = false
+            requiredVersion = cfg.minVersion
             
             if current < min {
                 requiredVersion = cfg.minVersion
