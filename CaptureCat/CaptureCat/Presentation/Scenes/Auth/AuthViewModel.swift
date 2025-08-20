@@ -18,8 +18,8 @@ class AuthViewModel: ObservableObject {
     }
     
     private let socialManager: SocialManager = SocialManager()
+    private let networkManager: NetworkManager
     private let authService: AuthService
-    var nickname: String = "캐치님"
     
     @Published var authenticationState: AuthenticationState = .initial
     @Published var isAutoLoginInProgress: Bool = false
@@ -30,8 +30,9 @@ class AuthViewModel: ObservableObject {
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
     
-    init(service: AuthService) {
-        self.authService = service
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
+        self.authService = AuthService(networkManager: networkManager)
         setupNotificationObservers()
     }
     
@@ -200,7 +201,6 @@ class AuthViewModel: ObservableObject {
                     
                     switch kakaoSignIn {
                     case .success(let success):
-                        nickname = success.data.nickname
                         KeyChainModule.create(key: .kakaoToken, data: "true")
                         handleLoginSuccess(/*isTutorial: success.data.tutorialCompleted*/)
                     case .failure(let failure):
@@ -228,7 +228,6 @@ class AuthViewModel: ObservableObject {
                     
                     switch appleSignIn {
                     case .success(let success):
-                        nickname = success.data.nickname
                         handleLoginSuccess()
                     case .failure(let failure):
                         self.authenticationState = .initial
@@ -375,5 +374,11 @@ class AuthViewModel: ObservableObject {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+}
+
+extension AuthViewModel {
+    func getUserInfo() async -> Result<LogInResponseDTO, Error> {
+        await UserService(networkManager: networkManager).userInfo()
     }
 }

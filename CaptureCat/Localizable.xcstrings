@@ -852,6 +852,16 @@
         }
       }
     },
+    "선택 완료 %lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "선택 완료 %1$lld/%2$lld"
+          }
+        }
+      }
+    },
     "설정" : {
       "extractionState" : "manual",
       "localizations" : {

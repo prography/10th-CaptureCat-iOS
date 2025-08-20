@@ -38,8 +38,7 @@ struct CaptureCatApp: App {
             fatalError("Invalid base URL")
         }
         let networkManager = NetworkManager(baseURL: url)
-        let service = AuthService(networkManager: networkManager)
-        return AuthViewModel(service: service)
+        return AuthViewModel(networkManager: networkManager)
     }()
     
     @StateObject private var updateViewModel = UpdateViewModel()

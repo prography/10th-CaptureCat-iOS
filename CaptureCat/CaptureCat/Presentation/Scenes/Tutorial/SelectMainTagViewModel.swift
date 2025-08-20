@@ -40,7 +40,7 @@ final class SelectMainTagViewModel: ObservableObject {
     let maxSelection = 5
     
     // 현재 선택 개수 / 최대치 표시 문자열
-    var selectionText: String {
+    var selectionText: LocalizedStringKey {
         "선택 완료 \(selected.count)/\(maxSelection)"
     }
     
