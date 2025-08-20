@@ -31,7 +31,7 @@ final class TagViewModel: ObservableObject {
     @Published var mode: Mode = .batch
     @Published var isShowingAddTagSheet: Bool = false
     @Published var pushNext: Bool = false
-    let segments = ["한번에", "한장씩"]
+    let segments: [LocalizedStringKey] = ["한번에", "한장씩"]
     
     @Published var tags: [String] = []
     @Published var selectedTags: Set<String> = []
