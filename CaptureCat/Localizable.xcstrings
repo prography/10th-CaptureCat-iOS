@@ -22,6 +22,12 @@
     },
     "%@" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -34,8 +40,8 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld/%2$lld 완료"
+            "state" : "translated",
+            "value" : "%1$lld/%2$lld Complete"
           }
         },
         "ko" : {
@@ -307,6 +313,22 @@
         }
       }
     },
+    "공부" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공부"
+          }
+        }
+      }
+    },
     "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요." : {
       "localizations" : {
         "en" : {
@@ -339,6 +361,22 @@
         }
       }
     },
+    "글귀" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quotes"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "글귀"
+          }
+        }
+      }
+    },
     "나중에 하기" : {
       "localizations" : {
         "en" : {
@@ -367,6 +405,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "나중에도 저장할 수 있으니 먼저 필요한 이미지만 골라보세요."
+          }
+        }
+      }
+    },
+    "노래" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "음악"
           }
         }
       }
@@ -415,6 +469,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "돌아가기"
+          }
+        }
+      }
+    },
+    "레시피" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipe"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레시피"
+          }
+        }
+      }
+    },
+    "레퍼런스" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레퍼런스"
           }
         }
       }
@@ -531,6 +617,22 @@
         }
       }
     },
+    "맛집" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurant"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "맛집"
+          }
+        }
+      }
+    },
     "모든 사진에 대한 접근 허용을 해도\n캡처캣은 스크린샷만 불러와요" : {
       "localizations" : {
         "en" : {
@@ -605,7 +707,7 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "보내주신 내용은 모두 확인하고 답변드려요"
           }
         }
@@ -859,6 +961,12 @@
             "state" : "new",
             "value" : "선택 완료 %1$lld/%2$lld"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택 완료 %1$lld/%2$lld"
+          }
         }
       }
     },
@@ -907,6 +1015,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정으로 이동"
+          }
+        }
+      }
+    },
+    "쇼핑" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shopping"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "쇼핑"
           }
         }
       }
@@ -1113,8 +1237,24 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "에 동의하게 됩니다."
+          }
+        }
+      }
+    },
+    "여행" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Travel"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여행"
           }
         }
       }
@@ -1147,6 +1287,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "완료"
+          }
+        }
+      }
+    },
+    "운동" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fitness"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동"
           }
         }
       }
@@ -1227,6 +1383,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "임시보관함에서 스크린샷을 저장할 수 있어요!"
+          }
+        }
+      }
+    },
+    "자기계발" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Self-Improvement"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자기계발"
           }
         }
       }
@@ -1350,6 +1522,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "즐겨찾기한 스크린샷이 없습니다."
+          }
+        }
+      }
+    },
+    "직무 관련" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Job"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "직무 관련"
           }
         }
       }
@@ -1572,8 +1760,24 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
+          }
+        }
+      }
+    },
+    "코디" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fashion"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코디"
           }
         }
       }
