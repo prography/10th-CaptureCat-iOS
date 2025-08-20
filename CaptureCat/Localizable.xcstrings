@@ -12,6 +12,12 @@
             "value" : "and"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "および"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -23,6 +29,12 @@
     "%@" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        },
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@"
@@ -44,6 +56,12 @@
             "value" : "%1$lld/%2$lld Complete"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/%lld 完了"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -55,6 +73,12 @@
     "%lld/20" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/20"
+          }
+        },
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld/20"
@@ -76,6 +100,12 @@
             "value" : "%lld% Completed"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% 完了"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -90,6 +120,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to delete %lld items? Deleted items cannot be restored."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件の項目を削除しますか？\n削除したら元に戻せないよ。"
           }
         },
         "ko" : {
@@ -108,6 +144,12 @@
             "value" : "%lld screenshots organized"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld枚整理したよ！"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -122,6 +164,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "There are %lld screenshots."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld枚のスクショがあるよ。"
           }
         },
         "ko" : {
@@ -140,6 +188,12 @@
             "value" : "Are you sure you want to delete 1 items? Deleted items cannot be restored."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1件の項目を削除しますか？\n削除したら元に戻せないよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -156,6 +210,12 @@
             "value" : "Sign in with Apple"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appleでログイン"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -167,6 +227,12 @@
     "CFBundleDisplayNAme" : {
       "extractionState" : "manual",
       "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CFBundleDisplayNAme"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -177,6 +243,12 @@
     },
     "options" : {
       "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "options"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -191,6 +263,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "TIP.Add to favorites to see it more often on the home screen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💡Tip: お気に入りにするとホームでよく見られるよ！"
           }
         },
         "ko" : {
@@ -209,6 +287,12 @@
             "value" : "By signing up, you agree to CaptureCat’s "
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登録すると、キャプチャキャットの"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -223,6 +307,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Privacy Policy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
           }
         },
         "ko" : {
@@ -241,6 +331,12 @@
             "value" : "Privacy Policy"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -255,6 +351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキップ"
           }
         },
         "ko" : {
@@ -273,6 +375,12 @@
             "value" : "Search"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検索"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -287,6 +395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No search results found."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検索結果はなかったよ。"
           }
         },
         "ko" : {
@@ -305,6 +419,12 @@
             "value" : "Continue"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -319,6 +439,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Study"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "勉強"
           }
         },
         "ko" : {
@@ -337,6 +463,12 @@
             "value" : "Select up to 5 topics of interest, Catch will create tags for you in advance."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "興味のあるテーマを（5個まで）選んでくれたら、キャッチがあらかじめタグを作っておくよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -351,6 +483,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thank you for using our service. If you let us know why you’re deleting your account, we may be able to help with the issue. If you prefer not to, you can proceed with deletion without selecting a reason."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ご利用ありがとうございました。アカウントを削除する理由を教えていただければ、その問題についてサポートできるかもしれません。希望しない場合は理由を選ばずに削除を続けられます。"
           }
         },
         "ko" : {
@@ -369,6 +507,12 @@
             "value" : "Quotes"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フレーズ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -383,6 +527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Do it later"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとで"
           }
         },
         "ko" : {
@@ -401,6 +551,12 @@
             "value" : "You can save it later, so just pick the images you need first."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとでも保存できるから、まず必要な画像だけ選んでみてね。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -415,6 +571,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Music"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音楽"
           }
         },
         "ko" : {
@@ -433,6 +595,12 @@
             "value" : "Next"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次へ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -447,6 +615,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Help"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルプ"
           }
         },
         "ko" : {
@@ -465,6 +639,12 @@
             "value" : "Go back"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻る"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -479,6 +659,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recipe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レシピ"
           }
         },
         "ko" : {
@@ -497,6 +683,12 @@
             "value" : "Reference"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "参考"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -511,6 +703,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Log out"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログアウト"
           }
         },
         "ko" : {
@@ -529,6 +727,12 @@
             "value" : "When you log out"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログアウトすると"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -543,6 +747,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Log in to save screenshots!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインするとスクショを保存できるよ！"
           }
         },
         "ko" : {
@@ -561,6 +771,12 @@
             "value" : "Log in to continue"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインしてから使ってね"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -575,6 +791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Log in"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインする"
           }
         },
         "ko" : {
@@ -593,6 +815,12 @@
             "value" : "Log in to manage everything across all your devices, Even if you delete them from your gallery, they’re safely stored in CaptureCat."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインすれば全デバイスで管理できて、\nギャラリーから消してもキャプチャキャットに安全に保存されるよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -607,6 +835,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローディング中..."
           }
         },
         "ko" : {
@@ -625,6 +859,12 @@
             "value" : "Restaurant"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グルメ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -639,6 +879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Even if you grant access to all photos, CaptureCat only loads screenshots."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真へのアクセスを全部許可しても、\nキャプチャキャットはスクショだけ読み込むよ"
           }
         },
         "ko" : {
@@ -657,6 +903,12 @@
             "value" : "All screenshots synced!"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショの同期が全部完了したよ！"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -671,6 +923,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Syncing all screenshots"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのスクショを同期中だよ"
           }
         },
         "ko" : {
@@ -689,6 +947,12 @@
             "value" : "Version Information"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン情報"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -703,6 +967,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "If you don’t have KakaoTalk, please contact us at capturecat77@gmail.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カカオトークがない方は、capturecat77@gmail.com に連絡してね！"
           }
         },
         "ko" : {
@@ -721,6 +991,12 @@
             "value" : "Send feedback"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバック"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -735,6 +1011,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I'm already using a similar service."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "似たサービスをもう使ってるよ"
           }
         },
         "ko" : {
@@ -753,6 +1035,12 @@
             "value" : "Photo access permission is required."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真アクセスの権限が必要だよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -767,6 +1055,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Photo access denied!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真にアクセスできないよ！"
           }
         },
         "ko" : {
@@ -785,6 +1079,12 @@
             "value" : "Grant photo access—only screenshots are retrieved!"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真アクセスを許可すればスクショだけゲット！"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -799,6 +1099,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
           }
         },
         "ko" : {
@@ -817,6 +1123,12 @@
             "value" : "Get help before deleting"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除する前にちょっと確認してね"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -831,6 +1143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please select the images to delete."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除する画像を選んでね。"
           }
         },
         "ko" : {
@@ -850,6 +1168,12 @@
             "value" : "Delete?"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除しちゃう？"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -864,6 +1188,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I want to delete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除するよ"
           }
         },
         "ko" : {
@@ -882,6 +1212,12 @@
             "value" : "Refreshing"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新中..."
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -896,6 +1232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New version available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいバージョンにアップデート"
           }
         },
         "ko" : {
@@ -914,6 +1256,12 @@
             "value" : "Terms of Service"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サービス利用規約"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -928,6 +1276,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Service Info"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サービス情報"
           }
         },
         "ko" : {
@@ -946,6 +1300,12 @@
             "value" : "Delete selected"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選んで削除"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -960,6 +1320,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "선택 완료 %1$lld/%2$lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択完了  %1$lld/%2$lld"
           }
         },
         "ko" : {
@@ -979,6 +1345,12 @@
             "value" : "Setting"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -993,6 +1365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Go to Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定へ"
           }
         },
         "ko" : {
@@ -1011,6 +1389,12 @@
             "value" : "Go to Settings"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定に移動"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1025,6 +1409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shopping"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショッピング"
           }
         },
         "ko" : {
@@ -1043,6 +1433,12 @@
             "value" : "I don't need to manage screenshots."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショ管理はいらないよ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1057,6 +1453,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You may not be able to manage screenshots. Do you still want to log out?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショを管理できなくなるかもしれないよ。\n本当にログアウトする？"
           }
         },
         "ko" : {
@@ -1075,6 +1477,12 @@
             "value" : "Permission is required to load screenshots. Unless you select them, they will not be uploaded to the server."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショを読み込むには権限が必要だよ。\n選ばない限りサーバーにはアップされないから安心してね。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1089,6 +1497,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Photo access is required to load screenshots."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショを読み込むには写真アクセスの権限が必要だよ。"
           }
         },
         "ko" : {
@@ -1107,6 +1521,12 @@
             "value" : "It's hard to find my screenshots."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショが見つけにくいよ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1121,6 +1541,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Organize your screenshots with tags!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショにタグをつけて整理してみてね！"
           }
         },
         "ko" : {
@@ -1139,6 +1565,12 @@
             "value" : "Before you start"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "始める前に"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1153,6 +1585,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You have %lld screenshots before getting started"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "始める前に %lld枚のスクショがあるよ。"
           }
         },
         "ko" : {
@@ -1171,6 +1609,12 @@
             "value" : "No screenshots yet."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだスクショがないよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1185,6 +1629,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No tags yet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだタグがないよ。"
           }
         },
         "ko" : {
@@ -1203,6 +1653,12 @@
             "value" : "Update"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップデート"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1217,6 +1673,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update now"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップデート"
           }
         },
         "ko" : {
@@ -1235,6 +1697,12 @@
             "value" : "."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "に同意したものとみなされます。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1249,6 +1717,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Travel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旅行"
           }
         },
         "ko" : {
@@ -1267,6 +1741,12 @@
             "value" : "Error"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1281,6 +1761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了！"
           }
         },
         "ko" : {
@@ -1299,6 +1785,12 @@
             "value" : "Fitness"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "運動"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1313,6 +1805,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unable to load image."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像を読み込めなかったよ"
           }
         },
         "ko" : {
@@ -1331,6 +1829,12 @@
             "value" : "Terms of Use"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用規約"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1345,6 +1849,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can now manage your saved screenshots across all devices."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これで全部のデバイスで保存したスクショを管理できるよ。"
           }
         },
         "ko" : {
@@ -1363,6 +1873,12 @@
             "value" : "Drafts"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時保存箱"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1377,6 +1893,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can save screenshots in Drafts!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時保存箱からスクショを保存できるよ！"
           }
         },
         "ko" : {
@@ -1395,6 +1917,12 @@
             "value" : "Self-Improvement"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己啓発"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1405,6 +1933,12 @@
     },
     "자동 로그인 중..." : {
       "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動でログインしてるよ..."
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1419,6 +1953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Do you often capture certain images?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よくスクショする画像はありますか？"
           }
         },
         "ko" : {
@@ -1438,6 +1978,12 @@
             "value" : "Save"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1452,6 +1998,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択"
           }
         },
         "ko" : {
@@ -1470,6 +2022,12 @@
             "value" : "Organize %lld/10"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "整理する %lld/10"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1484,6 +2042,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favorite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入り"
           }
         },
         "ko" : {
@@ -1502,6 +2066,12 @@
             "value" : "Add to favorites to see it more often on the home screen."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りにしたスクショはホームでよく見られるよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1516,6 +2086,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No favorited screenshots."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りにしたスクショはまだないよ。"
           }
         },
         "ko" : {
@@ -1534,6 +2110,12 @@
             "value" : "Job"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仕事関連"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1548,6 +2130,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Report a bug via chat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャットで不具合を報告する"
           }
         },
         "ko" : {
@@ -1566,6 +2154,12 @@
             "value" : "Reset"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1580,6 +2174,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "When you reset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセットすると"
           }
         },
         "ko" : {
@@ -1598,6 +2198,12 @@
             "value" : "Recently added tags"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近追加したタグ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1612,6 +2218,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加"
           }
         },
         "ko" : {
@@ -1630,6 +2242,12 @@
             "value" : "Added tags"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加したタグ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1644,6 +2262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter tags to add"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加するタグを入力してね"
           }
         },
         "ko" : {
@@ -1662,6 +2286,12 @@
             "value" : "Cancel"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1676,6 +2306,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign in with Kakao"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カカオでログイン"
           }
         },
         "ko" : {
@@ -1694,6 +2330,12 @@
             "value" : "Mr.Catch"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャッチさん"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1708,6 +2350,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CaptureCat has improved its usability.\nUpdate now and enjoy a smoother experience!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャプチャキャットが使いやすくなったよ。\n今すぐアップデートして、もっと快適に使ってみてね！"
           }
         },
         "ko" : {
@@ -1726,6 +2374,12 @@
             "value" : "It's inconvenient to use CaptureCat."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャプチャキャットがちょっと使いにくいよ"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1740,6 +2394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All of your data stored in CaptureCat will be deleted. Do you still want to reset?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャプチャキャットにたまったあなたのデータはすべて消えちゃいます。\n本当にリセットしますか？"
           }
         },
         "ko" : {
@@ -1758,6 +2418,12 @@
             "value" : "All of your data stored in CaptureCat will be deleted. \nDo you still want to delete your account?"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャプチャキャットにたまったあなたのデータはすべて消えちゃいます。\n本当に退会しますか？"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1772,6 +2438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fashion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コーデ"
           }
         },
         "ko" : {
@@ -1790,6 +2462,12 @@
             "value" : "Tag shortcuts"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグショートカット"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1804,6 +2482,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search by tag name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ名で検索してみてね"
           }
         },
         "ko" : {
@@ -1822,6 +2506,12 @@
             "value" : "Add tag"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ追加"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1838,6 +2528,12 @@
             "value" : "Edit tag"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ編集"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1852,6 +2548,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can save up to 4 tags."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグは最大4つまでつけられるよ。"
           }
         },
         "ko" : {
@@ -1871,6 +2573,12 @@
             "value" : "Tagging"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグする"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1885,6 +2593,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tagging %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグする %@"
           }
         },
         "ko" : {
@@ -1904,6 +2618,12 @@
             "value" : "All at Once"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まとめて"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1919,6 +2639,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "One by one"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1枚ずつ"
           }
         },
         "ko" : {
@@ -1937,6 +2663,12 @@
             "value" : "You’re currently using guest mode."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今はゲストモードで利用しているよ。"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1951,6 +2683,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "HOME"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホーム"
           }
         },
         "ko" : {
@@ -1969,6 +2707,12 @@
             "value" : "OK"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1983,6 +2727,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete Account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退会する"
           }
         },
         "ko" : {
@@ -2001,6 +2751,12 @@
             "value" : "Delete Account"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退会する"
+          }
+        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2015,6 +2771,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "When you delete your account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退会すると"
           }
         },
         "ko" : {
