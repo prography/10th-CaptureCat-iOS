@@ -31,7 +31,7 @@ struct SelectMainTagView: View {
                             Button {
                                 viewModel.toggle(topic)
                             } label: {
-                                Text(topic.title)
+                                Text(topic.localKey)
                             }
                             .chipStyle(
                                 isSelected: viewModel.selected.contains(topic),
@@ -51,7 +51,7 @@ struct SelectMainTagView: View {
             
             Button(viewModel.selectionText) {
                 viewModel.saveTopicLocal()
-                MixpanelManager.shared.trackInterestTag(viewModel.selected.map { $0.title })
+                MixpanelManager.shared.trackInterestTag(viewModel.selected.map { $0.id })
                 router.push(.permission)
             }
             .primaryStyle()

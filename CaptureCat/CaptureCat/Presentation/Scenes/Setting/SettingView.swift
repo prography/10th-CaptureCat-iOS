@@ -13,6 +13,7 @@ struct SettingsView: View {
     @EnvironmentObject private var updateViewModel: UpdateViewModel
     @Environment(\.openURL) private var openURL
     
+    @State private var nickname: String = "캐치님"
     @State private var showInitPopUp: Bool = false
     @State private var showTerms: Bool = false
     @State private var showPersonal: Bool = false
@@ -49,6 +50,16 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.top)
+        .task {
+            let result = await authViewModel.getUserInfo()
+            
+            switch result {
+            case .success(let response):
+                nickname = response.data.nickname
+            case .failure(let error):
+                debugPrint(error)
+            }
+        }
         .popUp(isPresented: $showUpdate,
                title: "새로운 버전 업데이트",
                message: "캡처캣이 사용성을 개선했어요.\n지금 바로 업데이트하고 편하게 사용해보세요!",
@@ -88,7 +99,6 @@ struct SettingsView: View {
             cancelTitle: "취소",
             confirmTitle: "회원탈퇴"
         ) {
-            //TODO: - signOutView 화면으로 이동
             router.push(.withdraw)
         }
 //        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
@@ -122,7 +132,7 @@ struct SettingsView: View {
     
     private var idCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(authViewModel.nickname)
+            Text(nickname)
                 .CFont(.subhead01Bold)
                 .foregroundColor(.text01)
                 .padding(24)

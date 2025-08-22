@@ -42,7 +42,7 @@ struct WithdrawView: View {
             }
         }
     }
-    let reasons = ["캡쳐캣 사용이 불편해요", "스크린샷을 찾기 어려워요", "스크린샷 관리가 필요하지 않아요", "비슷한 서비스를 이미 사용하고 있어요"]
+
     @State private var selectedReason: String?
     
     var body: some View {

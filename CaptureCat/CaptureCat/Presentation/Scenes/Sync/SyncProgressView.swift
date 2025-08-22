@@ -76,7 +76,7 @@ struct SyncProgressView: View {
     }
 }
 
-#Preview {
-    SyncProgressView()
-        .environmentObject(AuthViewModel(service: AuthService(networkManager: NetworkManager(baseURL: BaseURLType.development.url!))))
-}
+//#Preview {
+//    SyncProgressView()
+//        .environmentObject(AuthViewModel(service: AuthService(networkManager: NetworkManager(baseURL: BaseURLType.development.url!))))
+//}

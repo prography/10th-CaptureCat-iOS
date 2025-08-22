@@ -53,13 +53,13 @@ struct SyncCompletedView: View {
     }
 }
 
-#Preview {
-    // 성공 케이스
-    SyncCompletedView(syncResult: SyncResult(
-        totalCount: 10,
-        successCount: 10,
-        failedCount: 0,
-        failedItems: []
-    ))
-    .environmentObject(AuthViewModel(service: AuthService(networkManager: NetworkManager(baseURL: BaseURLType.development.url!))))
-}
+//#Preview {
+//    // 성공 케이스
+//    SyncCompletedView(syncResult: SyncResult(
+//        totalCount: 10,
+//        successCount: 10,
+//        failedCount: 0,
+//        failedItems: []
+//    ))
+//    .environmentObject(AuthViewModel(service: AuthService(networkManager: NetworkManager(baseURL: BaseURLType.development.url!))))
+//}

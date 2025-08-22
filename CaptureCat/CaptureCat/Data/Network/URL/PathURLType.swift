@@ -18,6 +18,7 @@ enum PathURLType {
     case mostUsedTags
     case favorite
     case favoriteImages
+    case userInfo
     
     func path() -> String {
         
@@ -46,6 +47,8 @@ enum PathURLType {
             return "/v1/bookmarks"
         case .favoriteImages:
             return "/v1/bookmarks/images"
+        case .userInfo:
+            return "/v1/user/info"
         }
     }
 }
