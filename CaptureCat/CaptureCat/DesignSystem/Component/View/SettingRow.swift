@@ -5,7 +5,7 @@
 //  Created by minsong kim on 8/22/25.
 //
 
-impodrt swiftUI
+import SwiftUI
 
 struct SettingRow: View {
     let title: LocalizedStringKey
