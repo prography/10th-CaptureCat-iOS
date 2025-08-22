@@ -119,10 +119,10 @@ final class SelectMainTagViewModel: ObservableObject {
         }
     }
     
-    //태그 저장 (로컬에서)
+    // 태그 저장 (로컬에서)
     func saveTopicLocal() {
         UserDefaults.standard.set(
-            selected.map { $0 },
+            selected.map { $0.id },
             forKey: LocalUserKeys.selectedTopics.rawValue
         )
     }
