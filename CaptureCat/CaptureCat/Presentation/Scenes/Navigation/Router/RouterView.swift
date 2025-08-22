@@ -64,6 +64,10 @@ struct RouterView<Content: View>: View {
                         WithdrawView()
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .tagSetting:
+                        TagSettingView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }

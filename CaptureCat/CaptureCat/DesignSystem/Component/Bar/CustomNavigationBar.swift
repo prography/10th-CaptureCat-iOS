@@ -21,7 +21,7 @@ struct CustomNavigationBar: View {
         actionTitle: LocalizedStringKey? = nil,
         onAction: (() -> Void)? = nil,
         isSaveEnabled: Bool = false,
-        color: Color = .black
+        color: Color = .text02
     ) {
         self.title = title
         self.onBack = onBack
@@ -40,7 +40,7 @@ struct CustomNavigationBar: View {
                 }
                 
                 Text(title)
-                    .CFont(.headline03Bold)
+                    .CFont(.headline02Bold)
                     .foregroundColor(color)
 
                 Spacer()
