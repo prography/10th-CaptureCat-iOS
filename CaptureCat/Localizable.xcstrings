@@ -92,6 +92,28 @@
         }
       }
     },
+    "%lld/30" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/30"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/30"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/30"
+          }
+        }
+      }
+    },
     "%lld%% 완료" : {
       "localizations" : {
         "en" : {
@@ -297,28 +319,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "가입하면 캡쳐캣의"
-          }
-        }
-      }
-    },
-    "개인정보 처리 방침" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy Policy"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プライバシーポリシー"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "개인정보 처리방침"
           }
         }
       }
@@ -653,6 +653,50 @@
         }
       }
     },
+    "등록" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Register"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登録"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록"
+          }
+        }
+      }
+    },
+    "등록된 태그가 없어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tags added yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだタグがありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록된 태그가 없어요."
+          }
+        }
+      }
+    },
     "레시피" : {
       "localizations" : {
         "en" : {
@@ -983,28 +1027,6 @@
         }
       }
     },
-    "불편사항 접수" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send feedback"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバック"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "불편사항 접수"
-          }
-        }
-      }
-    },
     "비슷한 서비스를 이미 사용하고 있어요" : {
       "localizations" : {
         "en" : {
@@ -1023,6 +1045,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "비슷한 서비스를 이미 사용하고 있어요"
+          }
+        }
+      }
+    },
+    "사용자 환경 설정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Preferences"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユーザー設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 환경 설정"
           }
         }
       }
@@ -1248,28 +1292,6 @@
         }
       }
     },
-    "서비스 이용약관" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terms of Service"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サービス利用規約"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "서비스 이용약관"
-          }
-        }
-      }
-    },
     "서비스 정보" : {
       "localizations" : {
         "en" : {
@@ -1421,6 +1443,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "쇼핑"
+          }
+        }
+      }
+    },
+    "수정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수정"
           }
         }
       }
@@ -1645,6 +1689,28 @@
         }
       }
     },
+    "앱 리뷰 남기기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave a Review"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリをレビューする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱 리뷰 남기기"
+          }
+        }
+      }
+    },
     "업데이트" : {
       "localizations" : {
         "en" : {
@@ -1817,6 +1883,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지를 불러올 수 없습니다"
+          }
+        }
+      }
+    },
+    "이용 약관" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Service"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サービス利用規約"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이용 약관"
           }
         }
       }
@@ -2120,6 +2208,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "직무 관련"
+          }
+        }
+      }
+    },
+    "채널 문의하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send feedback"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャンネルに連絡する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "채널 문의하기"
           }
         }
       }
@@ -2476,6 +2586,50 @@
         }
       }
     },
+    "태그 설정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 설정"
+          }
+        }
+      }
+    },
+    "태그 수정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Tag"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ編集"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 수정"
+          }
+        }
+      }
+    },
     "태그 이름으로 검색해 보세요" : {
       "localizations" : {
         "en" : {
@@ -2564,6 +2718,28 @@
         }
       }
     },
+    "태그로 분류하면 원하는 이미지를\n쉽게 찾을 수 있어요!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize with tags to find images easily!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグで整理すると、画像がもっと探しやすいよ！"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그로 분류하면 원하는 이미지를\n쉽게 찾을 수 있어요!"
+          }
+        }
+      }
+    },
     "태그하기" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2605,6 +2781,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "태그하기 %@"
+          }
+        }
+      }
+    },
+    "편집" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "편집"
           }
         }
       }
