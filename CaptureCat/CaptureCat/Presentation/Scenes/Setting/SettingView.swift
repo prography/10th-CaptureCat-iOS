@@ -101,7 +101,6 @@ struct SettingsView: View {
         ) {
             router.push(.withdraw)
         }
-//        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
         .sheet(isPresented: $showPersonal, content: {
             SafariView(url: URL(string: WebLink.personal.url)!)
         })

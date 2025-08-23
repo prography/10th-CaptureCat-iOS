@@ -30,6 +30,7 @@ class AuthViewModel: ObservableObject {
     @Published var isSignOutPresented: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
+    @Published var withdrawSuccess: Bool = false
     
     init(networkManager: NetworkManager, repository: ScreenshotRepository) {
         self.networkManager = networkManager
@@ -246,9 +247,7 @@ class AuthViewModel: ObservableObject {
     func logOut() {
         safelyCleanupAllTokens()
         clearAllCacheData()
-        DispatchQueue.main.async {
-            self.authenticationState = .initial
-        }
+        self.authenticationState = .initial
 //        MixpanelManager.shared.logout()
     }
     
@@ -263,9 +262,8 @@ class AuthViewModel: ObservableObject {
                 safelyCleanupAllTokens()
                 clearAllCacheData()
                 safelyCleanupUserDefaults()
-                DispatchQueue.main.async {
-                    self.authenticationState = .initial
-                }
+                self.authenticationState = .initial
+                self.withdrawSuccess = true
             case .failure (let error):
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
                 self.errorToast = true
