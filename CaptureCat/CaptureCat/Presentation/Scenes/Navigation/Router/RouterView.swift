@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RouterView<Content: View>: View {
     @StateObject var router: Router = Router()
+    @EnvironmentObject var repository: ScreenshotRepository
     
     private let content: Content
     private let networkManager: NetworkManager
@@ -26,7 +27,7 @@ struct RouterView<Content: View>: View {
                 .navigationDestination(for: Router.Route.self) { route in
                     switch route {
                     case .startGetScreenshot:
-                        let viewModel = StartGetScreenshotViewModel(service: TutorialService(networkManager: networkManager))
+                        let viewModel = StartGetScreenshotViewModel(repository: repository, service: TutorialService(networkManager: networkManager))
                         StartGetScreenshotView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
@@ -35,7 +36,7 @@ struct RouterView<Content: View>: View {
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .tag(let ids):
-                        let viewModel = TagViewModel(itemsIds: ids, networkManager: networkManager, router: router)
+                        let viewModel = TagViewModel(itemsIds: ids, repository: repository, router: router)
                         TagView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
@@ -44,12 +45,13 @@ struct RouterView<Content: View>: View {
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .favorite:
-                        let viewModel = FavoriteViewModel()
+                        let viewModel = FavoriteViewModel(repository: repository)
                         FavoriteView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .detail(let id):
-                        DetailView(imageId: id)
+                        let viewModel = DetailViewModel(imageId: id, repository: repository)
+                        DetailView(viewModel: viewModel, imageId: id)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .completeSave(let count):
@@ -66,6 +68,10 @@ struct RouterView<Content: View>: View {
                             .toolbar(.hidden, for: .navigationBar)
                     case .tagSetting:
                         TagSettingView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+                    case .recommendLogIn:
+                        RecommandLoginView()
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     }

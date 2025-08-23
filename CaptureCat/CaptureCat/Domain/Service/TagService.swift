@@ -8,11 +8,10 @@
 import Foundation
 
 final class TagService {
-    static let shared: TagService = TagService()
     private let networkManager: NetworkManager
     
-    private init() {
-        self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
     }
     
     func fetchPopularTagList() async -> Result<TagDTO, Error> {

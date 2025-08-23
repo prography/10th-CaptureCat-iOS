@@ -12,7 +12,7 @@ import Combine
 @MainActor
 final class HomeViewModel: ObservableObject {
     // MARK: - Dependencies
-    private let repository = ScreenshotRepository.shared
+    private let repository: ScreenshotRepository
     @Published var itemVMs: [ScreenshotItemViewModel] = []
     @Published var favoriteItemVMs: [ScreenshotItemViewModel] = []
     @Published var currentFavoriteIndex: Int = 0
@@ -35,10 +35,11 @@ final class HomeViewModel: ObservableObject {
     }()
     
     private var cancellables = Set<AnyCancellable>()
-    private var netwworkManager: NetworkManager
+//    private var netwworkManager: NetworkManager
     
-    init(networkManager: NetworkManager) {
-        self.netwworkManager = networkManager
+    init(repository: ScreenshotRepository) {
+        self.repository = repository
+//        self.netwworkManager = networkManager
         setupNotificationObservers()
         // 로그인 후에 명시적으로 호출하도록 변경 - 자동 로딩 제거
     }
@@ -163,7 +164,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadScreenshotFromLocal() {
         do {
-            let localItems = try ScreenshotRepository.shared.loadAll()
+            let localItems = try repository.loadAll()
             self.itemVMs = localItems
         } catch {
             debugPrint("❌ loadScreenshotFromLocal Error: \(error.localizedDescription)")
@@ -573,7 +574,7 @@ final class HomeViewModel: ObservableObject {
             let cachedVMs = InMemoryScreenshotCache.shared.retrieveAll()
             
             // 로컬 데이터를 ViewModel로 변환
-            let localVMs = localItems.map { ScreenshotItemViewModel(model: ScreenshotItem(entity: $0)) }
+            let localVMs = localItems.map { ScreenshotItemViewModel(model: ScreenshotItem(entity: $0), repository: repository) }
             
             // 캐시 데이터와 병합 (ID 기준으로 중복 제거)
             var mergedVMs: [ScreenshotItemViewModel] = []

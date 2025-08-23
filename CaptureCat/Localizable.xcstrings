@@ -785,6 +785,28 @@
         }
       }
     },
+    "로그인 시 다른 기기에서도 이미지를 관리할 수 있어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage your images on any device once you log in"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインすれば他の端末でも画像を管理できます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 시 다른 기기에서도 이미지를 관리할 수 있어요"
+          }
+        }
+      }
+    },
     "로그인 하면 스크린샷을 저장할 수 있어요! " : {
       "localizations" : {
         "en" : {

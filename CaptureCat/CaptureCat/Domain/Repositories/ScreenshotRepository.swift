@@ -9,11 +9,15 @@ import Foundation
 import Photos
 
 @MainActor
-final class ScreenshotRepository {
-    static let shared = ScreenshotRepository()
+final class ScreenshotRepository: ObservableObject {
+    private let networkManager: NetworkManager
     private var vms: [String: ScreenshotItemViewModel] = [:]
+    private let tagService: TagService
     
-    private init() {}
+    init(networkManager: NetworkManager) {
+        self.networkManager = networkManager
+        self.tagService = TagService(networkManager: networkManager)
+    }
     
     // MARK: - Smart Loading (로그인/비로그인 자동 분기)
     
@@ -50,7 +54,7 @@ final class ScreenshotRepository {
             return try SwiftDataManager.shared.fetchOtherTagsFromScreenshotsContaining(tags)
         } else {
             // TagService를 사용하여 서버에서 연관 태그 가져오기
-            let result = await TagService.shared.fetchRelatedTagList(page: 0, size: 100, tags: tags)
+            let result = await tagService.fetchRelatedTagList(page: 0, size: 100, tags: tags)
             
             switch result {
             case .success(let tagDTO):
@@ -72,13 +76,13 @@ final class ScreenshotRepository {
         if AccountStorage.shared.isGuest ?? true {
             return try SwiftDataManager.shared.fetchAllTags()
         } else {
-            let result = await TagService.shared.fetchPopularTagList()
+            let result = await tagService.fetchPopularTagList()
             
             switch result {
             case .success(let tagDTO):
                 return tagDTO.data.items.map { $0.name }
                 
-            case .failure(let error):
+            case .failure:
                 return InMemoryScreenshotCache.shared.getAllTags()
             }
         }
@@ -100,7 +104,7 @@ final class ScreenshotRepository {
         if AccountStorage.shared.isGuest ?? true {
             try SwiftDataManager.shared.deleteTag(imageId: imageId, tagId: tagId)
         } else {
-            let result = await TagService.shared.deleteTag(imageId: imageId, tagId: tagId)
+            let result = await tagService.deleteTag(imageId: imageId, tagId: tagId)
             
             switch result {
             case .success:
@@ -253,7 +257,7 @@ final class ScreenshotRepository {
     
      /// 특정 이미지에 태그 업데이트
     func updateTagToServer(id: String, tags: [String]) async /*throws*/ -> Result<TagListDTO, Error> {
-        let result = await TagService.shared.updateTag(imageId: id, tags: tags)
+        let result = await tagService.updateTag(imageId: id, tags: tags)
         
 //        switch result {
 //        case .success:
@@ -273,7 +277,7 @@ final class ScreenshotRepository {
             syncViewModel(existingViewModel, with: model)
             return existingViewModel
         }
-        let viewModel = ScreenshotItemViewModel(model: model)
+        let viewModel = ScreenshotItemViewModel(model: model, repository: self)
         vms[model.id] = viewModel
         return viewModel
     }

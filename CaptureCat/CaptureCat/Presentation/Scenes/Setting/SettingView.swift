@@ -35,7 +35,7 @@ struct SettingsView: View {
             
             if authViewModel.authenticationState == .guest {
                 guestCard
-                    .background(Color(.gray02))
+                    .background(Color(.primaryLow))
                     .cornerRadius(12)
                     .padding(.horizontal, 16)
             } else {
@@ -114,20 +114,25 @@ struct SettingsView: View {
     }
     
     private var guestCard: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 6) {
             Text("현재 게스트 모드로 사용하고 있어요")
                 .CFont(.subhead01Bold)
                 .foregroundColor(.text01)
+            Text("로그인 시 다른 기기에서도 이미지를 관리할 수 있어요")
+                .CFont(.caption02Regular)
+                .foregroundStyle(.text02)
+                .padding(.bottom, 12)
             
             Button(action: {
                 authViewModel.authenticationState = .initial
+                router.pop()
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)
             }
             .primaryStyle()
         }
-        .padding(24)
+        .padding(16)
     }
     
     private var idCard: some View {

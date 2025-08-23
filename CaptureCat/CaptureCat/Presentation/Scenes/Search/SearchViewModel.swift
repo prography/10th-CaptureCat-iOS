@@ -25,12 +25,12 @@ final class SearchViewModel: ObservableObject {
     private var currentPage: Int = 0
     private let pageSize: Int = 20
     
-    private let repository = ScreenshotRepository.shared
+    private let repository: ScreenshotRepository
     private var cancellables = Set<AnyCancellable>()
-    private var networkManager: NetworkManager
+//    private var networkManager: NetworkManager
     
-    init(networkManager: NetworkManager) {
-        self.networkManager = networkManager
+    init(repository: ScreenshotRepository) {
+        self.repository = repository
         
         // 검색어 변경 시 필터링 (태그가 선택되지 않은 경우에만)
         $searchText

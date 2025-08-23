@@ -41,9 +41,9 @@ final class TagViewModel: ObservableObject {
     @Published var currentIndex: Int = 0
     
     // MARK: - Dependencies
-    private let repository = ScreenshotRepository.shared
+    private let repository: ScreenshotRepository
     @Published var itemVMs: [ScreenshotItemViewModel] = []
-    private var networkManager: NetworkManager
+//    private var networkManager: NetworkManager
     var router: Router?
     
     private var dateFormatter: DateFormatter = {
@@ -58,8 +58,8 @@ final class TagViewModel: ObservableObject {
     @Published var uploadProgress: Double = 0.0  // 업로드 진행률 (0.0 ~ 1.0)
     @Published var uploadedCount: Int = 0  // 업로드 완료된 아이템 수
     
-    init(itemsIds: [String], networkManager: NetworkManager, router: Router? = nil) {
-        self.networkManager = networkManager
+    init(itemsIds: [String], repository: ScreenshotRepository, router: Router? = nil) {
+        self.repository = repository
         self.router = router
         createViewModel(from: itemsIds)
         
@@ -100,7 +100,7 @@ final class TagViewModel: ObservableObject {
                 tags: [],
                 isFavorite: asset.isFavorite
             )
-            self.itemVMs.append( (ScreenshotItemViewModel(model: newItem)))
+            self.itemVMs.append( (ScreenshotItemViewModel(model: newItem, repository: self.repository)))
         }
     }
     

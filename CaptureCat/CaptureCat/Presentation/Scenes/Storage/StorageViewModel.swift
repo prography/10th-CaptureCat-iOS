@@ -23,13 +23,14 @@ final class StorageViewModel: ObservableObject {
     private let maxSelection = 20
     
     // MARK: - Dependencies
-    private let manager = ScreenshotManager()
+    private let manager: ScreenshotManager
     private var cancellables = Set<AnyCancellable>()
     private var networkManager: NetworkManager
     
     // MARK: - Init
-    init(networkManager: NetworkManager) {
+    init(networkManager: NetworkManager, repository: ScreenshotRepository) {
         self.networkManager = networkManager
+        self.manager = ScreenshotManager(repository: repository)
         // 초기 데이터
         assets = manager.assets
         

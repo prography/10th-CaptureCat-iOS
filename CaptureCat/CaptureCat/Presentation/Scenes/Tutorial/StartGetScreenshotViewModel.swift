@@ -22,13 +22,15 @@ final class StartGetScreenshotViewModel: ObservableObject {
     private let maxSelection = 10
     
     // MARK: - Dependencies
-    private let manager = ScreenshotManager()
+//    private let repository: ScreenshotRepository
+    private let manager: ScreenshotManager
     private var cancellables = Set<AnyCancellable>()
     private var service: TutorialService
     
     // MARK: - Init
-    init(service: TutorialService) {
+    init(repository: ScreenshotRepository, service: TutorialService) {
         self.service = service
+        self.manager = ScreenshotManager(repository: repository)
         
         // 초기 데이터
         assets = manager.assets

@@ -20,6 +20,7 @@ class AuthViewModel: ObservableObject {
     private let socialManager: SocialManager = SocialManager()
     private let networkManager: NetworkManager
     private let authService: AuthService
+    private let repository: ScreenshotRepository
     
     @Published var authenticationState: AuthenticationState = .initial
     @Published var isAutoLoginInProgress: Bool = false
@@ -30,9 +31,10 @@ class AuthViewModel: ObservableObject {
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
     
-    init(networkManager: NetworkManager) {
+    init(networkManager: NetworkManager, repository: ScreenshotRepository) {
         self.networkManager = networkManager
         self.authService = AuthService(networkManager: networkManager)
+        self.repository = repository
         setupNotificationObservers()
     }
     
@@ -321,7 +323,7 @@ class AuthViewModel: ObservableObject {
         debugPrint("🧹 모든 캐시 데이터 정리 시작")
         
         // 1. 메모리 캐시 클리어 (InMemoryScreenshotCache)
-        ScreenshotRepository.shared.clearMemoryCache()
+        repository.clearMemoryCache()
         
         // 2. 모든 이미지 캐시 클리어 (서버 + 로컬)
         PhotoLoader.shared.clearAllCache()

@@ -24,6 +24,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     @Published var errorMessage: String?
     
     private var saveWorkItem: DispatchWorkItem?
+    private let repository: ScreenshotRepository
     
     /// 이미지 소스 타입 구분
     var isServerImage: Bool {
@@ -31,13 +32,14 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
     }
     
     // MARK: – Init
-    init(model: ScreenshotItem) {
+    init(model: ScreenshotItem, repository: ScreenshotRepository) {
         self.id = model.id
         self.imageURL = model.imageURL    // ✅ 서버 URL 저장
         self.fileName   = model.fileName
         self.createDate = model.createDate
         self.tags       = model.tags
         self.isFavorite = model.isFavorite
+        self.repository = repository
     }
     
     // MARK: – Image Loading
@@ -104,7 +106,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
             do {
                 let previousState = isFavorite
                 // 🔧 현재 상태를 명시적으로 전달하여 더 안전한 토글
-                try await ScreenshotRepository.shared.toggleFavorite(id: id, currentState: isFavorite)
+                try await repository.toggleFavorite(id: id, currentState: isFavorite)
                 
                 // ✅ API 성공 시 UI 상태 업데이트
                 await MainActor.run {
@@ -163,7 +165,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
                 debugPrint("✅ 로컬 전용 저장 완료: \(fileName)")
             } else {
                 // 로그인 모드: 서버 전용 저장 (로컬 저장 X)
-                try await ScreenshotRepository.shared.saveToServerOnly(self)
+                try await repository.saveToServerOnly(self)
                 debugPrint("✅ 서버 전용 저장 완료: \(fileName)")
             }
             
@@ -208,7 +210,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
         defer { isSaving = false }
         
         do {
-            try await ScreenshotRepository.shared.saveToServerOnly(self)
+            try await repository.saveToServerOnly(self)
             debugPrint("✅ 서버 저장 완료: \(fileName)")
             
             // 이미지 저장 완료 notification 전송

@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct RecommandLoginView: View {
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
             Button {
-                viewModel.authenticationState = .initial
+                viewModel.authenticationState = .guest
+                router.pop()
             } label: {
                 Image(systemName: "xmark")
                     .foregroundStyle(.text01)
@@ -36,7 +37,7 @@ struct RecommandLoginView: View {
                 Spacer()
                 
                 Button {
-                    dismiss()
+                    router.pop()
                 } label: {
                     Text("로그인하기")
                 }
@@ -44,6 +45,7 @@ struct RecommandLoginView: View {
                 .padding(.horizontal, 16)
                 Button {
                     viewModel.authenticationState = .guest
+                    router.pop()
                 } label: {
                     Text("나중에 하기")
                         .CFont(.caption02Regular)

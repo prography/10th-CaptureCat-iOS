@@ -27,6 +27,7 @@ final class ScreenshotManager: ObservableObject {
     private var currentIndex: Int = 0
     private let pageSize: Int = 20
     private var cancellables = Set<AnyCancellable>()
+    private let repository: ScreenshotRepository
     
     // 전체 스크린샷 개수
     var totalCount: Int {
@@ -38,7 +39,8 @@ final class ScreenshotManager: ObservableObject {
         assets.count
     }
     
-    init() {
+    init(repository: ScreenshotRepository) {
+        self.repository = repository
         requestPermissionAndFetch()
     }
     
@@ -101,7 +103,7 @@ final class ScreenshotManager: ObservableObject {
             // 새로운 ScreenshotItemViewModel들 생성
             let newItemVMs = newAssets.map { asset in
                 let item = ScreenshotItem(asset: asset)
-                return ScreenshotRepository.shared.viewModel(for: item)
+                return self.repository.viewModel(for: item)
             }
             self.itemVMs.append(contentsOf: newItemVMs)
             

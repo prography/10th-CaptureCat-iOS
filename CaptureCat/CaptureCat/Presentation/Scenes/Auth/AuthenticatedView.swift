@@ -19,14 +19,16 @@ struct AuthenticatedView: View {
     
     var networkManager: NetworkManager
     
-    init(networkManager: NetworkManager) {
-        print("🔄 AuthenticatedView.init(\(networkManager))")
-        self.networkManager = networkManager
-    }
-    
     var body: some View {
         RouterView(networkManager: networkManager) {
-            SyncView(networkManager: networkManager)
+            switch authViewModel.authenticationState {
+            case .guest:
+                TabContainerView(networkManager: networkManager)
+            case .initial:
+                LogInView()
+            case .signIn:
+                SyncView(networkManager: networkManager)
+            }
         }
         .popUp(isPresented: $updateViewModel.showOptional,
                title: "새로운 버전 업데이트",
@@ -43,21 +45,6 @@ struct AuthenticatedView: View {
             cancelAction: { openURL(storeURL) }
         )
         .environment(tabSelection)
-        .fullScreenCover(isPresented: Binding(
-            get: { 
-                let shouldShow = authViewModel.authenticationState == .initial
-                debugPrint("🔍 AuthenticatedView - authenticationState: \(authViewModel.authenticationState), shouldShow: \(shouldShow)")
-                return shouldShow
-            },
-            set: { _ in }
-        )) {
-            NavigationStack {
-                LogInView()
-            }
-        }
-        .transaction { transaction in
-            transaction.disablesAnimations = true
-        }
         .task {
             await updateViewModel.checkNow()
             
@@ -71,8 +58,9 @@ struct AuthenticatedView: View {
             }
             // 동기화 체크는 로그인 성공 후에만 수행하도록 AuthViewModel에서 처리
         }
-        .onChange(of: authViewModel.authenticationState) { oldValue, newValue in
-            debugPrint("🔄 AuthenticatedView - authenticationState 변경: \(oldValue) -> \(newValue)")
-        }
+    }
+    
+    private var mainPage: some View {
+        SyncView(networkManager: networkManager)
     }
 }

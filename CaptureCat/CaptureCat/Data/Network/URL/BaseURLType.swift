@@ -16,7 +16,7 @@ enum BaseURLType {
         case .production:
             return URL(string: "https://api.capture-cat.com")
         case .development:
-            return URL(string: "https://dev.api.capture-cat.com")
+            return URL(string: "https://dev.capture-cat.com")
         }
     }
 }

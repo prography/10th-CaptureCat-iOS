@@ -9,17 +9,17 @@ import AuthenticationServices
 import SwiftUI
 
 struct LogInView: View {
+    @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: AuthViewModel
     @State private var showTerms: Bool = false
     @State private var showPersonal: Bool = false
-    @State private var pushGuest: Bool = false
     
     var body: some View {
         VStack {
             HStack {
                 Spacer()
                 Button {
-                    pushGuest = true
+                    router.push(.recommendLogIn)
                 } label: {
                     Text("나중에 하기")
                         .CFont(.body02Regular)
@@ -81,10 +81,5 @@ struct LogInView: View {
         .sheet(isPresented: $showTerms, content: {
             SafariView(url: URL(string: WebLink.terms.url)!)
         })
-        .navigationDestination(isPresented: $pushGuest) {
-            RecommandLoginView()
-                .navigationBarBackButtonHidden()
-                .toolbar(.hidden, for: .navigationBar)
-        }
     }
 }

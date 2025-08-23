@@ -19,11 +19,12 @@ class DetailViewModel: ObservableObject {
     @Published var isFavorite: Bool = false
     
     private let imageId: String
-    private let repository = ScreenshotRepository.shared
+    private let repository: ScreenshotRepository
     
     // MARK: - Init
-    init(imageId: String) {
+    init(imageId: String, repository: ScreenshotRepository) {
         self.imageId = imageId
+        self.repository = repository
     }
     
     // MARK: - Computed Properties
@@ -121,7 +122,7 @@ class DetailViewModel: ObservableObject {
         // 서버에 삭제 요청
         Task {
             do {
-                try await ScreenshotRepository.shared.deleteTag(imageId: item.id, tagId: String(tagIndex))
+                try await repository.deleteTag(imageId: item.id, tagId: String(tagIndex))
                 debugPrint("✅ 태그 삭제 완료: \(tag)")
                 
                 // 다른 뷰들에게 태그 변경 알림
@@ -145,7 +146,7 @@ class DetailViewModel: ObservableObject {
         guard let item = item else { return }
         Task {
             do {
-                let result = try await ScreenshotRepository.shared.updateTag(id: item.id, tags: [newTag])
+                let result = try await repository.updateTag(id: item.id, tags: [newTag])
                 
                 switch result {
                 case .success(let data):
@@ -216,11 +217,11 @@ class DetailViewModel: ObservableObject {
             do {
                 if originalState {
                     // 원래 즐겨찾기 상태였으면 삭제
-                    try await ScreenshotRepository.shared.deleteFavorite(id: item.id)
+                    try await repository.deleteFavorite(id: item.id)
                     debugPrint("✅ 즐겨찾기 제거 완료: \(item.fileName)")
                 } else {
                     // 원래 즐겨찾기가 아니었으면 추가
-                    try await ScreenshotRepository.shared.uploadFavorite(id: item.id)
+                    try await repository.uploadFavorite(id: item.id)
                     debugPrint("✅ 즐겨찾기 추가 완료: \(item.fileName)")
                 }
                 
