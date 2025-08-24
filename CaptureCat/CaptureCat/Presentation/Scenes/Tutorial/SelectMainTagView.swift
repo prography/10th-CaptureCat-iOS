@@ -31,7 +31,7 @@ struct SelectMainTagView: View {
                             Button {
                                 viewModel.toggle(topic)
                             } label: {
-                                Text(topic.localKey)
+                                Text(topic.localizedKey)
                             }
                             .chipStyle(
                                 isSelected: viewModel.selected.contains(topic),

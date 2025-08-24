@@ -13,78 +13,35 @@ enum LocalUserKeys: String {
 }
 
 final class SelectMainTagViewModel: ObservableObject {
-    // 전체 토픽 목록
     enum Topic: String, CaseIterable, Identifiable {
-        case shopping
-        case job
-        case reference
-        case fashion
-        case study
-        case quotes
-        case travel
-        case selfImprovement
-        case restaurant
-        case music
-        case recipe
-        case fitness
-        
-        var id: String {
+        case shopping, job, reference, fashion, study, quotes, travel, selfImprovement, restaurant, music, recipe, fitness
+
+        // 1) 로컬라이징 키 (String) — Localizable.strings의 키
+        var i18nKey: String {
             switch self {
-            case .shopping:
-                "쇼핑"
-            case .job:
-                "직무 관련"
-            case .reference:
-                "레퍼런스"
-            case .fashion:
-                "코디"
-            case .study:
-                "공부"
-            case .quotes:
-                "글귀"
-            case .travel:
-                "여행"
-            case .selfImprovement:
-                "자기계발"
-            case .restaurant:
-                "맛집"
-            case .music:
-                "노래"
-            case .recipe:
-                "레시피"
-            case .fitness:
-                "운동"
+            case .shopping:         return "topic.shopping"
+            case .job:              return "topic.job"
+            case .reference:        return "topic.reference"
+            case .fashion:          return "topic.fashion"
+            case .study:            return "topic.study"
+            case .quotes:           return "topic.quotes"
+            case .travel:           return "topic.travel"
+            case .selfImprovement:  return "topic.selfImprovement"
+            case .restaurant:       return "topic.restaurant"
+            case .music:            return "topic.music"
+            case .recipe:           return "topic.recipe"
+            case .fitness:          return "topic.fitness"
             }
         }
-        
-        var localKey: LocalizedStringKey {
-            switch self {
-            case .shopping:
-                "쇼핑"
-            case .job:
-                "직무 관련"
-            case .reference:
-                "레퍼런스"
-            case .fashion:
-                "코디"
-            case .study:
-                "공부"
-            case .quotes:
-                "글귀"
-            case .travel:
-                "여행"
-            case .selfImprovement:
-                "자기계발"
-            case .restaurant:
-                "맛집"
-            case .music:
-                "노래"
-            case .recipe:
-                "레시피"
-            case .fitness:
-                "운동"
-            }
-        }
+
+        // 2) SwiftUI용 표시 키
+        var localizedKey: LocalizedStringKey { LocalizedStringKey(i18nKey) }
+
+        // 3) 실제 번역된 문자열 (저장용)
+        var localizedText: String { NSLocalizedString(i18nKey, comment: "") }
+
+        // Identifiable
+        var id: String { i18nKey }
     }
     
     // 선택된 토픽 집합
@@ -120,10 +77,14 @@ final class SelectMainTagViewModel: ObservableObject {
     }
     
     // 태그 저장 (로컬에서)
+//    func saveTopicLocal() {
+//        UserDefaults.standard.set(
+//            selected.map { NSLocalizedString( $0.localKey, comment: "") },
+//            forKey: LocalUserKeys.selectedTopics.rawValue
+//        )
+//    }
     func saveTopicLocal() {
-        UserDefaults.standard.set(
-            selected.map { $0.id },
-            forKey: LocalUserKeys.selectedTopics.rawValue
-        )
+        let texts = selected.map { $0.localizedText } // 저장 시점 언어로 고정
+        UserDefaults.standard.set(texts, forKey: LocalUserKeys.selectedTopics.rawValue)
     }
 }
