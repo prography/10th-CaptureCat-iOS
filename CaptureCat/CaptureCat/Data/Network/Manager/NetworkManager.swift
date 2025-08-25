@@ -268,3 +268,64 @@ extension NetworkManager {
         }
     }
 }
+
+extension NetworkManager {
+    /// RefreshToken도 Authorization 헤더와 함께 보내는 fetch 함수
+    func fetchDataWithRefresh<Builder: BuilderProtocol>(_ builder: Builder, isRetry: Bool = false) async throws -> Builder.Response {
+        var request = try await makeRequest(builder)
+        
+        // AccessToken
+        if let accessToken = KeyChainModule.read(key: .accessToken), !accessToken.isEmpty {
+            request.setValue(accessToken, forHTTPHeaderField: "Authorization")
+            debugPrint("🔑 AccessToken 추가: \(accessToken.prefix(20))...")
+        } else {
+            debugPrint("⚠️ AccessToken 없음")
+        }
+        
+        // RefreshToken
+        if let refreshToken = KeyChainModule.read(key: .refreshToken), !refreshToken.isEmpty {
+            request.setValue(refreshToken, forHTTPHeaderField: "Refresh-Token")
+            debugPrint("🔑 RefreshToken 추가: \(refreshToken.prefix(20))...")
+        } else {
+            debugPrint("⚠️ RefreshToken 없음")
+        }
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            debugPrint("🔴 HTTP Response를 가져올 수 없음")
+            throw NetworkError.responseNotFound
+        }
+        
+        debugPrint("📊 Status Code: \(httpResponse.statusCode)")
+        
+        switch httpResponse.statusCode {
+        case 200...299:
+            debugPrint("✅ 성공 응답: \(httpResponse.statusCode)")
+            return try await builder.deserializer.deserialize(data)
+        case 400:
+            throw NetworkError.badRequest
+            debugPrint("🔴 400")
+        case 401:
+            // 여기서는 굳이 토큰 갱신 로직을 안 돌리고 단순 실패 처리하거나
+            // 필요하다면 handleUnauthorizedError 호출 가능
+            throw NetworkError.unauthorized
+            debugPrint("🔴 401")
+        case 403:
+            throw NetworkError.forBidden
+            debugPrint("🔴 403")
+        case 404:
+            throw NetworkError.responseNotFound
+            debugPrint("🔴 404")
+        case 429:
+            throw NetworkError.tooManyRequests
+            debugPrint("🔴 429")
+        case 500:
+            throw NetworkError.internalServerError
+            debugPrint("🔴 500")
+        default:
+            throw NetworkError.unknown(httpResponse.statusCode)
+            debugPrint("🔴 \(httpResponse.statusCode)")
+        }
+    }
+}
