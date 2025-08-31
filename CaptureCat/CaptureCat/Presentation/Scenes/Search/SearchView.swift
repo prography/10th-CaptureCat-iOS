@@ -25,9 +25,51 @@ struct SearchView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
             
-            // 태그 바로가기 섹션
-            tagShortcutSection
-                .padding(.top, 32)
+            if viewModel.searchText.isEmpty {
+                // 태그 바로가기 섹션
+                tagShortcutSection
+                    .padding(.top, 32)
+            } else {
+                ZStack {
+                    if viewModel.filteredTags.isEmpty {
+                        VStack(spacing: 8) {
+                            Text("검색결과가 없어요")
+                                .CFont(.headline02Bold)
+                                .foregroundStyle(.text03)
+                            Text("스크린샷을 태그해 정리해보세요!")
+                                .CFont(.body01Regular)
+                                .foregroundStyle(.text03)
+                        }
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 150)
+                    } else {
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                ForEach(viewModel.filteredTags, id: \.self) { tag in
+                                    HStack(spacing: 8) {
+                                        Text(tag)
+                                            .CFont(.body01Regular)
+                                            .foregroundStyle(.text01)
+                                        Spacer(minLength: 0)
+                                        Image(.arrowOutward)
+                                            .foregroundStyle(.text02)
+                                    }
+                                    .padding(.vertical, 12)
+                                    .contentShape(Rectangle())
+                                    .padding(.horizontal, 16)
+                                    .onTapGesture {
+                                        viewModel.selectTag(tag)
+                                        router.push(.searchResult)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.top, 16)
+                        .scrollIndicators(.hidden)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
             
             Spacer()
         }
@@ -100,16 +142,18 @@ struct SearchView: View {
     // MARK: - 태그 바로가기 섹션
     private var tagShortcutSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 태그 목록
-            HStack {
-                Text("태그 바로가기")
-                    .CFont(.subhead01Bold)
-                    .foregroundColor(.text01)
-                Spacer()
+            if viewModel.searchText.isEmpty {
+                // 태그 목록
+                HStack {
+                    Text("태그 바로가기")
+                        .CFont(.subhead01Bold)
+                        .foregroundColor(.text01)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                // 기본 상태: 모든 태그 표시
+                defaultTagsSection
             }
-            .padding(.horizontal, 16)
-            // 기본 상태: 모든 태그 표시
-            defaultTagsSection
         }
     }
     

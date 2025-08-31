@@ -75,7 +75,7 @@ struct CaptureCatApp: App {
                 if onBoardingViewModel.isOnBoarding {
                     OnBoardingView(viewModel: $onBoardingViewModel)
                 } else {
-                    let searchViewModel: SearchViewModel = SearchViewModel(repository: screenshotRepository)
+                    let searchViewModel: SearchViewModel = SearchViewModel(repository: screenshotRepository, networkManager: networkManager)
                     
                     AuthenticatedView(networkManager: networkManager)
                         .environmentObject(screenshotRepository)
