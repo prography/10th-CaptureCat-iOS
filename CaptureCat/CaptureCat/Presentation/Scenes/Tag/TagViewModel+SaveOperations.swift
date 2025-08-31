@@ -96,15 +96,15 @@ extension TagViewModel {
             // 실패 시 롤백
             await rollbackOptimisticUpdate(originalStates: originalStates)
             
-            // 사용자에게 실패 알림
-            await MainActor.run {
-                // Toast나 알림을 통해 사용자에게 알림
-                NotificationCenter.default.post(
-                    name: .serverSyncFailed, 
-                    object: nil, 
-                    userInfo: ["error": error.localizedDescription]
-                )
-            }
+//            // 사용자에게 실패 알림
+//            await MainActor.run {
+//                // Toast나 알림을 통해 사용자에게 알림
+//                NotificationCenter.default.post(
+//                    name: .serverSyncFailed, 
+//                    object: nil, 
+//                    userInfo: ["error": error.localizedDescription]
+//                )
+//            }
         }
     }
     
@@ -253,9 +253,7 @@ extension TagViewModel {
                  uploadedCount = imageDatas.count
                  debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
                  
-                 // 이미지 저장 완료 notification 전송
-                 NotificationCenter.default.post(name: .imageSaveCompleted, object: nil)
-                 debugPrint("📢 이미지 저장 완료 notification 전송")
+                 // imageSaveCompleted notification 삭제됨 - 홈뷰 NotificationCenter 사용 중단
              }
              
          case .failure(let error):

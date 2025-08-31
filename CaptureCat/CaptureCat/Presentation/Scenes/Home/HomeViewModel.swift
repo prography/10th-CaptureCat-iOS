@@ -440,65 +440,7 @@ final class HomeViewModel: ObservableObject {
     // MARK: - Notification Handling
     
     private func setupNotificationObservers() {
-        // 즐겨찾기 상태 변경 알림
-        NotificationCenter.default.publisher(for: .favoriteStatusChanged)
-            .compactMap { notification in
-                notification.userInfo?["favoriteInfo"] as? FavoriteStatusInfo
-            }
-            .sink { [weak self] favoriteInfo in
-                self?.updateFavoriteStatus(favoriteInfo)
-            }
-            .store(in: &cancellables)
-        
-        // 태그 편집 완료 알림 (디바운싱 적용)
-        NotificationCenter.default.publisher(for: .tagEditCompleted)
-            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main) // 300ms 디바운싱
-            .sink { [weak self] _ in
-                Task {
-                    await self?.refreshAfterTagEdit()
-                }
-            }
-            .store(in: &cancellables)
-        
-        // 낙관적 업데이트 완료 알림 (즉시 로컬 데이터 새로고침)
-        NotificationCenter.default.publisher(for: .optimisticUpdateCompleted)
-            .sink { [weak self] _ in
-                Task { @MainActor in
-                    await self?.handleOptimisticUpdateCompleted()
-                }
-            }
-            .store(in: &cancellables)
-        
-        // 서버 동기화 실패 알림 (사용자에게 알림 표시)
-        NotificationCenter.default.publisher(for: .serverSyncFailed)
-            .compactMap { notification in
-                notification.userInfo?["error"] as? String
-            }
-            .sink { [weak self] errorMessage in
-                Task { @MainActor in
-                    await self?.handleServerSyncFailure(errorMessage: errorMessage)
-                }
-            }
-            .store(in: &cancellables)
-        
-        // 로그인 성공 알림 (홈화면 데이터 새로고침)
-        NotificationCenter.default.publisher(for: .loginSuccessCompleted)
-            .sink { [weak self] _ in
-                Task { @MainActor in
-                    await self?.handleLoginSuccessCompleted()
-                }
-            }
-            .store(in: &cancellables)
-        
-        // 이미지 저장 완료 알림 (홈화면 데이터 새로고침)
-        NotificationCenter.default.publisher(for: .imageSaveCompleted)
-            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main) // 500ms 디바운싱
-            .sink { [weak self] _ in
-                Task { @MainActor in
-                    await self?.handleImageSaveCompleted()
-                }
-            }
-            .store(in: &cancellables)
+        // NotificationCenter 관련 코드 제거됨
     }
     
     private func updateFavoriteStatus(_ favoriteInfo: FavoriteStatusInfo) {
@@ -544,112 +486,13 @@ final class HomeViewModel: ObservableObject {
     
     // MARK: - Optimistic Update Handling
     
-    /// 낙관적 업데이트 완료 처리 (즉시 로컬 데이터 새로고침)
-    private func handleOptimisticUpdateCompleted() async {
-        debugPrint("🚀 낙관적 업데이트 완료 - 즉시 로컬 데이터 새로고침")
-        
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        
-        if isGuest {
-            // 게스트 모드: 로컬 데이터 즉시 새로고침
-            loadScreenshotFromLocal()
-        } else {
-            // 로그인 모드: 로컬 + 캐시에서 즉시 새로고침 (서버는 백그라운드에서 동기화)
-            await refreshFromLocalAndCache()
-        }
-        
-        // 즐겨찾기도 함께 새로고침
-        await loadFavorite()
-        
-        debugPrint("✅ 낙관적 업데이트 후 즉시 새로고침 완료")
-    }
+    // handleOptimisticUpdateCompleted 메서드 삭제됨 - NotificationCenter 사용 중단
     
-    /// 로컬과 캐시에서 즉시 새로고침 (로그인 모드용)
-    private func refreshFromLocalAndCache() async {
-        debugPrint("🔄 로컬 + 캐시에서 즉시 새로고침")
-        
-        do {
-            // 로컬 SwiftData와 메모리 캐시를 결합해서 최신 데이터 구성
-            let localItems = try SwiftDataManager.shared.fetchAllEntities()
-            let cachedVMs = InMemoryScreenshotCache.shared.retrieveAll()
-            
-            // 로컬 데이터를 ViewModel로 변환
-            let localVMs = localItems.map { ScreenshotItemViewModel(model: ScreenshotItem(entity: $0), repository: repository) }
-            
-            // 캐시 데이터와 병합 (ID 기준으로 중복 제거)
-            var mergedVMs: [ScreenshotItemViewModel] = []
-            var seenIDs: Set<String> = []
-            
-            // 로컬 데이터 우선 (최신 태그 정보 포함)
-            for vm in localVMs {
-                if !seenIDs.contains(vm.id) {
-                    seenIDs.insert(vm.id)
-                    mergedVMs.append(vm)
-                }
-            }
-            
-            // 캐시 데이터 추가 (로컬에 없는 서버 데이터)
-            for cachedVM in cachedVMs {
-                if !seenIDs.contains(cachedVM.id) {
-                    seenIDs.insert(cachedVM.id)
-                    mergedVMs.append(cachedVM)
-                }
-            }
-            
-            // UI 업데이트
-            await MainActor.run {
-                self.itemVMs = mergedVMs
-                debugPrint("✅ 로컬 + 캐시 즉시 새로고침 완료: \(mergedVMs.count)개")
-            }
-            
-        } catch {
-            debugPrint("❌ 로컬 + 캐시 새로고침 실패: \(error.localizedDescription)")
-        }
-    }
+    // refreshFromLocalAndCache 메서드 삭제됨 - NotificationCenter 사용 중단
     
-    /// 서버 동기화 실패 처리 (사용자에게 알림)
-    private func handleServerSyncFailure(errorMessage: String) async {
-        debugPrint("❌ 서버 동기화 실패 알림 수신: \(errorMessage)")
-        
-        // TODO: Toast나 Alert로 사용자에게 알림
-        // 현재는 로그만 출력, 추후 UI 컴포넌트 추가 가능
-        
-        // 로컬 데이터는 이미 롤백되었으므로 UI 새로고침
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        
-        if isGuest {
-            loadScreenshotFromLocal()
-        } else {
-            await refreshFromLocalAndCache()
-        }
-        
-        debugPrint("✅ 서버 동기화 실패 후 UI 복원 완료")
-    }
+    // handleServerSyncFailure 메서드 삭제됨 - NotificationCenter 사용 중단
     
-    /// 로그인 성공 후 홈화면 데이터 새로고침
-    @MainActor
-    private func handleLoginSuccessCompleted() async {
-        debugPrint("📢 로그인 성공 알림 수신 - 홈화면 데이터 새로고침 시작")
-        
-        // 기존 데이터 상태 초기화
-        page = 0
-        favoritePage = 0
-        canLoadMorePages = true
-        canLoadMoreFavoritePages = true
-        itemVMs = []
-        favoriteItemVMs = []
-        currentFavoriteIndex = 0
-        
-        // 로그인 상태로 전체 데이터 새로고침
-        await loadScreenshots()
-        
-        // 데이터 로딩 완료 후 첫 화면 이미지들 미리 로드
-        if !itemVMs.isEmpty {
-            await loadInitialVisibleImagesForNotification()
-        }
-        
-        debugPrint("✅ 로그인 성공 후 홈화면 데이터 새로고침 완료")
-    }
+    // handleLoginSuccessCompleted 메서드 삭제됨 - NotificationCenter 사용 중단
     
     /// Notification으로 트리거된 이미지 미리 로딩 (HomeView의 loadInitialVisibleImages와 동일한 로직)
     private func loadInitialVisibleImagesForNotification() async {
@@ -682,27 +525,5 @@ final class HomeViewModel: ObservableObject {
         debugPrint("✅ Notification - 초기 이미지 로딩 전체 완료")
     }
     
-    /// 이미지 저장 완료 후 홈화면 데이터 새로고침
-    @MainActor
-    private func handleImageSaveCompleted() async {
-        debugPrint("📢 이미지 저장 완료 알림 수신 - 홈화면 데이터 새로고침 시작")
-        
-        // 게스트 모드인지 확인
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        
-        if isGuest {
-            // 게스트 모드: 로컬 데이터만 새로고침
-            debugPrint("🔍 게스트 모드 - 로컬 데이터만 새로고침")
-            loadScreenshotFromLocal()
-        } else {
-            // 로그인 모드: 서버 데이터 새로고침 (첫 페이지만)
-            debugPrint("🔍 로그인 모드 - 서버 첫 페이지 새로고침")
-            page = 0
-            canLoadMorePages = true
-            await loadFromServerOnly()
-            await loadFavorite() // 즐겨찾기도 함께 새로고침
-        }
-        
-        debugPrint("✅ 이미지 저장 완료 후 홈화면 데이터 새로고침 완료")
-    }
+    // handleImageSaveCompleted 메서드 삭제됨 - NotificationCenter 사용 중단
 }

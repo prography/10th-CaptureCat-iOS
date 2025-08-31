@@ -282,6 +282,12 @@ final class ScreenshotRepository: ObservableObject {
         return viewModel
     }
     
+    /// 임시 데이터용 ViewModel 생성 (캐싱 우회)
+    func createTemporaryViewModel(for model: ScreenshotItem) -> ScreenshotItemViewModel {
+        // 캐시를 사용하지 않고 항상 새 인스턴스 생성
+        return ScreenshotItemViewModel(model: model, repository: self)
+    }
+    
     private func syncViewModel(_ viewModel: ScreenshotItemViewModel, with model: ScreenshotItem) {
         viewModel.fileName = model.fileName
         viewModel.createDate = model.createDate

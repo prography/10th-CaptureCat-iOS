@@ -213,9 +213,7 @@ class ScreenshotItemViewModel: ObservableObject, Identifiable {
             try await repository.saveToServerOnly(self)
             debugPrint("✅ 서버 저장 완료: \(fileName)")
             
-            // 이미지 저장 완료 notification 전송
-            NotificationCenter.default.post(name: .imageSaveCompleted, object: nil)
-            debugPrint("📢 이미지 저장 완료 notification 전송")
+            // imageSaveCompleted notification 삭제됨 - 홈뷰 NotificationCenter 사용 중단
         } catch {
             errorMessage = error.localizedDescription
             debugPrint("❌ 서버 저장 실패: \(error.localizedDescription)")

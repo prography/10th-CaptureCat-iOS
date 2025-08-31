@@ -88,7 +88,7 @@ final class TagViewModel: ObservableObject {
         }
     }
     
-    // 배열을 받아서 대응하는 ScreenshotItemViewModel들을 생성
+    // 배열을 받아서 대응하는 ScreenshotItemViewModel들을 생성 (임시 데이터용)
     func createViewModel(from ids: [String]) {
         let results =  PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil)
         results.enumerateObjects { asset, _, _ in
@@ -100,7 +100,9 @@ final class TagViewModel: ObservableObject {
                 tags: [],
                 isFavorite: asset.isFavorite
             )
-            self.itemVMs.append( (ScreenshotItemViewModel(model: newItem, repository: self.repository)))
+            // 임시 데이터이므로 캐싱 우회하여 새 인스턴스 생성
+            let temporaryViewModel = self.repository.createTemporaryViewModel(for: newItem)
+            self.itemVMs.append(temporaryViewModel)
         }
     }
     

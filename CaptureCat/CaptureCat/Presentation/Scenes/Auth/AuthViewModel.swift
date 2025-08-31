@@ -288,7 +288,7 @@ class AuthViewModel: ObservableObject {
             
             // 모든 상태 업데이트가 완료된 후 notification 전송
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                NotificationCenter.default.post(name: .loginSuccessCompleted, object: nil)
+                // loginSuccessCompleted notification 삭제됨 - 홈뷰 NotificationCenter 사용 중단
                 debugPrint("📢 로그인 성공 notification 전송 완료")
             }
         }
