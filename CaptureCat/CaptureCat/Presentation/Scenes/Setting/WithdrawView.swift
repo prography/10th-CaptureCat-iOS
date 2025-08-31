@@ -86,7 +86,6 @@ struct WithdrawView: View {
             VStack(spacing: 4) {
                 Button("계속") {
                     authViewModel.withdraw(reason: selectedReason ?? "")
-                    router.pop()
                 }
                 .primaryStyle()
                 Button("취소") {
@@ -95,6 +94,13 @@ struct WithdrawView: View {
                 .primaryStyle(backgroundColor: .gray02, foregroundColor: .text02)
             }
             .padding(.horizontal, 16)
+        }
+        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
+        .onChange(of: authViewModel.withdrawSuccess) { success in
+            if success {
+                router.popToRoot()
+                authViewModel.withdrawSuccess = false
+            }
         }
         .padding(.top)
     }

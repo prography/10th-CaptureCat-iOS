@@ -15,64 +15,78 @@ import SwiftData
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            // App 전역에서 부를 수 있는 정적/싱글턴 로직만 사용
+            PhotoLoader.shared.cacheInfo()
+            debugPrint("✅ 메모리 경고 대응 완료(AppDelegate)")
+        }
+        
         return true
     }
 }
 
 @main
 struct CaptureCatApp: App {
-    @State var onBoardingViewModel: OnBoardingViewModel = OnBoardingViewModel()
+    // MARK: - App-scoped state objects
+    @StateObject private var authViewModel: AuthViewModel
+    @StateObject private var screenshotRepository: ScreenshotRepository
+    @StateObject private var updateViewModel = UpdateViewModel()
+    @StateObject private var homeViewModel: HomeViewModel
+    
+    @State private var onBoardingViewModel = OnBoardingViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
-    private var networkManager: NetworkManager {
-        guard let url = BaseURLType.production.url else {
-            fatalError("Invalid base URL")
-        }
-        
-        return NetworkManager(baseURL: url)
-    }
-    
-    @StateObject private var authViewModel: AuthViewModel = {
-        guard let url = BaseURLType.production.url else {
-            fatalError("Invalid base URL")
-        }
-        let networkManager = NetworkManager(baseURL: url)
-        return AuthViewModel(networkManager: networkManager)
-    }()
-    
-    @StateObject private var updateViewModel = UpdateViewModel()
-    @StateObject private var homeViewModel: HomeViewModel = {
-        guard let url = BaseURLType.production.url else {
-            fatalError("Invalid base URL")
-        }
-        let networkManager = NetworkManager(baseURL: url)
-        
-        return HomeViewModel(networkManager: networkManager)
-    }()
-    
+
+    private let networkManager: NetworkManager
+
     init() {
+        // 1) 의존성 생성
+        let baseURL = BaseURLType.production.url!
+        
+        let networkManager = NetworkManager(baseURL: baseURL)
+        self.networkManager = networkManager
+        
+        let repo = ScreenshotRepository(networkManager: networkManager)
+        
+        // 2) StateObject 초기화 (언더스코어 사용!)
+        _screenshotRepository = StateObject(wrappedValue: repo)
+        _authViewModel = StateObject(wrappedValue: AuthViewModel(
+            networkManager: networkManager,
+            repository: repo
+        ))
+        _homeViewModel = StateObject(wrappedValue: HomeViewModel(
+            repository: repo
+        ))
+        
+        // 3) 나머지 셋업
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoKey ?? "")
         UITextField.appearance().tintColor = .gray09
         Mixpanel.initialize(token: Bundle.main.mixpanelToken ?? "", trackAutomaticEvents: true)
-        setupMemoryWarningNotification()
     }
-    
+
     var body: some Scene {
         WindowGroup {
-            if onBoardingViewModel.isOnBoarding {
-                OnBoardingView(viewModel: $onBoardingViewModel)
-            } else {
-                AuthenticatedView(networkManager: networkManager)
-                    .environmentObject(updateViewModel)
-                    .environmentObject(authViewModel)
-                    .environmentObject(homeViewModel)
-                    .modelContainer(SwiftDataManager.shared.modelContainer)
-                    .onOpenURL { url in
-                        if (AuthApi.isKakaoTalkLoginUrl(url)) {
-                            _ = AuthController.handleOpenUrl(url: url)
+            Group {
+                if onBoardingViewModel.isOnBoarding {
+                    OnBoardingView(viewModel: $onBoardingViewModel)
+                } else {
+                    AuthenticatedView(networkManager: networkManager)
+                        .environmentObject(screenshotRepository)
+                        .environmentObject(updateViewModel)
+                        .environmentObject(authViewModel)
+                        .environmentObject(homeViewModel)
+                        .modelContainer(SwiftDataManager.shared.modelContainer)
+                        .onOpenURL { url in
+                            if AuthApi.isKakaoTalkLoginUrl(url) {
+                                _ = AuthController.handleOpenUrl(url: url)
+                            }
                         }
-                    }
+                }
             }
         }
         .onChange(of: scenePhase) { _, newPhase in

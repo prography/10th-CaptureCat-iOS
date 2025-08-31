@@ -10,14 +10,9 @@ import SwiftUI
 struct DetailView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var homeViewModel: HomeViewModel
-    @StateObject private var viewModel: DetailViewModel
+    @StateObject var viewModel: DetailViewModel
     
-    private let imageId: String
-    
-    init(imageId: String) {
-        self.imageId = imageId
-        self._viewModel = StateObject(wrappedValue: DetailViewModel(imageId: imageId))
-    }
+    let imageId: String
     
     var body: some View {
         ZStack {

@@ -11,7 +11,7 @@ import Combine
 @MainActor
 class FavoriteViewModel: ObservableObject {
     // MARK: - Dependencies
-    private let repository = ScreenshotRepository.shared
+    private let repository: ScreenshotRepository
     
     // MARK: - Published Properties
     @Published var favoriteItems: [ScreenshotItemViewModel] = []
@@ -29,7 +29,8 @@ class FavoriteViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization
-    init() {
+    init(repository: ScreenshotRepository) {
+        self.repository = repository
         setupNotificationObservers()
     }
     
@@ -132,7 +133,7 @@ class FavoriteViewModel: ObservableObject {
         Task {
             do {
                 // 🔧 Repository의 deleteFavorite를 직접 호출 (항상 삭제만 수행)
-                try await ScreenshotRepository.shared.deleteFavorite(id: viewModel.id)
+                try await repository.deleteFavorite(id: viewModel.id)
                 
                 // ✅ API 성공 시 ViewModel의 isFavorite 상태 업데이트
                 await MainActor.run {

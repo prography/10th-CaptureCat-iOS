@@ -20,6 +20,7 @@ class AuthViewModel: ObservableObject {
     private let socialManager: SocialManager = SocialManager()
     private let networkManager: NetworkManager
     private let authService: AuthService
+    private let repository: ScreenshotRepository
     
     @Published var authenticationState: AuthenticationState = .initial
     @Published var isAutoLoginInProgress: Bool = false
@@ -29,10 +30,12 @@ class AuthViewModel: ObservableObject {
     @Published var isSignOutPresented: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
+    @Published var withdrawSuccess: Bool = false
     
-    init(networkManager: NetworkManager) {
+    init(networkManager: NetworkManager, repository: ScreenshotRepository) {
         self.networkManager = networkManager
         self.authService = AuthService(networkManager: networkManager)
+        self.repository = repository
         setupNotificationObservers()
     }
     
@@ -244,9 +247,7 @@ class AuthViewModel: ObservableObject {
     func logOut() {
         safelyCleanupAllTokens()
         clearAllCacheData()
-        DispatchQueue.main.async {
-            self.authenticationState = .initial
-        }
+        self.authenticationState = .initial
 //        MixpanelManager.shared.logout()
     }
     
@@ -261,9 +262,8 @@ class AuthViewModel: ObservableObject {
                 safelyCleanupAllTokens()
                 clearAllCacheData()
                 safelyCleanupUserDefaults()
-                DispatchQueue.main.async {
-                    self.authenticationState = .initial
-                }
+                self.authenticationState = .initial
+                self.withdrawSuccess = true
             case .failure (let error):
                 self.errorMessage = "탈퇴에 실패했어요! 다시 시도해주세요."
                 self.errorToast = true
@@ -321,7 +321,7 @@ class AuthViewModel: ObservableObject {
         debugPrint("🧹 모든 캐시 데이터 정리 시작")
         
         // 1. 메모리 캐시 클리어 (InMemoryScreenshotCache)
-        ScreenshotRepository.shared.clearMemoryCache()
+        repository.clearMemoryCache()
         
         // 2. 모든 이미지 캐시 클리어 (서버 + 로컬)
         PhotoLoader.shared.clearAllCache()

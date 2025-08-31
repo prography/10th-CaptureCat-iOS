@@ -30,7 +30,7 @@ final class AuthService {
         let builder = WithdrawBuilder(reason: reason)
         
         do {
-            let response = try await networkManager.fetchData(builder)
+            let response = try await networkManager.fetchDataWithRefresh(builder)
             return Result<ResponseDTO, Error>.success(response)
         } catch {
             debugPrint("🔥 Withdraw Error:\(error)")

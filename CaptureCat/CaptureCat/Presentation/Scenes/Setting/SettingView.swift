@@ -35,7 +35,7 @@ struct SettingsView: View {
             
             if authViewModel.authenticationState == .guest {
                 guestCard
-                    .background(Color(.gray02))
+                    .background(Color(.primaryLow))
                     .cornerRadius(12)
                     .padding(.horizontal, 16)
             } else {
@@ -44,7 +44,7 @@ struct SettingsView: View {
                     .cornerRadius(12)
                     .padding(.horizontal, 16)
             }
-            
+            personalSettingSection
             serviceSection
             helpSection
         }
@@ -101,7 +101,6 @@ struct SettingsView: View {
         ) {
             router.push(.withdraw)
         }
-//        .toast(isShowing: $authViewModel.errorToast, message: authViewModel.errorMessage ?? "다시 시도해주세요")
         .sheet(isPresented: $showPersonal, content: {
             SafariView(url: URL(string: WebLink.personal.url)!)
         })
@@ -114,20 +113,25 @@ struct SettingsView: View {
     }
     
     private var guestCard: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 6) {
             Text("현재 게스트 모드로 사용하고 있어요")
                 .CFont(.subhead01Bold)
                 .foregroundColor(.text01)
+            Text("로그인 시 다른 기기에서도 이미지를 관리할 수 있어요")
+                .CFont(.caption02Regular)
+                .foregroundStyle(.text02)
+                .padding(.bottom, 12)
             
             Button(action: {
                 authViewModel.authenticationState = .initial
+                router.pop()
             }) {
                 Text("로그인하기")
                     .frame(maxWidth: .infinity)
             }
             .primaryStyle()
         }
-        .padding(24)
+        .padding(16)
     }
     
     private var idCard: some View {
@@ -138,6 +142,29 @@ struct SettingsView: View {
                 .padding(24)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private var personalSettingSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("사용자 환경 설정")
+                    .CFont(.body02Regular)
+                    .foregroundStyle(Color.text02)
+                    .backgroundStyle(Color.gray02)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.gray02)
+            
+            Button {
+                router.push(.tagSetting)
+            } label: {
+                SettingRow(title: "태그 설정")
+            }
+            .contentShape(Rectangle())
+        }
     }
     
     private var serviceSection: some View {
@@ -157,24 +184,21 @@ struct SettingsView: View {
             Button {
                 showPersonal = true
             } label: {
-                Text("개인정보 처리 방침")
-                    .CFont(.body01Regular)
-                    .foregroundStyle(Color.text01)
-                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
+                SettingRow(title: "개인정보 처리방침")
             }
             .contentShape(Rectangle())
             
             Button {
                 showTerms = true
             } label: {
-                Text("서비스 이용약관")
-                    .CFont(.body01Regular)
-                    .foregroundStyle(Color.text01)
-                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
+                SettingRow(title: "이용 약관")
+            }
+            .contentShape(Rectangle())
+            
+            Button {
+                openURL(storeURL)
+            } label: {
+                SettingRow(title: "앱 리뷰 남기기")
             }
             .contentShape(Rectangle())
             
@@ -223,16 +247,10 @@ struct SettingsView: View {
             .background(Color.gray02)
             
             Button {
-                debugPrint("불편사항 접수")
 //                KakaoChannelManger.chatChannel()
                 showChannel = true
             } label: {
-                Text("불편사항 접수")
-                    .CFont(.body01Regular)
-                    .foregroundStyle(Color.text01)
-                    .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
+                SettingRow(title: "채널 문의하기")
             }
             .contentShape(Rectangle())
             
@@ -259,7 +277,7 @@ struct SettingsView: View {
                     }
                 } label: {
                     Text("로그아웃")
-                        .CFont(.body01Regular)
+                        .CFont(.body02Regular)
                         .foregroundStyle(Color.text01)
                         .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
                         .padding(.vertical, 8)

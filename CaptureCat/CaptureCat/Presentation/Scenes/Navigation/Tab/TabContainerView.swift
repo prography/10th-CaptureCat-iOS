@@ -10,6 +10,7 @@ import Combine
 
 struct TabContainerView: View {
     @Environment(TabSelection.self) private var tabs
+    @EnvironmentObject var repository: ScreenshotRepository
     @State private var isKeyboardVisible: Bool = false
     @State private var showTutorial: Bool = false
     
@@ -28,12 +29,12 @@ struct TabContainerView: View {
                 // 1) 탭별 화면 분기
                 switch tabs.current {
                 case .temporaryStorage:
-                    let viewModel = StorageViewModel(networkManager: networkManager)
+                    let viewModel = StorageViewModel(networkManager: networkManager, repository: repository)
                     StorageView(viewModel: viewModel)
                 case .home:
                     HomeView()
                 case .search:
-                    let viewModel = SearchViewModel(networkManager: networkManager)
+                    let viewModel = SearchViewModel(repository: repository)
                     SearchView(viewModel: viewModel)
                 }
                 

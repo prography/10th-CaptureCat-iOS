@@ -24,11 +24,11 @@ struct ToastModifier: ViewModifier {
                         .foregroundColor(textColor)
                         .multilineTextAlignment(.center)
                         .frame(height: 46)
-                        .padding(.horizontal, 16)
                         .frame(maxWidth: fillWidth ? .infinity : nil)
                         .background(.overlayDim)
                         .cornerRadius(cornerRadius)
-                        .padding(.bottom, 72)
+                        .padding(.bottom, 80)
+                        .padding(.horizontal, 16)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }

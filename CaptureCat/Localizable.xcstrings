@@ -92,6 +92,28 @@
         }
       }
     },
+    "%lld/30" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/30"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/30"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/30"
+          }
+        }
+      }
+    },
     "%lld%% 완료" : {
       "localizations" : {
         "en" : {
@@ -279,6 +301,282 @@
         }
       }
     },
+    "topic.fashion" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fashion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コーデ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코디"
+          }
+        }
+      }
+    },
+    "topic.fitness" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fitness"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "運動"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동"
+          }
+        }
+      }
+    },
+    "topic.job" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Job"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仕事関連"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "직무 관련"
+          }
+        }
+      }
+    },
+    "topic.music" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音楽"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "노래"
+          }
+        }
+      }
+    },
+    "topic.quotes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quotes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フレーズ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "글귀"
+          }
+        }
+      }
+    },
+    "topic.recipe" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レシピ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레시피"
+          }
+        }
+      }
+    },
+    "topic.reference" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "参考"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레퍼런스"
+          }
+        }
+      }
+    },
+    "topic.restaurant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グルメ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "맛집"
+          }
+        }
+      }
+    },
+    "topic.selfImprovement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Self-Improvement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己啓発"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자기계발"
+          }
+        }
+      }
+    },
+    "topic.shopping" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shopping"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショッピング"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "쇼핑"
+          }
+        }
+      }
+    },
+    "topic.study" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "勉強"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공부"
+          }
+        }
+      }
+    },
+    "topic.travel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Travel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旅行"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여행"
+          }
+        }
+      }
+    },
     "가입하면 캡쳐캣의" : {
       "localizations" : {
         "en" : {
@@ -297,28 +595,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "가입하면 캡쳐캣의"
-          }
-        }
-      }
-    },
-    "개인정보 처리 방침" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy Policy"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プライバシーポリシー"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "개인정보 처리방침"
           }
         }
       }
@@ -433,28 +709,6 @@
         }
       }
     },
-    "공부" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Study"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "勉強"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "공부"
-          }
-        }
-      }
-    },
     "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요." : {
       "localizations" : {
         "en" : {
@@ -499,28 +753,6 @@
         }
       }
     },
-    "글귀" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quotes"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フレーズ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "글귀"
-          }
-        }
-      }
-    },
     "나중에 하기" : {
       "localizations" : {
         "en" : {
@@ -561,28 +793,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "나중에도 저장할 수 있으니 먼저 필요한 이미지만 골라보세요."
-          }
-        }
-      }
-    },
-    "노래" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Music"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "音楽"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "음악"
           }
         }
       }
@@ -653,46 +863,46 @@
         }
       }
     },
-    "레시피" : {
+    "등록" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recipe"
+            "value" : "Register"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レシピ"
+            "value" : "登録"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "레시피"
+            "value" : "등록"
           }
         }
       }
     },
-    "레퍼런스" : {
+    "등록된 태그가 없어요." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reference"
+            "value" : "No tags added yet."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "参考"
+            "value" : "まだタグがありません"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "레퍼런스"
+            "value" : "등록된 태그가 없어요."
           }
         }
       }
@@ -737,6 +947,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "로그아웃하면"
+          }
+        }
+      }
+    },
+    "로그인 시 다른 기기에서도 이미지를 관리할 수 있어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage your images on any device once you log in"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインすれば他の端末でも画像を管理できます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 시 다른 기기에서도 이미지를 관리할 수 있어요"
           }
         }
       }
@@ -851,28 +1083,6 @@
         }
       }
     },
-    "맛집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restaurant"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "グルメ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "맛집"
-          }
-        }
-      }
-    },
     "모든 사진에 대한 접근 허용을 해도\n캡처캣은 스크린샷만 불러와요" : {
       "localizations" : {
         "en" : {
@@ -983,28 +1193,6 @@
         }
       }
     },
-    "불편사항 접수" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send feedback"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバック"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "불편사항 접수"
-          }
-        }
-      }
-    },
     "비슷한 서비스를 이미 사용하고 있어요" : {
       "localizations" : {
         "en" : {
@@ -1023,6 +1211,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "비슷한 서비스를 이미 사용하고 있어요"
+          }
+        }
+      }
+    },
+    "사용자 환경 설정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Preferences"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユーザー設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 환경 설정"
           }
         }
       }
@@ -1248,28 +1458,6 @@
         }
       }
     },
-    "서비스 이용약관" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terms of Service"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サービス利用規約"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "서비스 이용약관"
-          }
-        }
-      }
-    },
     "서비스 정보" : {
       "localizations" : {
         "en" : {
@@ -1403,24 +1591,24 @@
         }
       }
     },
-    "쇼핑" : {
+    "수정" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shopping"
+            "value" : "Edit"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ショッピング"
+            "value" : "編集"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "쇼핑"
+            "value" : "수정"
           }
         }
       }
@@ -1645,6 +1833,28 @@
         }
       }
     },
+    "앱 리뷰 남기기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave a Review"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリをレビューする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱 리뷰 남기기"
+          }
+        }
+      }
+    },
     "업데이트" : {
       "localizations" : {
         "en" : {
@@ -1711,28 +1921,6 @@
         }
       }
     },
-    "여행" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Travel"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "旅行"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "여행"
-          }
-        }
-      }
-    },
     "오류" : {
       "localizations" : {
         "en" : {
@@ -1777,28 +1965,6 @@
         }
       }
     },
-    "운동" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fitness"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동"
-          }
-        }
-      }
-    },
     "이미지를 불러올 수 없습니다" : {
       "localizations" : {
         "en" : {
@@ -1817,6 +1983,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지를 불러올 수 없습니다"
+          }
+        }
+      }
+    },
+    "이용 약관" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Service"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サービス利用規約"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이용 약관"
           }
         }
       }
@@ -1905,28 +2093,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "임시보관함에서 스크린샷을 저장할 수 있어요!"
-          }
-        }
-      }
-    },
-    "자기계발" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Self-Improvement"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自己啓発"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "자기계발"
           }
         }
       }
@@ -2102,24 +2268,24 @@
         }
       }
     },
-    "직무 관련" : {
+    "채널 문의하기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Job"
+            "value" : "Send feedback"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "仕事関連"
+            "value" : "チャンネルに連絡する"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "직무 관련"
+            "value" : "채널 문의하기"
           }
         }
       }
@@ -2432,28 +2598,6 @@
         }
       }
     },
-    "코디" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fashion"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コーデ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "코디"
-          }
-        }
-      }
-    },
     "태그 바로가기" : {
       "localizations" : {
         "en" : {
@@ -2472,6 +2616,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "태그 바로가기"
+          }
+        }
+      }
+    },
+    "태그 설정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 설정"
+          }
+        }
+      }
+    },
+    "태그 수정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Tag"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ編集"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그 수정"
           }
         }
       }
@@ -2564,6 +2752,28 @@
         }
       }
     },
+    "태그로 분류하면 원하는 이미지를\n쉽게 찾을 수 있어요!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize with tags to find images easily!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグで整理すると、画像がもっと探しやすいよ！"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그로 분류하면 원하는 이미지를\n쉽게 찾을 수 있어요!"
+          }
+        }
+      }
+    },
     "태그하기" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2605,6 +2815,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "태그하기 %@"
+          }
+        }
+      }
+    },
+    "편집" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "편집"
           }
         }
       }
