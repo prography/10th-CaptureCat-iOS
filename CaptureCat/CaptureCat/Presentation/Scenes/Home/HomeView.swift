@@ -364,7 +364,7 @@ struct HomeView: View {
                 guard i < viewModel.itemVMs.count else { break }
                 
                 group.addTask {
-                    await viewModel.itemVMs[i].loadFullImage()
+                    await currentItems[i].loadFullImage()
                 }
             }
         }
