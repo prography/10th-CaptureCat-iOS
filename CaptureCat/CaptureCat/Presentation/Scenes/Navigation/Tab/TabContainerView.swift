@@ -34,8 +34,7 @@ struct TabContainerView: View {
                 case .home:
                     HomeView()
                 case .search:
-                    let viewModel = SearchViewModel(repository: repository)
-                    SearchView(viewModel: viewModel)
+                    SearchView()
                 }
                 
                 // 2) 화면 아래에 탭 바 - 키보드 상태에 따라 조건부 표시

@@ -9,10 +9,17 @@ import SwiftUI
 
 struct SearchView: View {
     @EnvironmentObject var router: Router
-    @StateObject var viewModel: SearchViewModel
+    @EnvironmentObject var viewModel: SearchViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("검색")
+                .CFont(.headline02Bold)
+                .foregroundStyle(.text02)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+            Divider()
+                .foregroundStyle(.divider)
             // 검색바
             searchBar
                 .padding(.horizontal, 16)
@@ -82,8 +89,8 @@ struct SearchView: View {
                 TextField("태그 이름으로 검색해 보세요", text: $viewModel.searchText)
                     .CFont(.body02Regular)
                     .foregroundColor(.gray06)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
                     .background(Color.gray03)
                     .cornerRadius(8)
             }
@@ -94,20 +101,15 @@ struct SearchView: View {
     private var tagShortcutSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 태그 목록
-            if viewModel.selectedTags.isEmpty {
-                HStack {
-                    Text("태그 바로가기")
-                        .CFont(.subhead01Bold)
-                        .foregroundColor(.text01)
-                    Spacer()
-                }
-                .padding(.horizontal, 16)
-                // 기본 상태: 모든 태그 표시
-                defaultTagsSection
-            } else {
-                // 선택된 태그가 있을 때: 연관 태그와 결과 표시
-                selectedTagsSection
+            HStack {
+                Text("태그 바로가기")
+                    .CFont(.subhead01Bold)
+                    .foregroundColor(.text01)
+                Spacer()
             }
+            .padding(.horizontal, 16)
+            // 기본 상태: 모든 태그 표시
+            defaultTagsSection
         }
     }
     
@@ -140,96 +142,20 @@ struct SearchView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .padding(.vertical, 20)
             } else {
-                tagGrid(tags: viewModel.filteredTags)
-            }
-        }
-    }
-    
-    // MARK: - 선택된 태그 상태 섹션
-    private var selectedTagsSection: some View {
-        VStack(spacing: 20) {
-            // 연관 태그들 표시
-            if !viewModel.relatedTags.isEmpty {
-                tagGrid(tags: viewModel.relatedTags)
-            }
-            
-            // 선택된 태그들의 검색 결과
-            selectedTagResults
-        }
-    }
-    
-    // MARK: - 태그 그리드
-    private func tagGrid(tags: [String]) -> some View {
-        return ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(tags, id: \.self) { tag in
-                    Button {
-                        viewModel.selectTag(tag)
-                    } label: {
-                        Text(tag)
-                            .CFont(.body02Regular)
-                    }
-                    .chipStyle(isSelected: false)
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-    
-    // MARK: - 선택된 태그 결과
-    private var selectedTagResults: some View {
-        VStack(spacing: 16) {
-            if viewModel.isLoadingScreenshots {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Spacer()
-                }
-                .padding(.vertical, 20)
-            } else {
-                ScrollView {
-                    LazyVGrid(columns: gridColumns, spacing: 12) {
-                        ForEach(viewModel.filteredScreenshots) { item in
-                            Button {
-                                router.push(.detail(id: item.id))
-                            } label: {
-                                ScreenshotItemView(viewModel: item, cornerRadius: 4) {
-                                    TagFlowLayout(tags: item.tags.map { $0.name }, maxLines: 2)
-                                        .padding(6)
-                                }
-                            }
-                            .onAppear {
-                                // 마지막 아이템에 도달했을 때 더 많은 데이터 로드
-                                if viewModel.shouldLoadMore(currentItem: item) {
-                                    viewModel.loadMoreScreenshots()
-                                }
-                            }
+                FlowLayout(spacing: 8, rowSpacing: 12) {
+                    ForEach(viewModel.filteredTags, id: \.self) { tag in
+                        Button {
+                            viewModel.selectTag(tag)
+                            router.push(.searchResult)
+                        } label: {
+                            Text(tag)
+                                .CFont(.body02Regular)
                         }
-                        
-                        // 추가 로딩 인디케이터
-                        if viewModel.isLoadingMore {
-                            VStack {
-                                HStack {
-                                    Spacer()
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                    Spacer()
-                                }
-                                .padding(.vertical, 10)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
+                        .chipStyle(isSelected: false)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 100)
                 }
+                .padding(.horizontal, 16)
             }
         }
     }
-    
-    // MARK: - Grid Layout
-    private let gridColumns = [
-        GridItem(.adaptive(minimum: 150), spacing: 12)
-    ]
-} 
+}
