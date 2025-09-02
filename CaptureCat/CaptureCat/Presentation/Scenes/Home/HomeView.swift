@@ -157,15 +157,7 @@ struct HomeView: View {
             // Pull to refresh (중복 실행 방지 적용)
             await viewModel.refreshScreenshots()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .loginSuccessCompleted)) { _ in
-            // 로그인 성공 알림을 받으면 즉시 데이터 새로고침
-            debugPrint("🏠 HomeView - 로그인 성공 notification 수신, 데이터 새로고침 시작")
-            Task {
-                // 약간의 지연을 두어 인증 상태가 완전히 안정화된 후 실행
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1초 대기
-                await loadDataBasedOnAuthState()
-            }
-        }
+        // .onReceive NotificationCenter 코드 삭제됨
         .sheet(isPresented: $showChannel) {
             SafariView(url: KakaoChannelManger.safariURL!)
         }
@@ -372,7 +364,7 @@ struct HomeView: View {
                 guard i < viewModel.itemVMs.count else { break }
                 
                 group.addTask {
-                    await viewModel.itemVMs[i].loadFullImage()
+                    await currentItems[i].loadFullImage()
                 }
             }
         }

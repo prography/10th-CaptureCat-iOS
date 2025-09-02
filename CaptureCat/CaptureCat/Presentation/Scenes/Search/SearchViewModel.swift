@@ -26,18 +26,52 @@ final class SearchViewModel: ObservableObject {
     private let pageSize: Int = 20
     
     private let repository: ScreenshotRepository
-    private var cancellables = Set<AnyCancellable>()
-//    private var networkManager: NetworkManager
+    private let service: SearchService
     
-    init(repository: ScreenshotRepository) {
+    private var searchTask: Task<Void, Never>?
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(repository: ScreenshotRepository, networkManager: NetworkManager) {
         self.repository = repository
+        self.service = SearchService(networkManager: networkManager)
         
         // 검색어 변경 시 필터링 (태그가 선택되지 않은 경우에만)
         $searchText
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] searchText in
-                guard let self = self, self.selectedTags.isEmpty else { return }
-                self.filterTags(with: searchText)
+            .sink { [weak self] query in
+                guard let self = self else { return }
+                
+                if AccountStorage.shared.isGuest ?? true {
+                    guard self.selectedTags.isEmpty else { return }
+                    self.filterTags(with: query)
+                } else {
+                    // 이전 검색 취소
+                    self.searchTask?.cancel()
+                    
+                    // 최신 검색 시작
+                    self.searchTask = Task { [weak self] in
+                        guard let self = self else { return }
+                        self.isLoading = true
+                        defer { self.isLoading = false }
+                        
+                        // 서버 호출
+                        let result = await self.service.searchTag(by: query)
+                        
+                        // 취소되었으면 무시
+                        guard !Task.isCancelled else { return }
+                        
+                        switch result {
+                        case .success(let dto):
+                            // ⬇️ 서버 응답 → [String]으로 매핑
+                            self.filteredTags = self.mapTags(from: dto)
+                        case .failure:
+                            // 실패 시 로컬 필터로 graceful fallback (원치 않으면 []로)
+                            self.filteredTags = self.allTags.filter {
+                                $0.localizedCaseInsensitiveContains(query)
+                            }
+                        }
+                    }
+                }
             }
             .store(in: &cancellables)
         
@@ -281,7 +315,13 @@ final class SearchViewModel: ObservableObject {
         resetPagination()
     }
     
+    private func mapTags(from dto: SearchDTO) -> [String] {
+        // 예: dto.tags, dto.data.tags, dto.items.map(\.name) 등
+        return dto.data.map { $0.name }
+    }
+    
     deinit {
+        searchTask?.cancel()
         cancellables.forEach { $0.cancel() }
     }
 } 

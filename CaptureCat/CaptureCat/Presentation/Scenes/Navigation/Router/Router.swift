@@ -21,6 +21,7 @@ final class Router: ObservableObject {
         case withdraw
         case tagSetting
         case recommendLogIn
+        case searchResult
     }
 
     @Published var path = NavigationPath()

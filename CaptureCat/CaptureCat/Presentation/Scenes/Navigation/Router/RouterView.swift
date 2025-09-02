@@ -74,6 +74,10 @@ struct RouterView<Content: View>: View {
                         RecommandLoginView()
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .searchResult:
+                        SearchResultView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }
