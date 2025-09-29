@@ -136,8 +136,13 @@ class HomeViewModel: ObservableObject {
             let newScreenshots: [ScreenshotItemViewModel]
             
             if AccountStorage.shared.isGuest ?? true {
-                // 게스트 모드에서는 로컬에서 전체 로드 (페이지네이션 미지원)
-                newScreenshots = try await repository.loadByTags([selectedTag ?? ""])
+                // 게스트 모드에서는 로컬에서 로드
+                if let selectedTag {
+                    newScreenshots = try await repository.loadByTags([selectedTag])
+                } else {
+                    // 전체 탭일 때는 모든 로컬 데이터 로드
+                    newScreenshots = try repository.loadAll()
+                }
                 hasMoreData = false // 로컬에서는 모든 데이터를 한 번에 로드
             } else if let selectedTag {
                 // 로그인 모드에서는 서버에서 페이지네이션으로 로드
@@ -145,6 +150,7 @@ class HomeViewModel: ObservableObject {
                 // 실제로는 repository의 loadByTagsFromServer 메서드를 직접 호출해야 함
                 newScreenshots = try await loadByTagsFromServerWithPagination([selectedTag], page: currentPage, size: pageSize)
             } else {
+                // 전체 탭일 때 서버에서 페이지네이션으로 로드
                 newScreenshots = try await repository.loadFromServerOnly(page: currentPage)
             }
             
@@ -249,23 +255,15 @@ class HomeViewModel: ObservableObject {
         // 1. 태그 목록 다시 로드
         await loadTags()
         
-        // 2. 선택된 태그가 있다면 해당 데이터들도 다시 로드
-        if selectedTag != nil {
-            resetPagination()
-            loadScreenshotsByTags()
-        } else {
-            let isGuest = AccountStorage.shared.isGuest ?? true
-            if !isGuest {
-                await loadScreenshotFromServer()
-            } else {
-                loadScreenshotFromLocal()
-            }
-        }
+        // 2. 페이지네이션 초기화 후 데이터 로드 (전체 탭 포함)
+        resetPagination()
+        loadScreenshotsByTags()
     }
     
     func clearAllSelections() {
         selectedTag = nil
         resetPagination()
+        loadScreenshotsByTags()
     }
     
     private func mapTags(from dto: SearchDTO) -> [Tag] {
