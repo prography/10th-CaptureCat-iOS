@@ -9,10 +9,5 @@ import Foundation
 
 struct SearchDTO: Codable {
     let result: String
-    let data: [DataType]
-}
-
-struct DataType: Codable {
-    let id: Int
-    let name: String
+    let data: [Tag]
 }
