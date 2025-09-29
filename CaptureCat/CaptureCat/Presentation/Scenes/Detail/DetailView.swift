@@ -65,7 +65,7 @@ struct DetailView: View {
         
         // 삭제 성공 시 HomeView에서 아이템 제거하고 dismiss
         if viewModel.errorMessage == nil {
-            homeViewModel.removeItem(with: imageId)
+//            homeViewModel.removeItem(with: imageId)
             router.pop()
         }
     }
