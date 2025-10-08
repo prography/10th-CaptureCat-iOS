@@ -15,11 +15,43 @@ class TagSettingViewModel: ObservableObject {
     @Published var selectedTag: Tag? = nil               // 현재 편집 중인 태그
     @Published var isShowingEditSheet: Bool = false      // 편집 시트 표시 여부
     @Published var tags: [Tag] = []                      // 태그 목록
+    @Published var isLoading: Bool = false               // 로딩 상태
+    
+    // MARK: - Dependencies
+    private let repository: ScreenshotRepository
+    
+    // MARK: - Initializer
+    init(repository: ScreenshotRepository) {
+        self.repository = repository
+    }
     
     // MARK: - Derived
     var tagCountText: String { "\(tags.count)/30" }
     
     var isEditButtonEnabled: Bool { !tags.isEmpty }
+    
+    // MARK: - Data Loading
+    func loadTags() async {
+        await MainActor.run {
+            isLoading = true
+        }
+        
+        do {
+            let loadedTags = try await repository.fetchAllTagsAsTag()
+            await MainActor.run {
+                self.tags = loadedTags
+                self.isDisabled = loadedTags.isEmpty
+                self.isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                print("태그 로딩 실패: \(error)")
+                self.tags = []
+                self.isDisabled = true
+                self.isLoading = false
+            }
+        }
+    }
     
     // MARK: - Actions
     func registerTag() {

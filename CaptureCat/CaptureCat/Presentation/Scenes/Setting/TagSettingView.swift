@@ -9,13 +9,7 @@ import SwiftUI
 
 struct TagSettingView: View {
     @EnvironmentObject var router: Router
-//    @StateObject var viewModel: TagSettingViewModel
-    @State private var isDisabled = true
-    @State private var searchTag: String = ""
-    @State private var selectedTag: Tag = Tag(id: 1, name: "태그 1")
-    @State private var tagEditBottomSheet: Bool = false
-    
-    @State var tags: [Tag] = [Tag(id: 1, name: "태그 1"), Tag(id: 2, name: "태그 2")]
+    @StateObject var viewModel: TagSettingViewModel
     
     var body: some View {
         VStack(spacing: 16) {
@@ -24,17 +18,32 @@ struct TagSettingView: View {
                 .foregroundStyle(.divider)
             searchBar
             
-            tagListView
+            if viewModel.isLoading {
+                loadingView
+            } else if viewModel.tags.isEmpty {
+                noTagListView
+            } else {
+                tagListView
+            }
         }
         .onAppear {
             UITextField.appearance().clearButtonMode = .whileEditing
+            Task {
+                await viewModel.loadTags()
+            }
         }
-        .sheet(isPresented: $tagEditBottomSheet, content: {
+        .sheet(isPresented: $viewModel.isShowingEditSheet, content: {
             NavigationStack {
                 EditTagSheet(
-                    tag: $selectedTag,
-                    isPresented: $tagEditBottomSheet,
-                    onAddNewTag: { newTag in print(newTag) }
+                    tag: Binding(
+                        get: { viewModel.selectedTag ?? Tag(id: 0, name: "") },
+                        set: { viewModel.selectedTag = $0 }
+                    ),
+                    isPresented: $viewModel.isShowingEditSheet,
+                    onAddNewTag: { newTag in 
+                        print("새 태그: \(newTag)")
+                        // TODO: 태그 업데이트 로직 추가
+                    }
                 )
                 .presentationDetents([ .height(180) ])
             }
@@ -54,7 +63,7 @@ struct TagSettingView: View {
             Text("태그 설정")
                 .CFont(.headline02Bold)
                 .foregroundStyle(.text02)
-            Text("\(tags.count)/30")
+            Text(viewModel.tagCountText)
                 .CFont(.headline02Regular)
                 .foregroundStyle(.text03)
             Spacer()
@@ -64,9 +73,9 @@ struct TagSettingView: View {
             } label: {
                 Text("편집")
                     .CFont(.body01Regular)
-                    .foregroundStyle(isDisabled ? .gray03 : .text03)
+                    .foregroundStyle(viewModel.isEditButtonEnabled ? .text03 : .gray03)
             }
-            .disabled(isDisabled)
+            .disabled(!viewModel.isEditButtonEnabled)
         }
         .padding(.horizontal, 16)
         .padding(.top)
@@ -75,7 +84,7 @@ struct TagSettingView: View {
     private var searchBar: some View {
         // 기본 검색 TextField
         HStack {
-            TextField("추가할 태그를 입력해주세요", text: $searchTag,
+            TextField("추가할 태그를 입력해주세요", text: $viewModel.addTag,
                       prompt: Text("추가할 태그를 입력해주세요")
                 .foregroundStyle(.text03)
             )
@@ -87,7 +96,7 @@ struct TagSettingView: View {
             .cornerRadius(8)
             
             Button {
-                print("cancel")
+                viewModel.registerTag()
             } label: {
                 Text("등록")
                     .CFont(.body02Regular)
@@ -99,6 +108,19 @@ struct TagSettingView: View {
         .background(Color.gray01)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
+    }
+    
+    private var loadingView: some View {
+        VStack {
+            Spacer()
+            ProgressView()
+                .scaleEffect(1.2)
+            Text("태그를 불러오는 중...")
+                .CFont(.body01Regular)
+                .foregroundStyle(.text03)
+                .padding(.top, 8)
+            Spacer()
+        }
     }
     
     private var noTagListView: some View {
@@ -118,10 +140,10 @@ struct TagSettingView: View {
     private var tagListView: some View {
         ScrollView {
             VStack(spacing: 0) {
-                ForEach(tags, id: \.id) { tag in
+                ForEach(viewModel.tags, id: \.id) { tag in
                     TagRow(
                         tag: tag,
-                        onEdit: { edit(tag) }
+                        onEdit: { viewModel.edit(tag) }
                     )
                     
                     // 인셋된 구분선 느낌 (왼쪽 여백 맞추기)
@@ -133,10 +155,5 @@ struct TagSettingView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .padding(.horizontal, 0)
         }
-    }
-    
-    private func edit(_ tag: Tag) {
-        print("수정: \(tag.name)")
-        self.tagEditBottomSheet = true
     }
 }
