@@ -17,23 +17,37 @@ struct HomeView: View {
             header
                 .padding(.bottom, 12)
             
-            TabSection(
-                tags: viewModel.allTags,
-                selectedTag: Binding(
-                    get: { viewModel.selectedTag },
-                    set: { viewModel.selectedTag = $0 }
-                ),
-                showAll: true
-            ) { newTag in
-                if let tag = newTag {
-                    viewModel.selectTag(tag)
-                } else {
-                    viewModel.clearAllSelections()
+            HStack {
+                TabSection(
+                    tags: viewModel.allTags,
+                    selectedTag: Binding(
+                        get: { viewModel.selectedTag },
+                        set: { viewModel.selectedTag = $0 }
+                    ),
+                    showAll: true
+                ) { newTag in
+                    if let tag = newTag {
+                        viewModel.selectTag(tag)
+                    } else {
+                        viewModel.clearAllSelections()
+                    }
+                    
+                    Task {
+                        await viewModel.refreshData()
+                    }
                 }
                 
-                Task {
-                    await viewModel.refreshData()
+                Button {
+                    router.push(.tagSetting)
+                } label: {
+                    Image(.toc)
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .opacity(0.9)
                 }
+                .background(.clear)
+                .padding(.trailing, 4)
+                .padding(.bottom, 2)
             }
             .padding(.horizontal, 8)
             
