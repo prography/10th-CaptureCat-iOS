@@ -60,7 +60,8 @@ struct CaptureCatApp: App {
             repository: repo
         ))
         _homeViewModel = StateObject(wrappedValue: HomeViewModel(
-            repository: repo
+            repository: repo,
+            networkManager: networkManager
         ))
         
         // 3) 나머지 셋업

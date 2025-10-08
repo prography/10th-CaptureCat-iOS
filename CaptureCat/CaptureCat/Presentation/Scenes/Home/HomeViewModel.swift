@@ -1,178 +1,103 @@
 //
-//  HomeViewModel.swift
+//  HomeViewModel2.swift
 //  CaptureCat
 //
-//  Created by minsong kim on 7/19/25.
+//  Created by minsong kim on 9/11/25.
 //
 
-import SwiftUI
-import Photos
 import Combine
+import SwiftUI
 
 @MainActor
-final class HomeViewModel: ObservableObject {
-    // MARK: - Dependencies
+class HomeViewModel: ObservableObject {
+    @Published var selectedTag: String?
+    @Published var allTags: [String] = []
+    @Published var filteredScreenshots: [ScreenshotItemViewModel] = []
+    @Published var isLoading: Bool = false
+    @Published var isLoadingScreenshots: Bool = false
+    
+    // 무한 스크롤을 위한 페이지네이션 상태
+    @Published var isLoadingMore: Bool = false
+    @Published var hasMoreData: Bool = true
+    private var currentPage: Int = 0
+    private let pageSize: Int = 20
+    
     private let repository: ScreenshotRepository
-    @Published var itemVMs: [ScreenshotItemViewModel] = []
-    @Published var favoriteItemVMs: [ScreenshotItemViewModel] = []
-    @Published var currentFavoriteIndex: Int = 0
-    @Published var isLoadingPage = false
-    @Published var isInitialLoading = false
-    @Published var isLoadingFavoritePage = false
-    private var canLoadMorePages = true
-    private var canLoadMoreFavoritePages = true
-    private var page: Int = 0
-    private var favoritePage: Int = 0
+    private let service: SearchService
     
-    // 중복 실행 방지를 위한 플래그들
-    @Published var isRefreshing = false  // UI에서 접근 가능하도록 public으로 변경
-    private var refreshTask: Task<Void, Never>?
-    
-    private var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 MM월 dd일"
-        return formatter
-    }()
-    
+    private var searchTask: Task<Void, Never>?
     private var cancellables = Set<AnyCancellable>()
-//    private var netwworkManager: NetworkManager
     
-    init(repository: ScreenshotRepository) {
+    init(repository: ScreenshotRepository, networkManager: NetworkManager) {
         self.repository = repository
-//        self.netwworkManager = networkManager
-        setupNotificationObservers()
-        // 로그인 후에 명시적으로 호출하도록 변경 - 자동 로딩 제거
-    }
-    
-    deinit {
-        // 메모리 해제 시 진행 중인 새로고침 작업 취소
-        refreshTask?.cancel()
-        debugPrint("🧹 HomeViewModel 해제 - 새로고침 작업 정리")
-        cancellables.forEach { $0.cancel() }
-    }
-    
-    /// 스마트 로딩 (로그인 상태에 따라 자동 분기) - 초기 로딩용
-    func loadScreenshots() async {
-        // 이미 로딩 중이면 중복 실행 방지
-        guard !isInitialLoading else { 
-            debugPrint("⚠️ 이미 초기 로딩 중 - loadScreenshots 스킵")
-            return 
-        }
+        self.service = SearchService(networkManager: networkManager)
         
-        isInitialLoading = true
-        defer { isInitialLoading = false }
-        
-        await loadFromServerOnly()
-        await loadFavorite()
-    }
-    
-    /// 게스트 모드 전용: 로컬 데이터만 로드 (서버 호출 없음)
-    func loadLocalDataOnly() async {
-        guard !isInitialLoading else { 
-            debugPrint("⚠️ 이미 초기 로딩 중 - loadLocalDataOnly 스킵")
-            return 
-        }
-        
-        isInitialLoading = true
-        defer { isInitialLoading = false }
-        
-        debugPrint("🔍 게스트 모드 - 로컬 데이터만 로드")
-        loadScreenshotFromLocal()
-        // 게스트 모드에서는 즐겨찾기 기능이 서버 기반이므로 로드하지 않음
-    }
-    
-    /// 강제 새로고침 (삭제 후 등에 사용) - 중복 실행 방지
-    func refreshScreenshots() async {
-        // 이미 새로고침 중이면 기존 작업 취소하고 새로 시작
-        if isRefreshing {
-            debugPrint("⚠️ 이미 새로고침 중 - pull-to-refresh 기존 작업 취소")
-            refreshTask?.cancel()
-        }
-        
-        // 새로운 새로고침 작업 시작
-        refreshTask = Task { @MainActor in
-            await performFullRefresh()
-        }
-        
-        await refreshTask?.value
-    }
-    
-    /// 전체 새로고침 로직 (동시 실행 방지)
-    @MainActor
-    private func performFullRefresh() async {
-        // 중복 실행 방지 체크
-        guard !isRefreshing else {
-            debugPrint("⚠️ 이미 새로고침 중 - pull-to-refresh 스킵")
-            return
-        }
-        
-        isRefreshing = true
-        defer { isRefreshing = false }
-        
-        debugPrint("🔄 전체 새로고침 시작")
-        
-        // 상태 초기화 및 새로 로드
-        page = 0
-        canLoadMorePages = true
-        itemVMs = []
-        
-        // 로그인 상태에 따라 적절한 로딩 방식 선택
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        if !isGuest {
-            await loadScreenshots()
-        } else {
-            await loadLocalDataOnly()
-        }
-        
-        debugPrint("✅ 전체 새로고침 완료")
-    }
-    
-    func loadNextPageServer() async {
-        // 게스트 모드에서는 서버 페이징 불가
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        if isGuest {
-            debugPrint("🔍 게스트 모드 - 서버 페이징 스킵")
-            return
-        }
-        
-        guard !isLoadingPage, canLoadMorePages else { return }
-        isLoadingPage = true
-        defer { isLoadingPage = false }
-        
-        do {
-            let serverItems = try await repository.loadFromServerOnly(page: page)
-            if serverItems.isEmpty {
-                canLoadMorePages = false         // 더 이상 불러올 게 없으면 멈춤
-            } else {
-                // 중복 제거: 기존 ID와 겹치지 않는 아이템만 추가
-                let existingIDs = Set(self.itemVMs.map { $0.id })
-                let newItems = serverItems.filter { !existingIDs.contains($0.id) }
-                
-                if !newItems.isEmpty {
-                    self.itemVMs += newItems
-                    debugPrint("✅ 새로운 아이템 \(newItems.count)개 추가 (중복 \(serverItems.count - newItems.count)개 제외)")
-                } else {
-                    debugPrint("⚠️ 모든 아이템이 중복이므로 추가하지 않음")
+        // 태그 변경 알림 구독
+        NotificationCenter.default.publisher(for: NSNotification.Name("TagChanged"))
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.refreshData()
                 }
-                
-                page += 1
             }
-        } catch {
-            debugPrint("❌ 서버 로드 실패: \(error.localizedDescription)")
-        }
+            .store(in: &cancellables)
+        
+        // 즐겨찾기 변경 알림 구독
+        NotificationCenter.default.publisher(for: .favoriteStatusChanged)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.refreshData()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 스크린샷 삭제 알림 구독
+        NotificationCenter.default.publisher(for: NSNotification.Name("ScreenshotDeleted"))
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.refreshData()
+                }
+            }
+            .store(in: &cancellables)
     }
     
-    func loadScreenshotFromLocal() {
+    func loadTags() async {
+        isLoading = true
+        do {
+            allTags = try await repository.fetchAllTags()
+        } catch {
+            print("태그 로딩 실패: \(error)")
+            allTags = []
+        }
+        isLoading = false
+    }
+    
+    func selectTag(_ tag: String) {
+        // 이미 선택된 태그가 아닌 경우에만 추가
+        guard selectedTag != tag else { return }
+        
+        selectedTag = tag
+        resetPagination()
+        loadScreenshotsByTags()
+    }
+    
+    // 페이지네이션 상태 초기화
+    private func resetPagination() {
+        currentPage = 0
+        hasMoreData = true
+        filteredScreenshots = []
+    }
+    
+    private func loadScreenshotFromLocal() {
         do {
             let localItems = try repository.loadAll()
-            self.itemVMs = localItems
+            self.filteredScreenshots = localItems
         } catch {
             debugPrint("❌ loadScreenshotFromLocal Error: \(error.localizedDescription)")
-            self.itemVMs = []
+            self.filteredScreenshots = []
         }
     }
     
-    func loadFromServerOnly() async {
+    private func loadScreenshotFromServer() async {
         do {
             let serverItems = try await repository.loadFromServerOnly()
             
@@ -188,342 +113,166 @@ final class HomeViewModel: ObservableObject {
             }
             
             // ✅ @MainActor에서 직접 동기적 업데이트
-            self.itemVMs = uniqueItems
+            self.filteredScreenshots = uniqueItems
             debugPrint("✅ 서버 초기 로드 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
         } catch {
             debugPrint("❌ 서버 로드 실패: \(error.localizedDescription)")
             // 서버 실패 시 빈 배열 (로컬 데이터 사용 X)
-            self.itemVMs = []
+            self.filteredScreenshots = []
         }
-        page += 1
+        currentPage += 1
     }
     
-    func loadFavorite() async {
-        // 게스트 모드에서는 즐겨찾기 로드하지 않음
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        if isGuest {
-            debugPrint("🔍 게스트 모드 - 즐겨찾기 로드 스킵")
-            return
-        }
-        
-        do {
-            let serverItems = try await repository.loadFavoriteFromServerOnly(page: 0, size: 20)
-            
-            // 중복 제거: 고유한 ID만 유지
-            var uniqueItems: [ScreenshotItemViewModel] = []
-            var seenIDs: Set<String> = []
-            
-            for item in serverItems {
-                if !seenIDs.contains(item.id) {
-                    seenIDs.insert(item.id)
-                    uniqueItems.append(item)
-                }
-            }
-            
-            self.favoriteItemVMs = uniqueItems
-            self.favoritePage = 1 // 초기 로드 후 페이지 설정
-            self.canLoadMoreFavoritePages = !serverItems.isEmpty
-            debugPrint("✅ 즐겨찾기 로드 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
-        } catch {
-            debugPrint("❌ 즐겨찾기 서버 로드 실패: \(error.localizedDescription)")
-        }
-    }
-    
-    /// 즐겨찾기 다음 페이지 로드
-    func loadNextFavoritePage() async {
-        // 게스트 모드에서는 즐겨찾기 페이징 불가
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        if isGuest {
-            debugPrint("🔍 게스트 모드 - 즐겨찾기 페이징 스킵")
-            return
-        }
-        
-        guard !isLoadingFavoritePage, canLoadMoreFavoritePages else { return }
-        isLoadingFavoritePage = true
-        defer { isLoadingFavoritePage = false }
-        
-        do {
-            let serverItems = try await repository.loadFavoriteFromServerOnly(page: favoritePage, size: 20)
-            if serverItems.isEmpty {
-                canLoadMoreFavoritePages = false
-            } else {
-                // 중복 제거: 기존 ID와 겹치지 않는 아이템만 추가
-                let existingIDs = Set(self.favoriteItemVMs.map { $0.id })
-                let newItems = serverItems.filter { !existingIDs.contains($0.id) }
-                
-                if !newItems.isEmpty {
-                    self.favoriteItemVMs += newItems
-                    debugPrint("✅ 새로운 즐겨찾기 아이템 \(newItems.count)개 추가 (중복 \(serverItems.count - newItems.count)개 제외)")
-                } else {
-                    debugPrint("⚠️ 모든 즐겨찾기 아이템이 중복이므로 추가하지 않음")
-                }
-                
-                favoritePage += 1
-            }
-        } catch {
-            debugPrint("❌ 즐겨찾기 다음 페이지 로드 실패: \(error.localizedDescription)")
-        }
-    }
-    
-    /// 메모리 캐시 클리어 (로그아웃 시 사용)
-    func clearCache() {
-        repository.clearMemoryCache()
-        PhotoLoader.shared.clearAllServerImageCache()
-        DispatchQueue.main.async {
-            self.itemVMs = []
-        }
-    }
-    
-    /// 아이템 삭제 (UI에서 즉시 제거)
-    func removeItem(with id: String) {
-        if let index = itemVMs.firstIndex(where: { $0.id == id }) {
-            itemVMs.remove(at: index)
-            debugPrint("✅ HomeView에서 아이템 제거 완료: \(id)")
-        }
-    }
-    
-    /// 태그 편집 완료 후 데이터 새로고침 (중복 실행 방지)
-    private func refreshAfterTagEdit() async {
-        // 이미 새로고침 중이면 기존 작업 취소하고 새로 시작
-        if isRefreshing {
-            debugPrint("⚠️ 이미 새로고침 중 - 기존 작업 취소")
-            refreshTask?.cancel()
-        }
-        
-        // 새로운 새로고침 작업 시작
-        refreshTask = Task { @MainActor in
-            await performRefresh()
-        }
-        
-        await refreshTask?.value
-    }
-    
-    /// 실제 새로고침 로직 (동시 실행 방지)
-    @MainActor
-    private func performRefresh() async {
-        // 중복 실행 방지 체크
-        guard !isRefreshing else {
-            debugPrint("⚠️ 이미 새로고침 중 - 스킵")
-            return
-        }
-        
-        isRefreshing = true
-        defer { isRefreshing = false }
-        
-        debugPrint("🔄 태그 편집 완료 - 홈 데이터 새로고침 시작")
-        
-        let isGuest = AccountStorage.shared.isGuest ?? true
-        
-        do {
-            if isGuest {
-                // 게스트 모드: 로컬에서 다시 로드
-                loadScreenshotFromLocal()
-            } else {
-                // 로그인 모드: 서버에서 다시 로드
-                await safeRefreshFromServer()
-            }
-            
-            // 즐겨찾기도 새로고침
-            await loadFavorite()
-            
-            debugPrint("✅ 태그 편집 완료 - 홈 데이터 새로고침 완료")
-        } catch {
-            debugPrint("❌ 새로고침 실패: \(error.localizedDescription)")
-            // 실패해도 기존 데이터는 유지
-        }
-    }
-    
-    /// 서버에서 데이터 안전하게 새로고침 (기존 데이터 보존)
-    private func safeRefreshFromServer() async {
-        debugPrint("🔄 서버에서 안전한 데이터 새로고침")
-        
-        // 현재 데이터 백업
-        let backupItems = itemVMs
-        let backupPage = page
-        let backupCanLoadMore = canLoadMorePages
-        
-        do {
-            // 페이지와 상태 임시 초기화
-            let tempPage = 0
-            let serverItems = try await repository.loadFromServerOnly(page: tempPage)
-            
-            // 중복 제거: 고유한 ID만 유지
-            var uniqueItems: [ScreenshotItemViewModel] = []
-            var seenIDs: Set<String> = []
-            
-            for item in serverItems {
-                if !seenIDs.contains(item.id) {
-                    seenIDs.insert(item.id)
-                    uniqueItems.append(item)
-                }
-            }
-            
-            // 성공 시에만 UI 업데이트
-            await MainActor.run {
-                self.itemVMs = uniqueItems
-                self.page = tempPage + 1
-                self.canLoadMorePages = true
-                debugPrint("✅ 서버 안전 새로고침 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
-            }
-            
-        } catch {
-            // 실패 시 기존 데이터 복원
-            await MainActor.run {
-                self.itemVMs = backupItems
-                self.page = backupPage
-                self.canLoadMorePages = backupCanLoadMore
-                debugPrint("❌ 서버 새로고침 실패 - 기존 데이터 유지: \(error.localizedDescription)")
-            }
-            print(error)
-        }
-    }
-    
-    /// 서버에서 데이터 새로고침 (기존 데이터 교체) - 기존 메서드 유지
-    private func refreshFromServer() async {
-        debugPrint("🔄 서버에서 데이터 새로고침")
-        
-        // 페이지와 상태 초기화
-        page = 0
-        canLoadMorePages = true
-        
-        do {
-            let serverItems = try await repository.loadFromServerOnly()
-            
-            // 중복 제거: 고유한 ID만 유지
-            var uniqueItems: [ScreenshotItemViewModel] = []
-            var seenIDs: Set<String> = []
-            
-            for item in serverItems {
-                if !seenIDs.contains(item.id) {
-                    seenIDs.insert(item.id)
-                    uniqueItems.append(item)
-                }
-            }
-            
-            // 메인 스레드에서 UI 업데이트
-            await MainActor.run {
-                self.itemVMs = uniqueItems
-                debugPrint("✅ 서버 새로고침 완료: \(uniqueItems.count)개 (중복 \(serverItems.count - uniqueItems.count)개 제거)")
-            }
-            
-            page += 1
-        } catch {
-            debugPrint("❌ 서버 새로고침 실패: \(error.localizedDescription)")
-        }
-    }
-    
-    func delete(_ viewModel: ScreenshotItemViewModel) {
-        // 1) 서버·로컬 삭제 호출
+    private func loadScreenshotsByTags() {
+        isLoadingScreenshots = true
         Task {
-            try? await viewModel.delete()
-            // 2) 리스트에서 제거
-            removeItem(with: viewModel.id)
+            await loadScreenshotsForCurrentPage()
         }
     }
     
-    // Carousel 등에서 index 변경 시 호출
-    func onAssetChanged(to index: Int) {
-        // index 범위 체크
-        guard index >= 0 && index < favoriteItemVMs.count else { return }
-        
-        currentFavoriteIndex = index
-        
-        // pagination 체크: currentFavoriteIndex가 favoriteItemVMs.count보다 3 적으면 다음 페이지 로드
-        let threshold = favoriteItemVMs.count - 3
-        if index >= threshold && !isLoadingFavoritePage && canLoadMoreFavoritePages {
-            Task {
-                await loadNextFavoritePage()
-            }
-        }
-    }
-    
-    // MARK: - Notification Handling
-    
-    private func setupNotificationObservers() {
-        // NotificationCenter 관련 코드 제거됨
-    }
-    
-    private func updateFavoriteStatus(_ favoriteInfo: FavoriteStatusInfo) {
-        // itemVMs에서 해당 아이템 찾아서 즐겨찾기 상태 업데이트
-        if let itemIndex = itemVMs.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
-            itemVMs[itemIndex].isFavorite = favoriteInfo.isFavorite
-            debugPrint("✅ HomeView - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
-        }
-        
-        // 🔧 캐시도 함께 업데이트 (로그인 모드인 경우)
-        if !(AccountStorage.shared.isGuest ?? true) {
-            InMemoryScreenshotCache.shared.updateFavorite(id: favoriteInfo.imageId, isFavorite: favoriteInfo.isFavorite)
-            debugPrint("✅ HomeView - 캐시 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId) -> \(favoriteInfo.isFavorite)")
-        }
-        
-        // favoriteItemVMs에서 해당 아이템 처리
-        if let favoriteIndex = favoriteItemVMs.firstIndex(where: { $0.id == favoriteInfo.imageId }) {
-            if favoriteInfo.isFavorite {
-                // 즐겨찾기로 설정됨 - 상태만 업데이트
-                favoriteItemVMs[favoriteIndex].isFavorite = true
-                debugPrint("✅ HomeView Carousel - 즐겨찾기 상태 업데이트: \(favoriteInfo.imageId)")
+    // 현재 페이지의 스크린샷 로드
+    private func loadScreenshotsForCurrentPage() async {
+        do {
+            let newScreenshots: [ScreenshotItemViewModel]
+            
+            if AccountStorage.shared.isGuest ?? true {
+                // 게스트 모드에서는 로컬에서 로드
+                if let selectedTag {
+                    newScreenshots = try await repository.loadByTags([selectedTag])
+                } else {
+                    // 전체 탭일 때는 모든 로컬 데이터 로드
+                    newScreenshots = try repository.loadAll()
+                }
+                hasMoreData = false // 로컬에서는 모든 데이터를 한 번에 로드
+            } else if let selectedTag {
+                // 로그인 모드에서는 서버에서 페이지네이션으로 로드
+                _ = try await repository.loadByTags([selectedTag])
+                // 실제로는 repository의 loadByTagsFromServer 메서드를 직접 호출해야 함
+                newScreenshots = try await loadByTagsFromServerWithPagination([selectedTag], page: currentPage, size: pageSize)
             } else {
-                // 즐겨찾기 해제됨 - carousel에서 제거
-                favoriteItemVMs.remove(at: favoriteIndex)
-                
-                // currentFavoriteIndex 조정
-                if currentFavoriteIndex >= favoriteItemVMs.count && !favoriteItemVMs.isEmpty {
-                    currentFavoriteIndex = favoriteItemVMs.count - 1
-                } else if favoriteItemVMs.isEmpty {
-                    currentFavoriteIndex = 0
-                }
-                
-                debugPrint("✅ HomeView Carousel - 즐겨찾기 아이템 제거: \(favoriteInfo.imageId)")
+                // 전체 탭일 때 서버에서 페이지네이션으로 로드
+                newScreenshots = try await repository.loadFromServerOnly(page: currentPage)
             }
-        } else if favoriteInfo.isFavorite {
-            // 새로 즐겨찾기로 추가된 아이템 - favoriteItemVMs에 추가할 수도 있지만,
-            // 실제로는 서버에서 최신 즐겨찾기 목록을 다시 로드하는 것이 더 안전함
-            Task {
-                await loadFavorite()
+            
+            if currentPage == 0 {
+                // 첫 페이지인 경우 전체 교체
+                filteredScreenshots = newScreenshots
+            } else {
+                // 추가 페이지인 경우 기존 데이터에 추가
+                filteredScreenshots.append(contentsOf: newScreenshots)
             }
+            
+            // 로드된 데이터가 pageSize보다 적으면 더 이상 데이터가 없음
+            if newScreenshots.count < pageSize {
+                hasMoreData = false
+            }
+            
+            await loadThumbnailsForNewScreenshots(newScreenshots)
+            
+        } catch {
+            print("태그별 스크린샷 로딩 실패: \(error)")
+            if currentPage == 0 {
+                filteredScreenshots = []
+            }
+            hasMoreData = false
+        }
+        
+        isLoadingScreenshots = false
+        isLoadingMore = false
+    }
+    
+    // 서버에서 페이지네이션으로 태그별 스크린샷 로드
+    private func loadByTagsFromServerWithPagination(_ tags: [String?], page: Int, size: Int) async throws -> [ScreenshotItemViewModel] {
+        let result = await ImageService.shared.checkImageList(by: tags.compactMap { $0 ?? "" }, page: page, size: size)
+        
+        switch result {
+        case .success(let response):
+            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
+                let mappedTags = serverItem.tags
+                
+                let screenshotItem = ScreenshotItem(
+                    id: String(serverItem.id),
+                    imageData: Data(),
+                    imageURL: serverItem.url,
+                    fileName: serverItem.name,
+                    createDate: serverItem.captureDate,
+                    tags: mappedTags,
+                    isFavorite: serverItem.isBookmarked
+                )
+                
+                return screenshotItem
+            }
+            
+            let viewModels = serverItems.map { item in
+                repository.viewModel(for: item)
+            }
+            
+            return viewModels
+            
+        case .failure(let error):
+            throw error
         }
     }
     
-    // MARK: - Optimistic Update Handling
-    
-    // handleOptimisticUpdateCompleted 메서드 삭제됨 - NotificationCenter 사용 중단
-    
-    // refreshFromLocalAndCache 메서드 삭제됨 - NotificationCenter 사용 중단
-    
-    // handleServerSyncFailure 메서드 삭제됨 - NotificationCenter 사용 중단
-    
-    // handleLoginSuccessCompleted 메서드 삭제됨 - NotificationCenter 사용 중단
-    
-    /// Notification으로 트리거된 이미지 미리 로딩 (HomeView의 loadInitialVisibleImages와 동일한 로직)
-    private func loadInitialVisibleImagesForNotification() async {
-        guard !itemVMs.isEmpty, itemVMs.count > 0 else {
-            debugPrint("📷 Notification - 로드할 이미지가 없음 (count: \(itemVMs.count))")
-            return
+    // 다음 페이지 로드 (무한 스크롤)
+    func loadMoreScreenshots() {
+//        guard !isLoadingMore && hasMoreData else {
+//            return
+//        }
+        
+        isLoadingMore = true
+        currentPage += 1
+        
+        Task {
+            await loadScreenshotsForCurrentPage()
         }
-        
-        let visibleCount = min(6, itemVMs.count)
-        debugPrint("📷 Notification - 초기 이미지 로딩 시작: \(visibleCount)개 (전체: \(itemVMs.count)개)")
-        
-        let itemsToLoad = Array(itemVMs.prefix(visibleCount))
-        
-        guard !itemsToLoad.isEmpty else {
-            debugPrint("📷 Notification - prefix로 가져온 아이템이 없음")
-            return
-        }
-        
-        // 각 이미지를 개별 Task로 로딩
+    }
+    
+    // 스크롤 끝 감지를 위한 메서드
+    func shouldLoadMore(currentItem: ScreenshotItemViewModel) -> Bool {
+        guard let lastItem = filteredScreenshots.last else { return false }
+        return currentItem.id == lastItem.id
+    }
+    
+    private func loadThumbnailsForNewScreenshots(_ screenshots: [ScreenshotItemViewModel]) async {
+        // ✅ 병렬 로딩으로 여러 이미지를 동시에 다운로드
         await withTaskGroup(of: Void.self) { group in
-            for (index, item) in itemsToLoad.enumerated() {
-                group.addTask { [item] in
-                    debugPrint("📷 Notification - 이미지 로딩 시작: \(index) - ID: \(item.id)")
-                    await item.loadFullImage()
-                    debugPrint("✅ Notification - 이미지 로딩 완료: \(index) - ID: \(item.id)")
+            for itemVM in screenshots {
+                group.addTask {
+                    // 썸네일로 로드하여 더 빠르게 처리
+                    await itemVM.loadFullImage()
                 }
             }
         }
-        
-        debugPrint("✅ Notification - 초기 이미지 로딩 전체 완료")
     }
     
-    // handleImageSaveCompleted 메서드 삭제됨 - NotificationCenter 사용 중단
+    // 기존의 loadThumbnailsForFilteredScreenshots 메서드는 loadThumbnailsForNewScreenshots로 대체
+    private func loadThumbnailsForFilteredScreenshots() async {
+        await loadThumbnailsForNewScreenshots(filteredScreenshots)
+    }
+    
+    func refreshData() async {
+        // 1. 태그 목록 다시 로드
+        await loadTags()
+        
+        // 2. 페이지네이션 초기화 후 데이터 로드 (전체 탭 포함)
+        resetPagination()
+        loadScreenshotsByTags()
+    }
+    
+    func clearAllSelections() {
+        selectedTag = nil
+        resetPagination()
+        loadScreenshotsByTags()
+    }
+    
+    private func mapTags(from dto: SearchDTO) -> [Tag] {
+        // 예: dto.tags, dto.data.tags, dto.items.map(\.name) 등
+        return dto.data
+    }
+    
+    deinit {
+        searchTask?.cancel()
+        cancellables.forEach { $0.cancel() }
+    }
 }

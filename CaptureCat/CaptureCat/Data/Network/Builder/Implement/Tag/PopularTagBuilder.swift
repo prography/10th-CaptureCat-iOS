@@ -18,7 +18,7 @@ struct PopularTagBuilder: BuilderProtocol {
 
     var useAuthorization: Bool { true }
     
-    init(page: Int = 0, size: Int = 10) {
+    init(page: Int = 0, size: Int = 20) {
         self.queries = [
             URLQueryItem(name: "page", value: String(page)),
             URLQueryItem(name: "size", value: String(size))
