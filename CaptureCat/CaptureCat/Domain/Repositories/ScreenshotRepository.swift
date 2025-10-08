@@ -71,7 +71,7 @@ final class ScreenshotRepository: ObservableObject {
         }
     }
     
-    /// 전체 태그 목록 (로그인 상태 자동 분기)
+    /// 전체 태그 목록 (로그인 상태 자동 분기) - String 배열 반환
     func fetchAllTags() async throws -> [String] {
         if AccountStorage.shared.isGuest ?? true {
             return try SwiftDataManager.shared.fetchAllTags()
@@ -84,6 +84,23 @@ final class ScreenshotRepository: ObservableObject {
                 
             case .failure:
                 return InMemoryScreenshotCache.shared.getAllTags()
+            }
+        }
+    }
+    
+    /// 전체 태그 목록 (로그인 상태 자동 분기) - Tag 객체 배열 반환
+    func fetchAllTagsAsTag() async throws -> [Tag] {
+        if AccountStorage.shared.isGuest ?? true {
+            return try SwiftDataManager.shared.fetchAllTagsAsTag()
+        } else {
+            let result = await tagService.fetchPopularTagList()
+            
+            switch result {
+            case .success(let tagDTO):
+                return tagDTO.data.items
+                
+            case .failure:
+                return InMemoryScreenshotCache.shared.getAllTagsAsTag()
             }
         }
     }

@@ -106,10 +106,19 @@ final class SwiftDataManager {
 }
 
 extension SwiftDataManager {
-    /// 전체 태그 목록 (중복 제거)
+    /// 전체 태그 목록 (중복 제거) - String 배열 반환
     func fetchAllTags() throws -> [String] {
         let all = try fetchAllEntities().flatMap { $0.tags }
         return Array(Set(all)).sorted()
+    }
+    
+    /// 전체 태그 목록 (중복 제거) - Tag 객체 배열 반환
+    func fetchAllTagsAsTag() throws -> [Tag] {
+        let tagNames = try fetchAllTags()
+        // 로컬 데이터는 ID가 없으므로 임시 ID 생성 (해시 기반으로 일관성 보장)
+        return tagNames.enumerated().map { index, name in
+            Tag(id: name.hashValue, name: name)
+        }
     }
     
     /// 특정 태그를 포함하는 Screenshot 엔티티들을 가져오기
