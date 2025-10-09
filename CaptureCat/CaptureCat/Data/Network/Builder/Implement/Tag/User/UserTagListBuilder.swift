@@ -10,7 +10,7 @@ import Foundation
 struct UserTagListBuilder: BuilderProtocol {
     typealias Response = TagDTO
     
-    var path: String = PathURLType.getTags.path()
+    var path: String = PathURLType.userTag.path()
     var queries: [URLQueryItem]?
     var method: HTTPMethod { .get }
     var parameters: [String: Any] = [:]

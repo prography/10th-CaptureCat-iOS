@@ -22,11 +22,9 @@ enum PathURLType {
     case userInfo
     
     //User Tag
-    case userTagCreate
-    case userTagList
+    case userTag
     
     func path() -> String {
-        
         switch self {
         case .auth:
             return "/v1/auth"
@@ -56,9 +54,7 @@ enum PathURLType {
             return "/v1/bookmarks/images"
         case .userInfo:
             return "/v1/user/info"
-        case .userTagCreate:
-            return "/v1/user-tags?tagName=java"
-        case .userTagList:
+        case .userTag:
             return "/v1/user-tags"
         }
     }

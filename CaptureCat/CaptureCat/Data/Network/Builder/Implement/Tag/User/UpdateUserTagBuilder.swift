@@ -10,7 +10,7 @@ import Foundation
 struct UpdateUserTagBuilder: BuilderProtocol {
     typealias Response = UserTagDTO
     
-    var path: String = PathURLType.userTagList.path()
+    var path: String = PathURLType.userTag.path()
     var queries: [URLQueryItem]?
     var method: HTTPMethod { .patch }
     var parameters: [String: Any] = [:]

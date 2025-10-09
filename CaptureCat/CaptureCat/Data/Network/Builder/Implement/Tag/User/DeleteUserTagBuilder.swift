@@ -10,7 +10,7 @@ import Foundation
 struct DeleteUserTagBuilder: BuilderProtocol {
     typealias Response = ResponseDTO
     
-    var path: String = PathURLType.userTagList.path()
+    var path: String = PathURLType.userTag.path()
     var queries: [URLQueryItem]?
     var method: HTTPMethod { .delete }
     var parameters: [String: Any] = [:]
