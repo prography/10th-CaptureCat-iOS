@@ -105,6 +105,40 @@ final class ScreenshotRepository: ObservableObject {
         }
     }
     
+    func fetchAllUserTag() async throws -> [Tag] {
+        if AccountStorage.shared.isGuest ?? true {
+            return try SwiftDataManager.shared.fetchAllTagsAsTag()
+        } else {
+            let result = await tagService.fetchUserTagList()
+            
+            switch result {
+            case .success(let tagDTO):
+                return tagDTO.data.items
+                
+            case .failure:
+                return []
+            }
+        }
+    }
+    
+    func registerUserTag(name: String) async throws -> Result<UserTagDTO, Error> {
+        let result = await tagService.createUserTag(tag: name)
+        
+        return result
+    }
+    
+    func updateUserTag(tag: Tag) async throws -> Result<UserTagDTO, Error> {
+        let result = await tagService.updateUserTag(tag: tag)
+        
+        return result
+    }
+    
+    func deleteUserTag(id: Int) async throws -> Result<ResponseDTO, Error> {
+        let result = await tagService.deleteUserTag(id: id)
+        
+        return result
+    }
+    
     func updateTag(id: String, tags: [String]) async throws -> Result<TagListDTO, Error>? {
         if AccountStorage.shared.isGuest ?? true {
             try SwiftDataManager.shared.updateTag(id: id, tags: tags)
