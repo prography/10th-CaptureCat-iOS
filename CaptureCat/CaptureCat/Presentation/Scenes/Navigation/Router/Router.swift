@@ -23,6 +23,8 @@ final class Router: ObservableObject {
         case tagEdit
         case recommendLogIn
         case searchResult
+        case deletePhotos
+        case uploadPhotos
     }
 
     @Published var path = NavigationPath()

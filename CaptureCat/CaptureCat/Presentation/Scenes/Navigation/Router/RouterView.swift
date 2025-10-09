@@ -84,6 +84,16 @@ struct RouterView<Content: View>: View {
                         SearchResultView()
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .deletePhotos:
+                        let viewModel = DeleteViewModel(repository: repository)
+                        DeleteView(viewModel: viewModel)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
+                    case .uploadPhotos:
+                        let viewModel = UploadViewModel(repository: repository)
+                        UploadView(viewModel: viewModel)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
         }

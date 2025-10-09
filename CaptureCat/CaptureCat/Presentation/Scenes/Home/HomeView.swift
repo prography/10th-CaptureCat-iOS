@@ -11,66 +11,140 @@ struct HomeView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: HomeViewModel
     @State private var showChannel = false
+    @State private var isMenuPresented = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
-                .padding(.bottom, 12)
-            
-            HStack {
-                TabSection(
-                    tags: viewModel.allTags,
-                    selectedTag: Binding(
-                        get: { viewModel.selectedTag },
-                        set: { viewModel.selectedTag = $0 }
-                    ),
-                    showAll: true
-                ) { newTag in
-                    if let tag = newTag {
-                        viewModel.selectTag(tag)
-                    } else {
-                        viewModel.clearAllSelections()
+        ZStack {
+            VStack(alignment: .leading, spacing: 0) {
+                header
+                    .padding(.bottom, 12)
+                
+                HStack {
+                    TabSection(
+                        tags: viewModel.allTags,
+                        selectedTag: Binding(
+                            get: { viewModel.selectedTag },
+                            set: { viewModel.selectedTag = $0 }
+                        ),
+                        showAll: true
+                    ) { newTag in
+                        if let tag = newTag {
+                            viewModel.selectTag(tag)
+                        } else {
+                            viewModel.clearAllSelections()
+                        }
+                        
+                        Task {
+                            await viewModel.refreshData()
+                        }
                     }
                     
-                    Task {
-                        await viewModel.refreshData()
+                    Button {
+                        router.push(.tagSetting)
+                    } label: {
+                        Image(.toc)
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .opacity(0.9)
                     }
+                    .background(.clear)
+                    .padding(.trailing, 4)
+                    .padding(.bottom, 2)
                 }
+                .padding(.horizontal, 8)
                 
-                Button {
-                    router.push(.tagSetting)
-                } label: {
-                    Image(.toc)
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .opacity(0.9)
-                }
-                .background(.clear)
-                .padding(.trailing, 4)
-                .padding(.bottom, 2)
-            }
-            .padding(.horizontal, 8)
-            
-            csBanner
-                .padding(.bottom, 8)
-            
-            ZStack {
-                if viewModel.allTags.isEmpty {
-                    VStack(spacing: 8) {
-                        Text("아직 태그가 없어요")
-                            .CFont(.headline02Bold)
-                            .foregroundStyle(.text03)
-                        Text("스크린샷을 태그해 정리해보세요!")
-                            .CFont(.body01Regular)
-                            .foregroundStyle(.text03)
+                csBanner
+                    .padding(.bottom, 8)
+                
+                ZStack {
+                    if viewModel.allTags.isEmpty {
+                        VStack(spacing: 8) {
+                            Text("아직 태그가 없어요")
+                                .CFont(.headline02Bold)
+                                .foregroundStyle(.text03)
+                            Text("스크린샷을 태그해 정리해보세요!")
+                                .CFont(.body01Regular)
+                                .foregroundStyle(.text03)
+                        }
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 150)
+                    } else {
+                        selectedTagResults
                     }
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 150)
-                } else {
-                    selectedTagResults
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            
+            Button {
+                withAnimation(.spring(response: 0.28, dampingFraction: 0.9)) {
+                    isMenuPresented.toggle()
+                }
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
+                    .background(Circle().fill(Color.primary01))
+                    .shadow(radius: 8, y: 4)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .padding(.trailing, 20)
+            .padding(.bottom, 24)
+            
+            if isMenuPresented {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.28, dampingFraction: 0.95)) {
+                        isMenuPresented = false
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            if isMenuPresented {
+                VStack(spacing: 18) {
+                    MenuCard(
+                        uploadAction: {
+                            // TODO: 업로드 액션
+                            router.push(.uploadPhotos)
+                            closeMenu()
+                        },
+                        organizeAction: {
+                            // TODO: 캡처 정리 액션
+                            router.push(.deletePhotos)
+                            closeMenu()
+                        }
+                    )
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .bottom).combined(with: .opacity),
+                        removal: .scale.combined(with: .opacity))
+                    )
+                    
+                    Spacer()
+                        .frame(height: 56) // plus 버튼 높이만큼 여백
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .padding(.trailing, 20)
+                .padding(.bottom, 12) // 기존 bottom padding + 버튼 높이 + 여백
+                
+                // 닫기 원형 버튼 - plus 버튼과 동일한 위치에 배치
+                Button(action: {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.95)) {
+                        isMenuPresented = false
+                    }
+                }) {
+                    Image(systemName: "xmark")
+                        .CFont(.subhead01Bold)
+                        .foregroundStyle(.primary01)
+                        .frame(width: 56, height: 56)
+                        .background(Circle().fill(Color.white))
+                        .shadow(radius: 8, y: 4)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .padding(.trailing, 20)
+                .padding(.bottom, 24)
+            }
         }
         .background(Color(.systemBackground))
         .task {
@@ -80,6 +154,12 @@ struct HomeView: View {
             Task {
                 await viewModel.refreshData()
             }
+        }
+    }
+    
+    func closeMenu() {
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.95)) {
+            isMenuPresented = false
         }
     }
     

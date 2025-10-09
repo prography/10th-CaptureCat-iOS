@@ -138,17 +138,15 @@ final class ScreenshotManager: ObservableObject {
         }
     }
     
-    // 현재 로드된 스크린샷 중 20개만 모두 선택
     func selectAll() {
-        let list = assets.map(\.localIdentifier)
+        guard let allAssets = allAssets else { return }
         
-        if list.count <= 20 {
-            selectedIDs = Set(list)
-        } else {
-            for index in 0..<20 {
-                selectedIDs.insert(list[index])
-            }
+        var allIdentifiers: [String] = []
+        for i in 0..<allAssets.count {
+            allIdentifiers.append(allAssets.object(at: i).localIdentifier)
         }
+        
+        selectedIDs = Set(allIdentifiers)
     }
     
     // 선택 해제
