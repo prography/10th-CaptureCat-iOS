@@ -225,14 +225,6 @@ class DetailViewModel: ObservableObject {
                     debugPrint("✅ 즐겨찾기 추가 완료: \(item.fileName)")
                 }
                 
-                // 3. 성공 시 다른 뷰들에게 상태 변경 알림
-                let favoriteInfo = FavoriteStatusInfo(imageId: item.id, isFavorite: item.isFavorite)
-                NotificationCenter.default.post(
-                    name: .favoriteStatusChanged,
-                    object: nil,
-                    userInfo: ["favoriteInfo": favoriteInfo]
-                )
-                
             } catch {
                 // 2. 실패 시 UI 상태 원복
                 item.isFavorite = originalState
