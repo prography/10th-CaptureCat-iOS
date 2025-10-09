@@ -15,6 +15,17 @@ final class FavoriteService {
         self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
     }
     
+    func fetchFavoriteTagList() async -> Result<TagDTO, Error> {
+        let builder = FavoriteTagBuilder()
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<TagDTO, Error>.success(result)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
     func uploadFavorite(id: String) async -> Result<ResponseDTO, Error> {
         let builder = UploadFavoriteBuilder(imageId: id)
         

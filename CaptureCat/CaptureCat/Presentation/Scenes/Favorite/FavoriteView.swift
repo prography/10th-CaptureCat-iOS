@@ -14,6 +14,7 @@ struct FavoriteView: View {
     var body: some View {
         VStack(spacing: 12) {
             navigationBar
+            favoriteTabSelection
             
             if viewModel.isLoading {
                 ProgressView("로딩 중...")
@@ -92,6 +93,7 @@ struct FavoriteView: View {
         }
         .background(Color(.systemBackground))
         .task {
+            await viewModel.loadTags()
             await viewModel.loadFavoriteItems()
             
             // 모든 아이템의 이미지 로드
@@ -123,6 +125,38 @@ struct FavoriteView: View {
         }
         .padding(.horizontal, 16)
         .padding(.top)
+    }
+    
+    private var favoriteTabSelection: some View {
+        HStack {
+            TabSection(
+                tags: viewModel.allTags,
+                selectedTag: Binding(
+                    get: { viewModel.selectedTag },
+                    set: { viewModel.selectedTag = $0 }
+                ),
+                showAll: true
+            ) { newTag in
+                if let tag = newTag {
+                    print(newTag)
+                } else {
+                    print(newTag)
+                }
+            }
+            
+            Button {
+                router.push(.tagSetting)
+            } label: {
+                Image(.toc)
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .opacity(0.9)
+            }
+            .background(.clear)
+            .padding(.trailing, 4)
+            .padding(.bottom, 2)
+        }
+        .padding(.horizontal, 8)
     }
     
     private var noFavoriteItems: some View {
