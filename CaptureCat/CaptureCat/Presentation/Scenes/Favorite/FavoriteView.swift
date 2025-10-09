@@ -12,19 +12,14 @@ struct FavoriteView: View {
     @StateObject var viewModel: FavoriteViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
-            CustomNavigationBar(title: "즐겨찾기") {
-                router.pop()
-            }
-            .padding(.top, 10)
-            .padding(.bottom, 12)
+        VStack(spacing: 12) {
+            navigationBar
             
             if viewModel.isLoading {
                 ProgressView("로딩 중...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.favoriteItems.isEmpty {
-                Text("즐겨찾기한 스크린샷이 없습니다.")
-                    .foregroundStyle(.secondary)
+                noFavoriteItems
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
@@ -41,15 +36,14 @@ struct FavoriteView: View {
                                         // 즐겨찾기 해제 (즉시 UI에서 제거)
                                         viewModel.toggleFavorite(item)
                                     } label: {
-                                        Image(.selectedFavorite) // 즐겨찾기 페이지에서는 항상 선택된 상태
+                                        Image(.favoriteSelected) // 즐겨찾기 페이지에서는 항상 선택된 상태
+                                            .renderingMode(.template)
                                             .resizable()
+                                            .foregroundStyle(.white)
                                             .frame(width: 24, height: 24)
                                             .padding(3)
-                                            .background(.overlayDim)
-                                            .clipShape(Circle())
                                     }
-                                        .padding(16),
-                                    alignment: .bottomTrailing
+                                    .padding(8), alignment: .bottomLeading
                                 )
                             }
                             .onAppear {
@@ -114,6 +108,32 @@ struct FavoriteView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
+        }
+    }
+    
+    private var navigationBar: some View {
+        HStack {
+            Text("좋아요")
+                .CFont(.headline02Bold)
+                .foregroundStyle(.text02)
+            Text("\(viewModel.favoriteItems.count)")
+                .CFont(.headline02Regular)
+                .foregroundStyle(.text03)
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.top)
+    }
+    
+    private var noFavoriteItems: some View {
+        VStack(spacing: 8) {
+            Text("아직 좋아요가 없어요.")
+                .CFont(.headline02Bold)
+                .foregroundStyle(.text02)
+            Text("자주 보고 싶은 이미지에\n좋아요를 누르면 빠르게 찾아볼 수 있어요")
+                .CFont(.body01Regular)
+                .foregroundStyle(.text03)
+                .multilineTextAlignment(.center)
         }
     }
     

@@ -142,13 +142,13 @@ class FavoriteViewModel: ObservableObject {
                 
                 debugPrint("✅ 즐겨찾기에서 제거 완료: \(viewModel.id)")
                 
-                // 성공 시 다른 뷰들에게 상태 변경 알림
-                let favoriteInfo = FavoriteStatusInfo(imageId: viewModel.id, isFavorite: false)
-                NotificationCenter.default.post(
-                    name: .favoriteStatusChanged,
-                    object: nil,
-                    userInfo: ["favoriteInfo": favoriteInfo]
-                )
+//                // 성공 시 다른 뷰들에게 상태 변경 알림
+//                let favoriteInfo = FavoriteStatusInfo(imageId: viewModel.id, isFavorite: false)
+//                NotificationCenter.default.post(
+//                    name: .favoriteStatusChanged,
+//                    object: nil,
+//                    userInfo: ["favoriteInfo": favoriteInfo]
+//                )
                 
             } catch {
                 debugPrint("❌ 즐겨찾기 삭제 실패: \(error.localizedDescription)")

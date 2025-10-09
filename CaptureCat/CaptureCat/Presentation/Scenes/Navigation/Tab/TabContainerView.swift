@@ -28,9 +28,9 @@ struct TabContainerView: View {
             } else {
                 // 1) 탭별 화면 분기
                 switch tabs.current {
-                case .temporaryStorage:
-                    let viewModel = StorageViewModel(networkManager: networkManager, repository: repository)
-                    StorageView(viewModel: viewModel)
+                case .favorite:
+                    let viewModel = FavoriteViewModel(repository: repository)
+                    FavoriteView(viewModel: viewModel)
                 case .home:
                     HomeView()
                 case .search:
@@ -70,7 +70,7 @@ struct TabContainerView: View {
 import Observation
 
 enum Tab: Hashable {
-    case temporaryStorage
+    case favorite
     case home
     case search
 }
