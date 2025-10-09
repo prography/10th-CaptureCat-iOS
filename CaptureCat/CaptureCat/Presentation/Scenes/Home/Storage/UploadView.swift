@@ -10,7 +10,7 @@ import SwiftUI
 struct UploadView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
-    @StateObject var viewModel: StorageViewModel
+    @StateObject var viewModel: UploadViewModel
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 

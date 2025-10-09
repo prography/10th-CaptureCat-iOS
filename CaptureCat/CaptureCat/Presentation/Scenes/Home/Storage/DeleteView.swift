@@ -10,7 +10,7 @@ import SwiftUI
 struct DeleteView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
-    @StateObject var viewModel: StorageViewModel
+    @StateObject var viewModel: DeleteViewModel
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
