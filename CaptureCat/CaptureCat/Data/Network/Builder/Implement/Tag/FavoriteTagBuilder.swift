@@ -1,16 +1,16 @@
 //
-//  PopularTagBuilder.swift
+//  FavoriteTagBuilder.swift
 //  CaptureCat
 //
-//  Created by minsong kim on 7/24/25.
+//  Created by minsong kim on 10/9/25.
 //
 
 import Foundation
 
-struct PopularTagBuilder: BuilderProtocol {
+struct FavoriteTagBuilder: BuilderProtocol {
     typealias Response = TagDTO
     
-    var path: String = PathURLType.mostUsedTags.path()
+    var path: String = PathURLType.favoriteTags.path()
     var queries: [URLQueryItem]?
     var method: HTTPMethod { .get }
     var parameters: [String: Any] = [:]

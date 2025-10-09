@@ -18,6 +18,7 @@ enum PathURLType {
     case relatedTags
     case mostUsedTags
     case favorite
+    case favoriteTags
     case favoriteImages
     case userInfo
     
@@ -50,6 +51,8 @@ enum PathURLType {
             return "/v1/tags/most-used"
         case .favorite:
             return "/v1/bookmarks"
+        case .favoriteTags:
+            return "/v1/bookmarks/tags"
         case .favoriteImages:
             return "/v1/bookmarks/images"
         case .userInfo:
