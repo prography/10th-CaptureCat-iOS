@@ -16,6 +16,7 @@ class TagSettingViewModel: ObservableObject {
     @Published var isShowingEditSheet: Bool = false // 편집 시트 표시 여부
     @Published var tags: [Tag] = [] // 태그 목록
     @Published var isLoading: Bool = false // 로딩 상태
+    @Published var selectedTagIds: Set<Int> = [] // 선택된 태그 ID들
     
     // MARK: - Dependencies
     private let repository: ScreenshotRepository
@@ -151,5 +152,33 @@ class TagSettingViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    // MARK: - Tag Selection Management
+    func toggleSelection(for tag: Tag) {
+        if selectedTagIds.contains(tag.id) {
+            selectedTagIds.remove(tag.id)
+        } else {
+            selectedTagIds.insert(tag.id)
+        }
+    }
+    
+    func isSelected(_ tag: Tag) -> Bool {
+        return selectedTagIds.contains(tag.id)
+    }
+    
+    func deleteSelectedTags() {
+        let tagsToDelete = tags.filter { selectedTagIds.contains($0.id) }
+        
+        for tag in tagsToDelete {
+            removeTag(tag)
+        }
+        
+        // 삭제 완료 후 선택 상태 초기화
+        selectedTagIds.removeAll()
+    }
+    
+    func selectAllTags() {
+        selectedTagIds = Set(tags.map { $0.id })
     }
 }

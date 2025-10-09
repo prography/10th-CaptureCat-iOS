@@ -26,7 +26,7 @@ struct TagEditView: View {
             
             HStack {
                 Button {
-                    //TODO: - 전체 선택
+                    viewModel.selectAllTags()
                 } label: {
                     Text("전체삭제")
                 }

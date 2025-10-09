@@ -68,7 +68,7 @@ struct TagSettingView: View {
             Spacer()
             
             Button{
-                print("편집")
+                router.push(.tagEdit)
             } label: {
                 Text("편집")
                     .CFont(.body01Regular)
@@ -147,7 +147,7 @@ struct TagSettingView: View {
                     
                     // 인셋된 구분선 느낌 (왼쪽 여백 맞추기)
                     Divider()
-                        .padding(.leading, 16)
+                        .padding(.horizontal, 16)
                 }
             }
             .background(Color(.systemBackground))
