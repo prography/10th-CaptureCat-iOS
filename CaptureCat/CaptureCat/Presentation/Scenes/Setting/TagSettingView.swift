@@ -41,8 +41,7 @@ struct TagSettingView: View {
                     ),
                     isPresented: $viewModel.isShowingEditSheet,
                     onAddNewTag: { newTag in 
-                        print("새 태그: \(newTag)")
-                        // TODO: 태그 업데이트 로직 추가
+                        viewModel.updateTag(Tag(id: viewModel.selectedTag?.id ?? 0, name: newTag))
                     }
                 )
                 .presentationDetents([ .height(180) ])
