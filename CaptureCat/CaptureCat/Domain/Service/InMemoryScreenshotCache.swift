@@ -75,6 +75,14 @@ final class InMemoryScreenshotCache {
         return Array(Set(allTags)).sorted()
     }
     
+    func getAllTagsAsTag() -> [Tag] {
+        let allTags = allItems.flatMap { $0.tags }
+        let uniqueTags = Dictionary(grouping: allTags) { $0.name }
+            .compactMapValues { $0.first }
+            .values
+        return Array(uniqueTags).sorted { $0.name < $1.name }
+    }
+    
     func getOtherTags(for baseTags: [String]) -> [String] {
         let matchingItems = getItemsByTags(baseTags)
         let otherTags = matchingItems.flatMap { $0.tags.map { $0.name } }.filter { !baseTags.contains($0) }

@@ -66,8 +66,14 @@ struct RouterView<Content: View>: View {
                         WithdrawView()
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .tagEdit:
+                        let viewModel = TagSettingViewModel(repository: repository)
+                        TagEditView(viewModel: viewModel)
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     case .tagSetting:
-                        TagSettingView()
+                        let viewModel = TagSettingViewModel(repository: repository)
+                        TagSettingView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
                     case .recommendLogIn:

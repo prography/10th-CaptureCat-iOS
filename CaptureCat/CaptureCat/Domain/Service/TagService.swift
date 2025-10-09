@@ -14,6 +14,50 @@ final class TagService {
         self.networkManager = networkManager
     }
     
+    func createUserTag(tag: String) async -> Result<UserTagDTO, Error> {
+        let builder = CreateUserTagBuilder(tagName: tag)
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<UserTagDTO, Error>.success(result)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func fetchUserTagList() async -> Result<TagDTO, Error> {
+        let builder = UserTagListBuilder()
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<TagDTO, Error>.success(result)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func updateUserTag(tag: Tag) async -> Result<UserTagDTO, Error> {
+        let builder = UpdateUserTagBuilder(newTag: tag.name, id: tag.id)
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<UserTagDTO, Error>.success(result)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func deleteUserTag(id: Int) async -> Result<ResponseDTO, Error> {
+        let builder = DeleteUserTagBuilder(tagId: String(id))
+        
+        do {
+            let result = try await networkManager.fetchData(builder)
+            return Result<ResponseDTO, Error>.success(result)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
     func fetchPopularTagList() async -> Result<TagDTO, Error> {
         let builder = PopularTagBuilder()
         
