@@ -20,6 +20,7 @@ final class Router: ObservableObject {
         case completeSync(result: SyncResult)
         case withdraw
         case tagSetting
+        case tagEdit
         case recommendLogIn
         case searchResult
     }
