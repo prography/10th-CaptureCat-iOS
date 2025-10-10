@@ -84,15 +84,6 @@ final class SearchViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
-        // 즐겨찾기 변경 알림 구독
-        NotificationCenter.default.publisher(for: .favoriteStatusChanged)
-            .sink { [weak self] _ in
-                Task { @MainActor in
-                    await self?.refreshData()
-                }
-            }
-            .store(in: &cancellables)
-        
         // 스크린샷 삭제 알림 구독
         NotificationCenter.default.publisher(for: NSNotification.Name("ScreenshotDeleted"))
             .sink { [weak self] _ in

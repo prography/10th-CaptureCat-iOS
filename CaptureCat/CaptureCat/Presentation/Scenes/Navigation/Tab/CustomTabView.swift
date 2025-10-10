@@ -18,16 +18,13 @@ struct CustomTabView: View {
             HStack {
                 Spacer()
                 Button {
-                    selectedTab = .temporaryStorage
+                    selectedTab = .favorite
                 } label: {
                     VStack {
-                        Image(selectedTab == .temporaryStorage ? .storageSelected : .storageUnselected)
+                        Image(selectedTab == .favorite ? .favoriteSelected : .favoriteUnselected)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 30)
-                        Text("임시보관함")
-                            .CFont(selectedTab == .temporaryStorage ? .caption01Semibold : .caption02Regular)
-                            .foregroundStyle(selectedTab == .temporaryStorage ? .text01 : .text03)
+                            .frame(width: 32)
                     }
                 }
                 Spacer()
@@ -38,10 +35,7 @@ struct CustomTabView: View {
                         Image(selectedTab == .home ? .homeSelected : .homeUnselected)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 30)
-                        Text("홈")
-                            .CFont(selectedTab == .home ? .caption01Semibold : .caption02Regular)
-                            .foregroundStyle(selectedTab == .home ? .text01 : .text03)
+                            .frame(width: 32)
                     }
                 }
                 Spacer()
@@ -52,10 +46,7 @@ struct CustomTabView: View {
                         Image(selectedTab == .search ? .searchSelected : .searchUnselected)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 30)
-                        Text("검색")
-                            .CFont(selectedTab == .search ? .caption01Semibold : .caption02Regular)
-                            .foregroundStyle(selectedTab == .search ? .text01 : .text03)
+                            .frame(width: 32)
                     }
                     
                 }

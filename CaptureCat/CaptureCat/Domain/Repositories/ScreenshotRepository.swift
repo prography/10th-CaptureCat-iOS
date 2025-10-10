@@ -448,25 +448,29 @@ final class ScreenshotRepository: ObservableObject {
             }
         }
     }
-    
-//    func renameTag(from oldName: String, to newName: String) async throws {
-//        if AccountStorage.shared.isGuest ?? true {
-//            try SwiftDataManager.shared.renameTag(from: oldName, to: newName)
-//        } else {
-//            // 로그인 모드에서는 메모리 캐시 업데이트만
-//            let items = InMemoryScreenshotCache.shared.retrieveAll()
-//            for item in items {
-//                if item.tags.contains(oldName) {
-//                    item.removeTag(oldName)
-//                    item.addTag(newName)
-//                }
-//            }
-//        }
-//    }
 }
 
 // MARK: - Favorite Management
 extension ScreenshotRepository {
+    func fetchFavoriteTag() async throws -> [String] {
+        if AccountStorage.shared.isGuest ?? true {
+            let tags = try SwiftDataManager.shared.fetchFavoriteEntities().flatMap { $0.tags }
+            var seen = Set<String>()
+            
+            return tags.filter { seen.insert($0).inserted }
+        } else {
+            let result = await FavoriteService.shared.fetchFavoriteTagList()
+            
+            switch result {
+            case .success(let tagDTO):
+                return tagDTO.data.items.map { $0.name }
+                
+            case .failure:
+                return InMemoryScreenshotCache.shared.getAllTags()
+            }
+        }
+    }
+    
     /// 즐겨찾기 추가 (로그인 상태에 따라 분기)
     func uploadFavorite(id: String) async throws {
         if AccountStorage.shared.isGuest ?? true {
