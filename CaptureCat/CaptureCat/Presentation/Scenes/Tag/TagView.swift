@@ -16,6 +16,8 @@ struct TagView: View {
     @State private var draggingItem = 0.0
     @State private var isDragging = false
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
+    @State private var tagMode: TagSheetMode = .add
+    @State private var tagExpanded: Bool = false
     
     var body: some View {
         mainContentView
@@ -24,16 +26,16 @@ struct TagView: View {
                 for itemVM in viewModel.itemVMs {  await itemVM.loadFullImage() }
             }
             .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
-                NavigationStack {
-                    AddTagSheet(
-                        tags: $viewModel.tags,
-                        selectedTags: $viewModel.selectedTags,
-                        isPresented: $viewModel.isShowingAddTagSheet,
-                        onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
-                        onDeleteTag: { tag in viewModel.toggleTag(tag) }
-                    )
-                    .presentationDetents([ .height(viewModel.selectedTags.isEmpty ?  200 : 250) ])
-                }
+                TagSheet(
+                    mode: $tagMode,
+                    isExpanded: $tagExpanded,
+                    tags: $viewModel.tags,
+                    selectedTags: $viewModel.selectedTags,
+                    isPresented: $viewModel.isShowingAddTagSheet,
+                    onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
+                    onDeleteTag: { tag in viewModel.toggleTag(tag) }
+                )
+                .presentationDetents([ .height(200) ])
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
@@ -45,53 +47,77 @@ struct TagView: View {
     
     // MARK: - Main Content View
     private var mainContentView: some View {
-        VStack {
+        VStack(alignment: .center, spacing: 16) {
             navigationBarView
-            modePickerView
+            modeTab
+                .padding(.bottom, 16)
             contentSectionView
-            Spacer()
+//            if viewModel.selectedTags.isEmpty {
+//                noTagButtonView
+//            } else {
+                allTagListViewEditMode
+//            }
             tagSectionView
-            Spacer()
+                .padding(.bottom, 8)
+            saveButton
         }
     }
     
     // MARK: - Navigation Bar
     private var navigationBarView: some View {
-        CustomNavigationBar(
-            title: viewModel.mode == .batch ? "태그하기" : "태그하기 \(viewModel.progressText)",
-            onBack: {
+        HStack {
+            Button{
                 router.pop()
-            },
-            actionTitle: "저장",
-            onAction: {
-                Task {
-                    await viewModel.save(isGuest: authViewModel.authenticationState == .guest)
-                    
-                    router.push(.completeSave(count: viewModel.itemVMs.count))
-                    // TagEditCompleted 알림은 홈으로 돌아간 후에 발생시키도록 UploadCompleteView로 이동
-                }
-            },
-            isSaveEnabled: true
-        )
+            } label: {
+                Image(systemName: "chevron.left")
+                    .foregroundStyle(.text02)
+            }
+            
+            Text("태그하기")
+                .CFont(.headline02Bold)
+                .foregroundStyle(.text02)
+            Text(viewModel.mode == .batch ? "" : "\(viewModel.progressText)")
+                .CFont(.headline02Regular)
+                .foregroundStyle(.text03)
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.top)
     }
     
-    // MARK: - Mode Picker
-    private var modePickerView: some View {
-        Picker("options", selection: $viewModel.mode) {
-            Text(viewModel.segments[0])
-                .tag(Mode.batch)
-            Text(viewModel.segments[1])
-                .tag(Mode.single)
+//    // MARK: - Mode Picker
+    private var modeTab: some View {
+        HStack(spacing: 0) {
+            tabButton(.batch)
+            tabButton(.single)
         }
-        .pickerStyle(.segmented)
-        .frame(width: 200)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
         .zIndex((viewModel.isDeletingItem || isDeletingWithGesture) ? 0 : 1000) // 삭제 중이거나 삭제 제스처 중일 때는 가려지고, 평상시에는 최상위에서 클릭 가능
         .allowsHitTesting(!(viewModel.isDeletingItem || isDeletingWithGesture)) // 삭제 중이거나 삭제 제스처 중일 때는 터치 비활성화
         .opacity((viewModel.isDeletingItem || isDeletingWithGesture) ? 0.3 : 1.0) // 삭제 중이거나 삭제 제스처 중일 때 반투명으로 표시
         .animation(.easeInOut(duration: 0.3), value: viewModel.isDeletingItem || isDeletingWithGesture) // 부드러운 상태 전환
-        .onChange(of: viewModel.mode) { _, _ in
-            viewModel.updateSelectedTags()
+    }
+    
+    private func tabButton(_ tab: Mode) -> some View {
+        let isSelected = viewModel.mode == tab
+        
+        return Button {
+            withAnimation(.easeInOut) {
+                viewModel.mode = tab
+            }
+        } label: {
+            VStack(spacing: 8) {
+                Text(tab.value)
+                    .CFont(.subhead01Bold)
+                    .foregroundColor(isSelected ? .primary01 : .text03)
+                Rectangle()
+                    .fill(isSelected ? .primary01 : .divider)
+                    .frame(height: isSelected ? 2 : 0.5)
+                    .frame(maxWidth: .infinity)
+            }
         }
+        .buttonStyle(.plain)
     }
     
     // MARK: - Content Section
@@ -114,16 +140,60 @@ struct TagView: View {
             }
         }
         .padding(.horizontal, 40)
-        .padding(.top, 12)
     }
     
     private var singleContentView: some View {
         carouselView
-            .padding(.top, 12)
             .zIndex((viewModel.isDeletingItem || isDeletingWithGesture) ? 1000 : 0)
     }
     
     // MARK: - Tag Section
+    private var noTagButtonView: some View {
+        Button {
+            viewModel.addNewTag(name: "태그 없음")
+        } label: {
+            Text("태그 없음으로 태그")
+        }
+        .chipStyle(
+            isSelected: true,
+            selectedBackground: .gray02,
+            selectedForeground: .text01,
+            selectedBorderColor: .divider,
+            icon: Image(.plus)
+        )
+    }
+    
+    private var allTagListViewEditMode: some View {
+        GeometryReader { geo in
+            ScrollView(.horizontal, showsIndicators: false) {
+                ZStack {
+                    // 부모(스크롤 영역) 너비만큼 자리 차지하는 투명 뷰
+                    Color.clear
+                        .frame(width: geo.size.width)
+
+                    HStack(spacing: 6) {
+                        ForEach(Array(viewModel.selectedTags), id: \.self) { tag in
+                            Button {
+                                withAnimation(.easeInOut) {
+                                    viewModel.toggleTag(tag)
+                                }
+                            } label: {
+                                Text(tag)
+                            }
+                            .chipStyle(
+                                isSelected: true,
+                                selectedBackground: .text01,
+                                icon: Image(.xmark)
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+            }
+        }
+        .frame(height: 50) // chip 높이에 맞게
+    }
+    
     private var tagSectionView: some View {
         VStack(spacing: 12) {
             HStack {
@@ -148,12 +218,34 @@ struct TagView: View {
                         } label: {
                             Text(tag)
                         }
-                        .chipStyle(isSelected: viewModel.selectedTags.contains(tag), selectedBackground: .primary01)
+                        .chipStyle(
+                            isSelected: viewModel.selectedTags.contains(tag),
+                            selectedBackground: .clear,
+                            selectedForeground: .gray04,
+                            unselectedBorderColor: .divider,
+                            icon: viewModel.selectedTags.contains(tag) ? Image(.check) : nil
+                        )
                     }
                 }
             }
             .padding(.leading, 16)
         }
+    }
+    
+    private var saveButton: some View {
+        Button {
+            Task {
+                await viewModel.save(isGuest: authViewModel.authenticationState == .guest)
+                
+                router.push(.completeSave(count: viewModel.itemVMs.count))
+            }
+        } label: {
+            Text("저장하기")
+        }
+        .buttonStyle(
+            PrimaryButtonStyle(cornerRadius: 4, backgroundColor: .primary01, foregroundColor: .white, verticalPadding: 14, fillWidth: true)
+        )
+        .padding(.horizontal, 16)
     }
     
     // MARK: - Upload Progress Overlay
@@ -277,15 +369,13 @@ struct TagView: View {
                         viewModel.toggleFavorite(at: currentIndex)
                     }
                 } label: {
-                    Image(itemVM.isFavorite ? .selectedFavorite : .unselectedFavorite)
+                    Image(itemVM.isFavorite ? .favoriteSelected : .favoriteUnselected)
                         .resizable()
                         .frame(width: 24, height: 24)
                         .padding(3)
-                        .background(.overlayDim)
-                        .clipShape(Circle())
                 }
                     .padding(16),
-                alignment: .bottomTrailing
+                alignment: .bottomLeading
             )
         }
         .padding(.horizontal, 50)

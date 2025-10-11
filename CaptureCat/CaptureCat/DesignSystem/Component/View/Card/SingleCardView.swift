@@ -19,7 +19,7 @@ struct SingleCardView<Content: View>: View {
     let onDragStateChanged: ((Bool) -> Void)?  // 드래그 상태 변경 콜백 추가
     
     init(
-        cornerRadius: CGFloat = 24,
+        cornerRadius: CGFloat = 4,
         onDelete: (() -> Void)? = nil,  // 삭제 콜백 매개변수 추가
         onDragStateChanged: ((Bool) -> Void)? = nil,  // 드래그 상태 변경 콜백 매개변수 추가
         @ViewBuilder content: () -> Content

@@ -11,6 +11,8 @@ struct DetailView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var homeViewModel: HomeViewModel
     @StateObject var viewModel: DetailViewModel
+    @State private var mode: TagSheetMode = .edit
+    @State var isExpanded = false
     
     let imageId: String
     
@@ -28,17 +30,18 @@ struct DetailView: View {
             }
         }
         .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
-            NavigationStack {
-                AddTagSheet(
+                TagSheet(
+                    mode: $mode,
+                    isExpanded: $isExpanded,
                     tags: $viewModel.tags,
                     selectedTags: $viewModel.tempSelectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
                     onAddNewTag: { newTag in viewModel.addNewTag(newTag) },
-                    onDeleteTag: { tag in viewModel.deleteTag(tag) }
+                    onDeleteTag: { tag in viewModel.deleteTag(tag) },
+                    onSaveTag: { tag in viewModel.addTagByChip(tag) }
                 )
-                .presentationDetents([ .height(250) ])
+                .presentationDetents(mode == .add ? [.height(200)] : [.medium])
                 .ignoresSafeArea(.keyboard, edges: .bottom)
-            }
         })
         .popUp(
             isPresented: $viewModel.isDeleted,
@@ -126,7 +129,7 @@ struct DetailView: View {
     
     private var tagOverlay: some View {
         HStack(spacing: 4) {
-            ForEach(viewModel.tags, id: \.self) { tag in
+            ForEach(Array(viewModel.tempSelectedTags), id: \.self) { tag in
                 Text(tag)
                     .CFont(.caption01Semibold)
                     .padding(.horizontal, 10)
