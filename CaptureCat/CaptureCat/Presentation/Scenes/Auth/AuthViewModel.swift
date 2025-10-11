@@ -312,6 +312,7 @@ class AuthViewModel: ObservableObject {
     private func safelyCleanupUserDefaults() {
         debugPrint("🧹 UserDefaults 안전 정리 시작")
         UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
+        UserDefaults.standard.removeObject(forKey: LocalUserKeys.deleteOriginalsAfterSave.rawValue)
         UserDefaults.standard.synchronize()
         debugPrint("🧹 UserDefaults 안전 정리 완료")
     }
