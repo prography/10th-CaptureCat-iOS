@@ -14,6 +14,7 @@ enum TagSheetMode {
 
 struct TagSheet: View {
     @Binding var mode: TagSheetMode
+    @Binding var isExpanded: Bool
     @Binding var tags: [String]
     @Binding var selectedTags: Set<String>
     @Binding var isPresented: Bool
@@ -53,9 +54,7 @@ struct TagSheet: View {
                         .foregroundStyle(.text02)
                     selectedTagListViewEditMode
                         .padding(.bottom, 32)
-                    Text("기존태그 보기")
-                        .CFont(.subhead01Bold)
-                        .foregroundStyle(.text02)
+                    tagListTitle
                     allTagListViewEditMode
                 }
                 .padding(.horizontal, 16)
@@ -109,30 +108,15 @@ struct TagSheet: View {
         }
     }
     
-    private var inputTextField: some View {
-        TextField("추가할 태그를 입력해주세요", text: $newTag)
-            .CFont(.body02Regular)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .frame(height: 38)
-            .background(.gray01)
-            .cornerRadius(8)
-            .foregroundColor(.text03)
-            .textFieldStyle(.plain)
-            .padding(.horizontal, 16)
-    }
-    
     private var selectedTagListViewEditMode: some View {
         FlowLayout(spacing: 8, rowSpacing: 12) {
-            ForEach(tags, id: \.self) { tag in
-                if selectedTags.contains(tag) {
-                    Button {
-                        onDeleteTag?(tag)
-                    } label: {
-                        Text(tag)
-                    }
-                    .chipStyle(isSelected: true, selectedBackground: .text01, icon: Image(.xmark))
+            ForEach(Array(selectedTags), id: \.self) { tag in
+                Button {
+                    onDeleteTag?(tag)
+                } label: {
+                    Text(tag)
                 }
+                .chipStyle(isSelected: true, selectedBackground: .text01, icon: Image(.xmark))
             }
             Button {
                 withAnimation { mode = .add }
@@ -149,8 +133,28 @@ struct TagSheet: View {
         }
     }
     
+    private var tagListTitle: some View {
+        HStack {
+            Text("기존태그 보기")
+                .CFont(.subhead01Bold)
+                .foregroundStyle(.text02)
+            Spacer()
+            Button {
+                isExpanded.toggle()
+            } label: {
+                HStack(spacing: 4) {
+                    Text("더보기")
+                        .CFont(.body02Regular)
+                        .foregroundStyle(.text03)
+                        .underline(color: .text03)
+                    Image(.arrowDown)
+                }
+            }
+        }
+    }
+    
     private var allTagListViewEditMode: some View {
-        FlowLayout(spacing: 8, rowSpacing: 12) {
+        FlowLayout(spacing: 6, rowSpacing: 6) {
             ForEach(tags, id: \.self) { tag in
                 Button {
                     onDeleteTag?(tag)
@@ -165,23 +169,35 @@ struct TagSheet: View {
                     unselectedForeground: .text01,
                     selectedBorderColor: .divider,
                     unselectedBorderColor: .divider,
-                    icon: Image(systemName: "checkmark")
+                    icon: Image(.check)
                 )
             }
         }
+        .frame(maxHeight: isExpanded ? nil : 50)
+    }
+    
+    private var inputTextField: some View {
+        TextField("추가할 태그를 입력해주세요", text: $newTag)
+            .CFont(.body02Regular)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .frame(height: 38)
+            .background(.gray01)
+            .cornerRadius(8)
+            .foregroundColor(.text03)
+            .textFieldStyle(.plain)
+            .padding(.horizontal, 16)
     }
     
     private var selectedTagListViewAddMode: some View {
         FlowLayout(spacing: 8, rowSpacing: 12) {
-            ForEach(tags, id: \.self) { tag in
-                if selectedTags.contains(tag) {
-                    Button {
-                        onDeleteTag?(tag)
-                    } label: {
-                        Text(tag)
-                    }
-                    .chipStyle(isSelected: true, selectedBackground: .text01, icon: Image(.xmark))
+            ForEach(Array(selectedTags), id: \.self) { tag in
+                Button {
+                    onDeleteTag?(tag)
+                } label: {
+                    Text(tag)
                 }
+                .chipStyle(isSelected: true, selectedBackground: .text01, icon: Image(.xmark))
             }
         }
         .padding(.horizontal, 16)
