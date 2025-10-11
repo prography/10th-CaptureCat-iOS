@@ -61,6 +61,5 @@ struct ImageDeleteSettingView: View {
                 .foregroundStyle(.text02)
         }
         .padding(.horizontal, 16)
-        .padding(.top)
     }
 }
