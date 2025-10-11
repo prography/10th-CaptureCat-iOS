@@ -20,7 +20,7 @@ struct ChipButtonStyle: ButtonStyle {
     let verticalPadding: CGFloat
     
     func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: icon == nil ? 0 : 6) {
+        HStack(spacing: icon == nil ? 0 : 4) {
             configuration.label
                 .CFont(isSelected ? .subhead02Bold : .body02Regular)
             if let icon {
@@ -28,7 +28,7 @@ struct ChipButtonStyle: ButtonStyle {
                     .resizable()
                     .renderingMode(.template)
                     .scaledToFit()
-                    .frame(width: 24, height: 24)
+                    .frame(width: 14, height: 14)
             }
         }
         .padding(.horizontal, horizontalPadding)
