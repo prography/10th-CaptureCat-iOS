@@ -37,8 +37,27 @@ class DetailViewModel: ObservableObject {
     // MARK: - Setup Methods
     private func setupInitialTags() {
         guard let item = item else { return }
-        tags = item.tags.map { $0.name }
-        tempSelectedTags = Set(tags)
+        tempSelectedTags = Set(item.tags.map { $0.name })
+    }
+    
+    func loadTags() async {
+        await MainActor.run {
+            isLoading = true
+        }
+        
+        do {
+            let loadedTags = try await repository.fetchAllUserTag()
+            await MainActor.run {
+                self.tags = loadedTags.map { $0.name }
+                self.isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                print("태그 로딩 실패: \(error)")
+                self.tags = []
+                self.isLoading = false
+            }
+        }
     }
     
     func onAppear() {
@@ -62,6 +81,7 @@ class DetailViewModel: ObservableObject {
             self.item = loadedItem
             self.isFavorite = loadedItem.isFavorite // 즐겨찾기 상태 동기화
             setupInitialTags()
+            await loadTags()
             
             // 풀 이미지 로드
             await loadedItem.loadFullImage()
@@ -81,12 +101,34 @@ class DetailViewModel: ObservableObject {
         isShowingAddTagSheet = false
     }
     
+    func registerTag(_ newTag: String) {
+        Task {
+            // 로그인 모드: 서버에 등록
+            do {
+                let result = try await repository.registerUserTag(name: newTag)
+                switch result {
+                case .success(let userTag):
+                    await MainActor.run {
+                        tags.append(userTag.data.name)
+                    }
+                case .failure(let error):
+                    print("태그 등록 실패: \(error)")
+                    errorMessage = error.localizedDescription
+                }
+            } catch {
+                print("태그 등록 중 오류: \(error)")
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+    
     func addNewTag(_ newTag: String) {
         guard let item = item else { return }
         
-        // 빈 문자열이나 이미 존재하는 태그는 추가하지 않음
+        // 빈 문자열은 추가하지 않음
         guard !newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-              /*!item.tags.contains(newTag)*/ else { return }
+              /*!item.tags.contains(newTag)*/ else {
+            return }
         
         // 최대 4개 태그 제한
         guard item.tags.count < 4 else {
@@ -95,6 +137,7 @@ class DetailViewModel: ObservableObject {
         }
         
         // 새 태그 추가
+        registerTag(newTag)
         item.addTag(newTag)
         tags.append(newTag)  // UI 업데이트를 위해 @Published tags 배열에도 추가
         tempSelectedTags.insert(newTag)

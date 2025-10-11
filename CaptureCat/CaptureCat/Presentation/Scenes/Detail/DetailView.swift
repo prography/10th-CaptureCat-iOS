@@ -12,6 +12,7 @@ struct DetailView: View {
     @EnvironmentObject var homeViewModel: HomeViewModel
     @StateObject var viewModel: DetailViewModel
     @State private var mode: TagSheetMode = .edit
+    @State var isExpanded = false
     
     let imageId: String
     
@@ -31,6 +32,7 @@ struct DetailView: View {
         .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
                 TagSheet(
                     mode: $mode,
+                    isExpanded: $isExpanded,
                     tags: $viewModel.tags,
                     selectedTags: $viewModel.tempSelectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
@@ -126,7 +128,7 @@ struct DetailView: View {
     
     private var tagOverlay: some View {
         HStack(spacing: 4) {
-            ForEach(viewModel.tags, id: \.self) { tag in
+            ForEach(Array(viewModel.tempSelectedTags), id: \.self) { tag in
                 Text(tag)
                     .CFont(.caption01Semibold)
                     .padding(.horizontal, 10)
