@@ -15,9 +15,9 @@ enum Mode: Int {
     var value: String {
         switch self {
         case .batch:
-            "batch"
+            "한번에"
         case .single:
-            "single"
+            "한장씩"
         }
     }
 }

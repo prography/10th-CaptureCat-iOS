@@ -21,9 +21,9 @@ struct MultiCardView<Content: View>: View {
     )
     
     init(
-        cornerRadius: CGFloat = 24,
-        backgroundOffset: CGFloat = 12,
-        backgroundRotation: Angle = .degrees(-8),
+        cornerRadius: CGFloat = 4,
+        backgroundOffset: CGFloat = 4,
+        backgroundRotation: Angle = .degrees(-4),
         @ViewBuilder content: () -> Content
     ) {
         self.content = content()

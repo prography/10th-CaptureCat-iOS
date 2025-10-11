@@ -33,7 +33,7 @@ struct ScreenshotItemView<Overlay: View>: View {
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                         .overlay(
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(Color.overlayDim, lineWidth: 1)
+                                .stroke(Color.divider, lineWidth: 1)
                         )
                 } else if viewModel.isLoadingImage {
                     ProgressView()
