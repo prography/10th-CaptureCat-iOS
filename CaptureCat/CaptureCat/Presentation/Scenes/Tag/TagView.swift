@@ -35,7 +35,7 @@ struct TagView: View {
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
-                .presentationDetents([ .height(viewModel.selectedTags.isEmpty ?  200 : 250) ])
+                .presentationDetents([ .height(250) ])
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
@@ -47,14 +47,18 @@ struct TagView: View {
     
     // MARK: - Main Content View
     private var mainContentView: some View {
-        VStack {
+        VStack(alignment: .center, spacing: 16) {
             navigationBarView
             modeTab
-                .padding(.bottom, 32)
-            contentSectionView
                 .padding(.bottom, 16)
+            contentSectionView
+//            if viewModel.selectedTags.isEmpty {
+//                noTagButtonView
+//            } else {
+                allTagListViewEditMode
+//            }
             tagSectionView
-                .padding(.bottom, 24)
+                .padding(.bottom, 8)
             saveButton
         }
     }
@@ -144,6 +148,52 @@ struct TagView: View {
     }
     
     // MARK: - Tag Section
+    private var noTagButtonView: some View {
+        Button {
+            viewModel.addNewTag(name: "태그 없음")
+        } label: {
+            Text("태그 없음으로 태그")
+        }
+        .chipStyle(
+            isSelected: true,
+            selectedBackground: .gray02,
+            selectedForeground: .text01,
+            selectedBorderColor: .divider,
+            icon: Image(.plus)
+        )
+    }
+    
+    private var allTagListViewEditMode: some View {
+        GeometryReader { geo in
+            ScrollView(.horizontal, showsIndicators: false) {
+                ZStack {
+                    // 부모(스크롤 영역) 너비만큼 자리 차지하는 투명 뷰
+                    Color.clear
+                        .frame(width: geo.size.width)
+
+                    HStack(spacing: 6) {
+                        ForEach(Array(viewModel.selectedTags), id: \.self) { tag in
+                            Button {
+                                withAnimation(.easeInOut) {
+                                    viewModel.toggleTag(tag)
+                                }
+                            } label: {
+                                Text(tag)
+                            }
+                            .chipStyle(
+                                isSelected: true,
+                                selectedBackground: .text01,
+                                icon: Image(.xmark)
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+            }
+        }
+        .frame(height: 50) // chip 높이에 맞게
+    }
+    
     private var tagSectionView: some View {
         VStack(spacing: 12) {
             HStack {
@@ -168,7 +218,13 @@ struct TagView: View {
                         } label: {
                             Text(tag)
                         }
-                        .chipStyle(isSelected: viewModel.selectedTags.contains(tag), selectedBackground: .primary01)
+                        .chipStyle(
+                            isSelected: viewModel.selectedTags.contains(tag),
+                            selectedBackground: .clear,
+                            selectedForeground: .gray04,
+                            unselectedBorderColor: .divider,
+                            icon: viewModel.selectedTags.contains(tag) ? Image(.check) : nil
+                        )
                     }
                 }
             }

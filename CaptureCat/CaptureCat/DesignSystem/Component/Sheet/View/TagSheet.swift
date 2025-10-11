@@ -169,7 +169,7 @@ struct TagSheet: View {
                     unselectedForeground: .text01,
                     selectedBorderColor: .divider,
                     unselectedBorderColor: .divider,
-                    icon: Image(.check)
+                    icon: selectedTags.contains(tag) ? Image(.check) : nil
                 )
             }
         }
@@ -197,7 +197,11 @@ struct TagSheet: View {
                 } label: {
                     Text(tag)
                 }
-                .chipStyle(isSelected: true, selectedBackground: .text01, icon: Image(.xmark))
+                .chipStyle(
+                    isSelected: true,
+                    selectedBackground: .text01,
+                    icon: Image(.xmark)
+                )
             }
         }
         .padding(.horizontal, 16)
