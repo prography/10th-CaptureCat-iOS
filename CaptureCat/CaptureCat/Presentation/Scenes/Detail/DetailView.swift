@@ -11,6 +11,7 @@ struct DetailView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var homeViewModel: HomeViewModel
     @StateObject var viewModel: DetailViewModel
+    @State private var mode: TagSheetMode = .edit
     
     let imageId: String
     
@@ -28,17 +29,16 @@ struct DetailView: View {
             }
         }
         .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
-            NavigationStack {
-                AddTagSheet(
+                TagSheet(
+                    mode: $mode,
                     tags: $viewModel.tags,
                     selectedTags: $viewModel.tempSelectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
                     onAddNewTag: { newTag in viewModel.addNewTag(newTag) },
                     onDeleteTag: { tag in viewModel.deleteTag(tag) }
                 )
-                .presentationDetents([ .height(250) ])
+                .presentationDetents(mode == .add ? [.height(200)] : [.medium])
                 .ignoresSafeArea(.keyboard, edges: .bottom)
-            }
         })
         .popUp(
             isPresented: $viewModel.isDeleted,
