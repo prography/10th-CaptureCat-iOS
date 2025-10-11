@@ -32,6 +32,9 @@ extension TagViewModel {
             await optimisticSaveToServer()
             MixpanelManager.shared.trackImageSave(entry: .inbox, tagging: mode, tagCount: itemVMs.reduce(0) { partial, item in partial + item.tags.count }, screenshotCount: itemVMs.count)
         }
+        
+        // 저장 완료 후 UserDefaults 설정에 따라 원본 사진 삭제
+        await deleteOriginalsIfEnabled()
     }
     
     /// 낙관적 업데이트로 서버 저장 (즉시 로컬 업데이트 + 백그라운드 서버 동기화)
@@ -262,3 +265,81 @@ extension TagViewModel {
          }
     }
 } 
+
+// MARK: - Original Asset Deletion
+extension TagViewModel {
+    
+    /// UserDefaults 설정에 따라 원본 사진 삭제 여부 결정
+    private func deleteOriginalsIfEnabled() async {
+        let shouldDelete = UserDefaults.standard.deleteOriginalsAfterSave
+        
+        guard shouldDelete else {
+            debugPrint("🔧 원본 사진 삭제 설정이 비활성화되어 있습니다")
+            return
+        }
+        
+        debugPrint("🗑️ 원본 사진 삭제 설정이 활성화되어 있어 삭제를 시작합니다")
+        await deleteOriginalAssets()
+    }
+    
+    /// 사진 라이브러리 쓰기 권한 확인
+    private func checkPhotoLibraryWritePermission() async -> Bool {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        
+        switch status {
+        case .authorized:
+            return true
+        case .notDetermined:
+            let newStatus = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+            return newStatus == .authorized
+        case .denied, .restricted:
+            debugPrint("❌ 사진 라이브러리 쓰기 권한이 거부되었습니다")
+            return false
+        case .limited:
+            // limited 권한에서도 삭제는 가능할 수 있음
+            return true
+        @unknown default:
+            return false
+        }
+    }
+    
+    /// 원본 PHAsset들을 갤러리에서 삭제
+    private func deleteOriginalAssets() async {
+        // 1. 권한 확인
+        guard await checkPhotoLibraryWritePermission() else {
+            debugPrint("❌ 사진 라이브러리 쓰기 권한이 없어 원본 사진을 삭제할 수 없습니다")
+            return
+        }
+        
+        // 2. PHAsset 가져오기
+        let assetIds = itemVMs.map { $0.id }
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: assetIds, options: nil)
+        
+        var assetsToDelete: [PHAsset] = []
+        fetchResult.enumerateObjects { asset, _, _ in
+            assetsToDelete.append(asset)
+        }
+        
+        guard !assetsToDelete.isEmpty else {
+            debugPrint("⚠️ 삭제할 PHAsset이 없습니다")
+            return
+        }
+        
+        debugPrint("🗑️ 원본 사진 삭제 시작: \(assetsToDelete.count)개")
+        
+        // 3. 실제 삭제 수행
+        await withCheckedContinuation { continuation in
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.deleteAssets(assetsToDelete as NSFastEnumeration)
+            }) { success, error in
+                if success {
+                    debugPrint("✅ 원본 사진 삭제 완료: \(assetsToDelete.count)개")
+                } else {
+                    let errorMessage = error?.localizedDescription ?? "Unknown error"
+                    debugPrint("❌ 원본 사진 삭제 실패: \(errorMessage)")
+                }
+                continuation.resume()
+            }
+        }
+    }
+}
