@@ -20,6 +20,7 @@ struct TagSheet: View {
     @Binding var isPresented: Bool
     var onAddNewTag: ((String) -> Void)?
     var onDeleteTag: ((String) -> Void)?
+    var onSaveTag: ((String) -> Void)?
     
     @State private var newTag: String = ""
     @State private var keyboardHeight: CGFloat = 0
@@ -157,7 +158,7 @@ struct TagSheet: View {
         FlowLayout(spacing: 6, rowSpacing: 6) {
             ForEach(tags, id: \.self) { tag in
                 Button {
-                    onDeleteTag?(tag)
+                    onSaveTag?(tag)
                 } label: {
                     Text(tag)
                 }

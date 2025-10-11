@@ -147,6 +147,24 @@ class DetailViewModel: ObservableObject {
         saveTags(newTag)
     }
     
+    func addTagByChip(_ newTag: String) {
+        guard let item = item else { return }
+        
+        // 최대 4개 태그 제한
+        guard item.tags.count < 4 else {
+            debugPrint("⚠️ 태그는 최대 4개까지만 추가할 수 있습니다.")
+            return
+        }
+        
+        // 새 태그 추가
+        item.addTag(newTag)
+        tempSelectedTags.insert(newTag)
+        
+        debugPrint("✅ 새 태그 추가됨: \(newTag)")
+        
+        saveTags(newTag)
+    }
+    
     func deleteTag(_ tag: String) {
         guard let item = item else { return }
         var tagIndex: Int = 0

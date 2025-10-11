@@ -37,7 +37,8 @@ struct DetailView: View {
                     selectedTags: $viewModel.tempSelectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
                     onAddNewTag: { newTag in viewModel.addNewTag(newTag) },
-                    onDeleteTag: { tag in viewModel.deleteTag(tag) }
+                    onDeleteTag: { tag in viewModel.deleteTag(tag) },
+                    onSaveTag: { tag in viewModel.addTagByChip(tag) }
                 )
                 .presentationDetents(mode == .add ? [.height(200)] : [.medium])
                 .ignoresSafeArea(.keyboard, edges: .bottom)

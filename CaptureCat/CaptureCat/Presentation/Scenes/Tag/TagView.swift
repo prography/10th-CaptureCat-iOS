@@ -16,7 +16,7 @@ struct TagView: View {
     @State private var draggingItem = 0.0
     @State private var isDragging = false
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
-    @State private var tagMode: TagSheetMode = .edit
+    @State private var tagMode: TagSheetMode = .add
     @State private var tagExpanded: Bool = false
     
     var body: some View {
@@ -35,7 +35,7 @@ struct TagView: View {
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
-                .presentationDetents([ .height(250) ])
+                .presentationDetents([ .height(200) ])
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
