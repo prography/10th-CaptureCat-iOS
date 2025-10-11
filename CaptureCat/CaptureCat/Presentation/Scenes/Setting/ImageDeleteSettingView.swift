@@ -16,16 +16,15 @@ struct ImageDeleteSettingView: View {
             navigationBar
             Divider()
                 .foregroundStyle(.divider)
-            HStack {
+            Toggle(isOn: $isOn) {
                 Text("업로드 후 삭제 안내 팝업 설정")
                     .CFont(.body01Regular)
                     .foregroundStyle(.text01)
-                Toggle("", isOn: $isOn)
-                    .toggleStyle(.switch)
-                    .tint(.primary01)
-                    .onChange(of: isOn) { _, newValue in
-                        UserDefaults.standard.deleteOriginalsAfterSave = newValue
-                    }
+            }
+            .toggleStyle(.switch)
+            .tint(.primary01)
+            .onChange(of: isOn) { _, newValue in
+                UserDefaults.standard.deleteOriginalsAfterSave = newValue
             }
             .padding(.horizontal, 16)
             Text("캡처캣에 업로드가 완료되면, 갤러리에서 이미지를\n삭제할지 팝업으로 안내해요.")
