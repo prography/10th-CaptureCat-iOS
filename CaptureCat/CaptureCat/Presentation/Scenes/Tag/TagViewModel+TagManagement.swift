@@ -13,12 +13,12 @@ extension TagViewModel {
     // MARK: - Tag Loading & Saving
     /// 전체 태그 목록을 로컬/서버에서 가져와 tags에 세팅
     func loadTags() {
-        tags = UserDefaults.standard.stringArray(forKey: LocalUserKeys.selectedTopics.rawValue) ?? []
+        tags = UserDefaults.standard.selectedTopics
     }
     
     /// 전체 태그 목록을 UserDefaults에 저장
     func saveTags() {
-        UserDefaults.standard.set(tags, forKey: LocalUserKeys.selectedTopics.rawValue)
+        UserDefaults.standard.selectedTopics = tags
         debugPrint("💾 태그 목록 저장 완료: \(tags)")
     }
     

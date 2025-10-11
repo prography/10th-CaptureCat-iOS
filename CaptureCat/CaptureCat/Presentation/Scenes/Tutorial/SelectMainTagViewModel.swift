@@ -10,6 +10,7 @@ import SwiftUI
 
 enum LocalUserKeys: String {
     case selectedTopics = "selectedTopics"
+    case deleteOriginalsAfterSave = "deleteOriginalsAfterSave"
 }
 
 final class SelectMainTagViewModel: ObservableObject {
@@ -85,6 +86,6 @@ final class SelectMainTagViewModel: ObservableObject {
 //    }
     func saveTopicLocal() {
         let texts = selected.map { $0.localizedText } // 저장 시점 언어로 고정
-        UserDefaults.standard.set(texts, forKey: LocalUserKeys.selectedTopics.rawValue)
+        UserDefaults.standard.selectedTopics = texts
     }
 }

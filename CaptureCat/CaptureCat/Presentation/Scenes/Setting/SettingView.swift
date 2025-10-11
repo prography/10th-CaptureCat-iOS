@@ -164,6 +164,13 @@ struct SettingsView: View {
                 SettingRow(title: "태그 설정")
             }
             .contentShape(Rectangle())
+            
+            Button {
+                router.push(.imageSetting)
+            } label: {
+                SettingRow(title: "이미지 삭제 설정")
+            }
+            .contentShape(Rectangle())
         }
     }
     
@@ -206,23 +213,22 @@ struct SettingsView: View {
                 showUpdate = true
                 debugPrint("버전 정보")
             } label: {
-                VStack {
-                    HStack {
-                        Text("버전 정보")
-                            .CFont(.body01Regular)
-                            .foregroundStyle(Color.text01)
-                        Spacer()
-                        
-                        if updateViewModel.requiredVersion != Bundle.main.appVersion {
-                            Text("업데이트")
-                                .CFont(.body01Regular)
-                                .foregroundStyle(Color.text01)
-                        }
-                    }
-                    Text("\(Bundle.main.appVersion)")
-                        .CFont(.caption02Regular)
+                HStack {
+                    Text("버전: \(Bundle.main.appVersion)")
+                        .CFont(.body01Regular)
                         .foregroundStyle(Color.text01)
-                        .frame(maxWidth: .infinity, minHeight: 12, alignment: .leading)
+                    Spacer()
+                    
+                    if updateViewModel.requiredVersion != Bundle.main.appVersion {
+                        Text("업데이트")
+                            .CFont(.subhead03Bold)
+                            .foregroundStyle(Color.primary01)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+//                            .contentShape(Rectangle())
+                            .buttonBorderShape(.roundedRectangle(radius: 8))
+                            .border(.primaryPress)
+                    }
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
@@ -292,7 +298,7 @@ struct SettingsView: View {
                 } label: {
                     Text("회원 탈퇴")
                         .CFont(.body02Regular)
-                        .foregroundStyle(Color.text01).frame(maxWidth: .infinity, minHeight: 16, alignment: .leading)
+                        .foregroundStyle(Color.error).frame(maxWidth: .infinity, minHeight: 16, alignment: .leading)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
                 }

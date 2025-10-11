@@ -71,6 +71,10 @@ struct RouterView<Content: View>: View {
                         TagEditView(viewModel: viewModel)
                             .navigationBarBackButtonHidden()
                             .toolbar(.hidden, for: .navigationBar)
+                    case .imageSetting:
+                        ImageDeleteSettingView()
+                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                     case .tagSetting:
                         let viewModel = TagSettingViewModel(repository: repository)
                         TagSettingView(viewModel: viewModel)
