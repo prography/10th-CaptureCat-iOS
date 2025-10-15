@@ -13,6 +13,7 @@ struct DetailView: View {
     @StateObject var viewModel: DetailViewModel
     @State private var mode: TagSheetMode = .edit
     @State var isExpanded = false
+    @State private var tagSheetHeight: CGFloat = 300 // edit 모드를 고려한 더 큰 기본값
     
     let imageId: String
     
@@ -36,11 +37,13 @@ struct DetailView: View {
                     tags: $viewModel.tags,
                     selectedTags: $viewModel.tempSelectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
+                    sheetHeight: $tagSheetHeight,
                     onAddNewTag: { newTag in viewModel.addNewTag(newTag) },
                     onDeleteTag: { tag in viewModel.deleteTag(tag) },
                     onSaveTag: { tag in viewModel.addTagByChip(tag) }
                 )
-                .presentationDetents(mode == .add ? [.height(200)] : [.medium])
+                .presentationDetents([.height(tagSheetHeight)])
+                .animation(.easeInOut(duration: 0.3), value: tagSheetHeight)
                 .ignoresSafeArea(.keyboard, edges: .bottom)
         })
         .popUp(

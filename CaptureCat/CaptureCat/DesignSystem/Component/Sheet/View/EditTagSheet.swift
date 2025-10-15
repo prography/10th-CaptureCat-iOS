@@ -10,10 +10,25 @@ import SwiftUI
 struct EditTagSheet: View {
     @Binding var tag: Tag
     @Binding var isPresented: Bool
+    @Binding var sheetHeight: CGFloat
     var onAddNewTag: ((String) -> Void)?
     
     @State private var newTag: String = ""
     @State private var keyboardHeight: CGFloat = 0
+    @State private var contentSize: CGSize = .zero
+    
+    var dynamicHeight: CGFloat {
+        // contentSize가 아직 측정되지 않았다면 기본값 사용
+        guard contentSize != .zero else {
+            return 180
+        }
+        
+        let baseHeight = contentSize.height + 56 // 상하 패딩 고려
+        let minHeight: CGFloat = 180
+        let maxHeight = UIScreen.main.bounds.height * 0.9
+        
+        return max(minHeight, min(baseHeight, maxHeight))
+    }
     
     var body: some View {
         VStack(spacing: 28) {
@@ -65,7 +80,13 @@ struct EditTagSheet: View {
 //            }
         }
         .padding(.top, 28)
+        .readSize { size in
+            contentSize = size
+                sheetHeight = dynamicHeight
+        }
         .onAppear {
+            // 초기 높이 설정
+            sheetHeight = dynamicHeight
             // 키보드 notification 감지 시작
             NotificationCenter.default.addObserver(
                 forName: UIResponder.keyboardWillShowNotification,
@@ -74,6 +95,7 @@ struct EditTagSheet: View {
             ) { notification in
                 if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
                     keyboardHeight = keyboardFrame.height
+                    sheetHeight = dynamicHeight
                 }
             }
             
@@ -83,6 +105,7 @@ struct EditTagSheet: View {
                 queue: .main
             ) { _ in
                 keyboardHeight = 0
+                sheetHeight = dynamicHeight
             }
         }
         .onDisappear {

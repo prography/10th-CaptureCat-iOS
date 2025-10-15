@@ -18,6 +18,7 @@ struct TagView: View {
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
     @State private var tagMode: TagSheetMode = .add
     @State private var tagExpanded: Bool = false
+    @State private var tagSheetHeight: CGFloat = 300 // edit 모드를 고려한 더 큰 기본값
     
     var body: some View {
         mainContentView
@@ -32,10 +33,12 @@ struct TagView: View {
                     tags: $viewModel.tags,
                     selectedTags: $viewModel.selectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
+                    sheetHeight: $tagSheetHeight,
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
-                .presentationDetents([ .height(200) ])
+                .presentationDetents([.height(tagSheetHeight)])
+                .animation(.easeInOut(duration: 0.3), value: tagSheetHeight)
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
