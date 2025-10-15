@@ -11,10 +11,10 @@ import Combine
 @MainActor
 final class SearchViewModel: ObservableObject {
     @Published var searchText: String = ""
-    @Published var allTags: [String] = []
-    @Published var filteredTags: [String] = []
-    @Published var selectedTags: [String] = []  // 다중 태그 선택
-    @Published var relatedTags: [String] = []   // 연관 태그들
+    @Published var allTags: [Tag] = []
+    @Published var filteredTags: [Tag] = []
+    @Published var selectedTags: [Tag] = []  // Tag 객체 배열로 변경
+    @Published var relatedTags: [Tag] = []   // 연관 태그들
     @Published var filteredScreenshots: [ScreenshotItemViewModel] = []
     @Published var isLoading: Bool = false
     @Published var isLoadingScreenshots: Bool = false
@@ -63,11 +63,11 @@ final class SearchViewModel: ObservableObject {
                         switch result {
                         case .success(let dto):
                             // ⬇️ 서버 응답 → [String]으로 매핑
-                            self.filteredTags = self.mapTags(from: dto)
+                            self.filteredTags = dto.data
                         case .failure:
                             // 실패 시 로컬 필터로 graceful fallback (원치 않으면 []로)
                             self.filteredTags = self.allTags.filter {
-                                $0.localizedCaseInsensitiveContains(query)
+                                $0.name.localizedCaseInsensitiveContains(query)
                             }
                         }
                     }
@@ -112,12 +112,12 @@ final class SearchViewModel: ObservableObject {
             filteredTags = allTags
         } else {
             filteredTags = allTags.filter { tag in
-                tag.localizedCaseInsensitiveContains(searchText)
+                tag.name.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
     
-    func selectTag(_ tag: String) {
+    func selectTag(_ tag: Tag) {
         // 이미 선택된 태그가 아닌 경우에만 추가
         guard !selectedTags.contains(tag) else { return }
         
@@ -130,7 +130,7 @@ final class SearchViewModel: ObservableObject {
         }
     }
     
-    func removeTag(_ tag: String) {
+    func removeTag(_ tag: Tag) {
         selectedTags.removeAll { $0 == tag }
         
         if selectedTags.isEmpty {
@@ -167,13 +167,15 @@ final class SearchViewModel: ObservableObject {
             
             if AccountStorage.shared.isGuest ?? true {
                 // 게스트 모드에서는 로컬에서 전체 로드 (페이지네이션 미지원)
-                newScreenshots = try await repository.loadByTags(selectedTags)
+                let tagNames = selectedTags.map { $0.name }
+                newScreenshots = try await repository.loadByTags(tagNames)
                 hasMoreData = false // 로컬에서는 모든 데이터를 한 번에 로드
             } else {
                 // 로그인 모드에서는 서버에서 페이지네이션으로 로드
-                let loadedScreenshots = try await repository.loadByTags(selectedTags)
+                let tagNames = selectedTags.map { $0.name }
+                let loadedScreenshots = try await repository.loadByTags(tagNames)
                 // 실제로는 repository의 loadByTagsFromServer 메서드를 직접 호출해야 함
-                newScreenshots = try await loadByTagsFromServerWithPagination(selectedTags, page: currentPage, size: pageSize)
+                newScreenshots = try await loadByTagsFromServerWithPagination(tagNames, page: currentPage, size: pageSize)
             }
             
             if currentPage == 0 {
@@ -261,7 +263,8 @@ final class SearchViewModel: ObservableObject {
         }
         
         do {
-            let otherTags = try await repository.fetchOtherTagsFromScreenshotsContaining(selectedTags)
+            let tagNames = selectedTags.map { $0.name }
+            let otherTags = try await repository.fetchOtherTagsFromScreenshotsContaining(tagNames)
             relatedTags = otherTags
         } catch {
             print("연관 태그 로딩 실패: \(error)")

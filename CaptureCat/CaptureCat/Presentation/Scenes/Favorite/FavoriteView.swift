@@ -87,14 +87,14 @@ struct FavoriteView: View {
                 }
                 .refreshable {
                     // Pull to refresh
-                    await viewModel.refreshFavoriteItems()
+                    await viewModel.refreshFavoriteItems(tag: viewModel.selectedTag)
                 }
             }
         }
         .background(Color(.systemBackground))
         .task {
             await viewModel.loadTags()
-            await viewModel.loadFavoriteItems()
+            await viewModel.loadFavoriteItems(tag: nil)
             
             // 모든 아이템의 이미지 로드
             let currentItems = Array(viewModel.favoriteItems)
@@ -137,10 +137,8 @@ struct FavoriteView: View {
                 ),
                 showAll: true
             ) { newTag in
-                if let tag = newTag {
-                    print(newTag)
-                } else {
-                    print(newTag)
+                Task {
+                    await viewModel.loadFavoriteItems(tag: newTag)
                 }
             }
             

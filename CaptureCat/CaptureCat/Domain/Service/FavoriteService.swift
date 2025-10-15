@@ -48,8 +48,8 @@ final class FavoriteService {
         }
     }
     
-    func checkFavoriteImageList(page: Int, size: Int) async -> Result<FavoriteImageDTO, Error> {
-        let builder = FavoriteImageBuilder(page: page, size: size)
+    func checkFavoriteImageList(page: Int, size: Int, tagId: Int?) async -> Result<FavoriteImageDTO, Error> {
+        let builder = FavoriteImageBuilder(page: page, size: size, tagId: tagId)
         
         do {
             let response = try await networkManager.fetchData(builder)

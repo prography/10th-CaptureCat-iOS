@@ -89,6 +89,15 @@ final class InMemoryScreenshotCache {
         return Array(Set(otherTags)).sorted()
     }
     
+    func getOtherTagsAsTag(for baseTags: [String]) -> [Tag] {
+        let matchingItems = getItemsByTags(baseTags)
+        let otherTags = matchingItems.flatMap { $0.tags }.filter { !baseTags.contains($0.name) }
+        let uniqueTags = Dictionary(grouping: otherTags) { $0.name }
+            .compactMapValues { $0.first }
+            .values
+        return Array(uniqueTags).sorted { $0.name < $1.name }
+    }
+    
     // MARK: - Favorite Operations
     
     /// 특정 아이템의 즐겨찾기 상태 업데이트

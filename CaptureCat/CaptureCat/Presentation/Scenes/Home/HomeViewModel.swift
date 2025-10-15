@@ -10,8 +10,8 @@ import SwiftUI
 
 @MainActor
 class HomeViewModel: ObservableObject {
-    @Published var selectedTag: String?
-    @Published var allTags: [String] = []
+    @Published var selectedTag: Tag?
+    @Published var allTags: [Tag] = []
     @Published var filteredScreenshots: [ScreenshotItemViewModel] = []
     @Published var isLoading: Bool = false
     @Published var isLoadingScreenshots: Bool = false
@@ -53,7 +53,7 @@ class HomeViewModel: ObservableObject {
         isLoading = false
     }
     
-    func selectTag(_ tag: String) {
+    func selectTag(_ tag: Tag) {
         // 이미 선택된 태그가 아닌 경우에만 추가
         guard selectedTag != tag else { return }
         
@@ -120,7 +120,7 @@ class HomeViewModel: ObservableObject {
             if AccountStorage.shared.isGuest ?? true {
                 // 게스트 모드에서는 로컬에서 로드
                 if let selectedTag {
-                    newScreenshots = try await repository.loadByTags([selectedTag])
+                    newScreenshots = try await repository.loadByTags([selectedTag.name])
                 } else {
                     // 전체 탭일 때는 모든 로컬 데이터 로드
                     newScreenshots = try repository.loadAll()
@@ -128,9 +128,9 @@ class HomeViewModel: ObservableObject {
                 hasMoreData = false // 로컬에서는 모든 데이터를 한 번에 로드
             } else if let selectedTag {
                 // 로그인 모드에서는 서버에서 페이지네이션으로 로드
-                _ = try await repository.loadByTags([selectedTag])
+                _ = try await repository.loadByTags([selectedTag.name])
                 // 실제로는 repository의 loadByTagsFromServer 메서드를 직접 호출해야 함
-                newScreenshots = try await loadByTagsFromServerWithPagination([selectedTag], page: currentPage, size: pageSize)
+                newScreenshots = try await loadByTagsFromServerWithPagination([selectedTag.name], page: currentPage, size: pageSize)
             } else {
                 // 전체 탭일 때 서버에서 페이지네이션으로 로드
                 newScreenshots = try await repository.loadFromServerOnly(page: currentPage)
