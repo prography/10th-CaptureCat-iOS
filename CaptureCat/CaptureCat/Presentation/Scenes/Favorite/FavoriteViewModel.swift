@@ -15,8 +15,8 @@ class FavoriteViewModel: ObservableObject {
     
     // MARK: - Published Properties
     @Published var favoriteItems: [ScreenshotItemViewModel] = []
-    @Published var allTags: [String] = []
-    @Published var selectedTag: String?
+    @Published var allTags: [Tag] = []
+    @Published var selectedTag: Tag?
     @Published var isLoading = false
     @Published var isLoadingPage = false
     @Published var errorMessage: String?
@@ -24,7 +24,6 @@ class FavoriteViewModel: ObservableObject {
     // MARK: - Private Properties
     private var page: Int = 0
     private var canLoadMorePages = true
-    private var hasLoadedInitialData = false
     private let pageSize = 20
     
     // MARK: - Private Properties
@@ -48,15 +47,13 @@ class FavoriteViewModel: ObservableObject {
     }
     
     /// 즐겨찾기 아이템들 초기 로드
-    func loadFavoriteItems() async {
-        guard !hasLoadedInitialData else { return }
-        
+    func loadFavoriteItems(tag: Tag?) async {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
         
         do {
-            let items = try await repository.loadFavorites(page: 0, size: pageSize)
+            let items = try await repository.loadFavorites(page: 0, size: pageSize, tagId: tag?.id)
             
             // 중복 제거
             var uniqueItems: [ScreenshotItemViewModel] = []
@@ -72,7 +69,6 @@ class FavoriteViewModel: ObservableObject {
             self.favoriteItems = uniqueItems
             self.page = 1 // 다음 페이지 준비
             self.canLoadMorePages = !items.isEmpty
-            self.hasLoadedInitialData = true
             
             debugPrint("✅ 즐겨찾기 초기 로드 완료: \(uniqueItems.count)개")
             
@@ -84,14 +80,14 @@ class FavoriteViewModel: ObservableObject {
     }
     
     /// 다음 페이지 로드 (페이지네이션)
-    func loadNextPage() async {
+    func loadNextPage(tag: Tag? = nil) async {
         guard !isLoadingPage, canLoadMorePages else { return }
         
         isLoadingPage = true
         defer { isLoadingPage = false }
         
         do {
-            let newItems = try await repository.loadFavorites(page: page, size: pageSize)
+            let newItems = try await repository.loadFavorites(page: page, size: pageSize, tagId: tag?.id)
             
             if newItems.isEmpty {
                 canLoadMorePages = false
@@ -118,14 +114,13 @@ class FavoriteViewModel: ObservableObject {
     }
     
     /// 새로고침 (Pull to Refresh)
-    func refreshFavoriteItems() async {
-        hasLoadedInitialData = false
+    func refreshFavoriteItems(tag: Tag?) async {
         page = 0
         canLoadMorePages = true
         favoriteItems = []
         errorMessage = nil
         
-        await loadFavoriteItems()
+        await loadFavoriteItems(tag: tag)
     }
     
     /// 즐겨찾기에서 아이템 제거 (UI에서 즉시 제거)

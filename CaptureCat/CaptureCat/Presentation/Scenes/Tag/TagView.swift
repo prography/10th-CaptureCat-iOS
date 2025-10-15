@@ -182,7 +182,7 @@ struct TagView: View {
                             }
                             .chipStyle(
                                 isSelected: true,
-                                selectedBackground: .text01,
+                                selectedBackground: .secondary01,
                                 icon: Image(.xmark)
                             )
                         }

@@ -47,7 +47,7 @@ struct SearchView: View {
                             LazyVStack(alignment: .leading, spacing: 0) {
                                 ForEach(viewModel.filteredTags, id: \.self) { tag in
                                     HStack(spacing: 8) {
-                                        Text(tag)
+                                        Text(tag.name)
                                             .CFont(.body01Regular)
                                             .foregroundStyle(.text01)
                                         Spacer(minLength: 0)
@@ -99,7 +99,7 @@ struct SearchView: View {
                                 Button {
                                     viewModel.removeTag(tag)
                                 } label: {
-                                    Text(tag)
+                                    Text(tag.name)
                                 }
                                 .chipStyle(
                                     isSelected: true,
@@ -192,7 +192,7 @@ struct SearchView: View {
                             viewModel.selectTag(tag)
                             router.push(.searchResult)
                         } label: {
-                            Text(tag)
+                            Text(tag.name)
                                 .CFont(.body02Regular)
                         }
                         .chipStyle(isSelected: false)

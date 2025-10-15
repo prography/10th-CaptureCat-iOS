@@ -55,7 +55,7 @@ struct SearchResultView: View {
                                 router.pop()
                             }
                         } label: {
-                            Text(tag)
+                            Text(tag.name)
                         }
                         .chipStyle(
                             isSelected: true,
@@ -117,14 +117,14 @@ struct SearchResultView: View {
     }
     
     // MARK: - 태그 그리드
-    private func tagGrid(tags: [String]) -> some View {
+    private func tagGrid(tags: [Tag]) -> some View {
         return ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(tags, id: \.self) { tag in
                     Button {
                         viewModel.selectTag(tag)
                     } label: {
-                        Text(tag)
+                        Text(tag.name)
                             .CFont(.body02Regular)
                     }
                     .chipStyle(isSelected: false)

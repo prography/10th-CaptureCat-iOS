@@ -49,47 +49,29 @@ final class ScreenshotRepository: ObservableObject {
     }
     
     /// 연관 태그 가져오기 (로그인 상태 자동 분기)
-    func fetchOtherTagsFromScreenshotsContaining(_ tags: [String]) async throws -> [String] {
+    func fetchOtherTagsFromScreenshotsContaining(_ tags: [String]) async throws -> [Tag] {
         if AccountStorage.shared.isGuest ?? true {
-            return try SwiftDataManager.shared.fetchOtherTagsFromScreenshotsContaining(tags)
+            return try SwiftDataManager.shared.fetchOtherTagsFromScreenshotsContainingAsTag(tags)
         } else {
             // TagService를 사용하여 서버에서 연관 태그 가져오기
             let result = await tagService.fetchRelatedTagList(page: 0, size: 100, tags: tags)
             
             switch result {
             case .success(let tagDTO):
-                // TagDTO에서 태그 이름들을 추출
-                let tagNames = tagDTO.data.items.map { $0.name }
-                debugPrint("✅ 서버에서 연관 태그 로드 성공: \(tagNames)")
-                return tagNames
+                // TagDTO에서 Tag 객체들을 직접 반환
+                debugPrint("✅ 서버에서 연관 태그 로드 성공: \(tagDTO.data.items)")
+                return tagDTO.data.items
             case .failure(let error):
                 debugPrint("❌ 서버에서 연관 태그 로드 실패: \(error.localizedDescription)")
                 // 실패 시 빈 배열 반환
-                return InMemoryScreenshotCache.shared.getOtherTags(for: tags)
+                return InMemoryScreenshotCache.shared.getOtherTagsAsTag(for: tags)
                 
-            }
-        }
-    }
-    
-    /// 전체 태그 목록 (로그인 상태 자동 분기) - String 배열 반환
-    func fetchAllTags() async throws -> [String] {
-        if AccountStorage.shared.isGuest ?? true {
-            return try SwiftDataManager.shared.fetchAllTags()
-        } else {
-            let result = await tagService.fetchPopularTagList()
-            
-            switch result {
-            case .success(let tagDTO):
-                return tagDTO.data.items.map { $0.name }
-                
-            case .failure:
-                return InMemoryScreenshotCache.shared.getAllTags()
             }
         }
     }
     
     /// 전체 태그 목록 (로그인 상태 자동 분기) - Tag 객체 배열 반환
-    func fetchAllTagsAsTag() async throws -> [Tag] {
+    func fetchAllTags() async throws -> [Tag] {
         if AccountStorage.shared.isGuest ?? true {
             return try SwiftDataManager.shared.fetchAllTagsAsTag()
         } else {
@@ -452,21 +434,25 @@ final class ScreenshotRepository: ObservableObject {
 
 // MARK: - Favorite Management
 extension ScreenshotRepository {
-    func fetchFavoriteTag() async throws -> [String] {
+    func fetchFavoriteTag() async throws -> [Tag] {
         if AccountStorage.shared.isGuest ?? true {
             let tags = try SwiftDataManager.shared.fetchFavoriteEntities().flatMap { $0.tags }
             var seen = Set<String>()
+            let uniqueStringTags = tags.filter { seen.insert($0).inserted }
             
-            return tags.filter { seen.insert($0).inserted }
+            // String 태그를 Tag 객체로 변환 (해시 기반 ID 사용)
+            return uniqueStringTags.map { tagName in
+                Tag(id: tagName.hashValue, name: tagName)
+            }
         } else {
             let result = await FavoriteService.shared.fetchFavoriteTagList()
             
             switch result {
             case .success(let tagDTO):
-                return tagDTO.data.items.map { $0.name }
+                return tagDTO.data.items  // 이미 [Tag] 타입
                 
             case .failure:
-                return InMemoryScreenshotCache.shared.getAllTags()
+                return InMemoryScreenshotCache.shared.getAllTagsAsTag()
             }
         }
     }
@@ -580,7 +566,7 @@ extension ScreenshotRepository {
     }
     
     /// 즐겨찾기 목록 조회 (로그인 상태에 따라 분기)
-    func loadFavorites(page: Int, size: Int) async throws -> [ScreenshotItemViewModel] {
+    func loadFavorites(page: Int, size: Int, tagId: Int?) async throws -> [ScreenshotItemViewModel] {
         if AccountStorage.shared.isGuest ?? true {
             // 게스트 모드: 로컬에서 즐겨찾기 조회
             let favoriteEntities = try SwiftDataManager.shared.fetchFavoriteEntities()
@@ -599,12 +585,12 @@ extension ScreenshotRepository {
             }
             return items.map(viewModel(for:))
         } else {
-            return try await loadFavoriteFromServerOnly(page: page, size: size)
+            return try await loadFavoriteFromServerOnly(page: page, size: size, tagId: tagId)
         }
     }
     
-    func loadFavoriteFromServerOnly(page: Int = 0, size: Int = 20) async throws -> [ScreenshotItemViewModel] {
-        let result = await FavoriteService.shared.checkFavoriteImageList(page: page, size: size)
+    func loadFavoriteFromServerOnly(page: Int = 0, size: Int = 20, tagId: Int?) async throws -> [ScreenshotItemViewModel] {
+        let result = await FavoriteService.shared.checkFavoriteImageList(page: page, size: size, tagId: tagId)
         
         switch result {
         case .success(let response):

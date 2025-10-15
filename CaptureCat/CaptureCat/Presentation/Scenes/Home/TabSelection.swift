@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct TabSection: View {
-    let tags: [String]                        // 태그 이름들
-    @Binding var selectedTag: String?         // 선택된 태그 (nil = 전체)
+    let tags: [Tag]                           // 태그 객체들
+    @Binding var selectedTag: Tag?            // 선택된 태그 (nil = 전체)
     var showAll: Bool = true
-    var onCategoryChanged: ((String?) -> Void)? = nil
+    var onCategoryChanged: ((Tag?) -> Void)? = nil
     
     // "전체" 포함 여부에 따라 표시할 배열 생성
-    private var displayed: [String?] {
+    private var displayed: [Tag?] {
         showAll ? [nil] + tags.map { Optional($0) } : tags.map { Optional($0) }
     }
     
@@ -25,36 +25,36 @@ struct TabSection: View {
                     ForEach(displayed, id: \.self) { tag in
                         tabItem(tag)
                             .padding(.horizontal, 4)
-                            .id(tag ?? "ALL") // nil이면 "ALL"로 아이디 부여
+                            .id(tag?.id ?? -1) // nil이면 -1로 아이디 부여
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                let newID = tag   // nil = 전체
+                                let newTag = tag   // nil = 전체
                                 withAnimation(.easeInOut) {
-                                    selectedTag = newID
+                                    selectedTag = newTag
                                 }
-                                onCategoryChanged?(newID)
+                                onCategoryChanged?(newTag)
                                 withAnimation(.easeInOut) {
-                                    proxy.scrollTo(newID ?? "ALL", anchor: .center)
+                                    proxy.scrollTo(newTag?.id ?? -1, anchor: .center)
                                 }
                             }
                     }
                     .padding(.horizontal, 2)
                 }
             }
-            .onChange(of: selectedTag) { _, newID in
+            .onChange(of: selectedTag) { _, newTag in
                 withAnimation(.easeInOut) {
-                    proxy.scrollTo(newID ?? "ALL", anchor: .center)
+                    proxy.scrollTo(newTag?.id ?? -1, anchor: .center)
                 }
             }
         }
     }
     
     @ViewBuilder
-    private func tabItem(_ tag: String?) -> some View {
+    private func tabItem(_ tag: Tag?) -> some View {
         let isSelected = selectedTag == tag || (tag == nil && selectedTag == nil)
         
         VStack(spacing: 8) {
-            Text(tag ?? "전체")  // nil이면 "전체" 표시
+            Text(tag?.name ?? "전체")  // nil이면 "전체" 표시, Tag 객체면 name 사용
                 .CFont(.subhead02Bold)
                 .foregroundStyle(isSelected ? .primary01 : .text03)
             Rectangle()

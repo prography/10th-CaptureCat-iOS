@@ -25,7 +25,7 @@ struct ToastModifier: ViewModifier {
                         .multilineTextAlignment(.center)
                         .frame(height: 46)
                         .frame(maxWidth: fillWidth ? .infinity : nil)
-                        .background(.overlayDim)
+                        .background(.secondary01)
                         .cornerRadius(cornerRadius)
                         .padding(.bottom, 80)
                         .padding(.horizontal, 16)

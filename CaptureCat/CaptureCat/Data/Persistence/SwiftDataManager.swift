@@ -165,6 +165,16 @@ extension SwiftDataManager {
         return Array(otherTags).sorted()
     }
     
+    func fetchOtherTagsFromScreenshotsContainingAsTag(_ tags: [String]) throws -> [Tag] {
+        // String 태그들을 먼저 가져오기
+        let stringTags = try fetchOtherTagsFromScreenshotsContaining(tags)
+        
+        // String 태그를 Tag 객체로 변환 (해시 기반 ID 사용)
+        return stringTags.map { tagName in
+            Tag(id: tagName.hashValue, name: tagName)
+        }
+    }
+    
     /// 여러 아이템에 태그 일괄 추가
     func addTag(_ tag: String, toIDs ids: [String]) throws {
         let items = ids.compactMap {
