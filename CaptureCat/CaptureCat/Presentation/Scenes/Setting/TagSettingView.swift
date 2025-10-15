@@ -10,6 +10,7 @@ import SwiftUI
 struct TagSettingView: View {
     @EnvironmentObject var router: Router
     @StateObject var viewModel: TagSettingViewModel
+    @State private var editTagSheetHeight: CGFloat = 180
     
     var body: some View {
         VStack(spacing: 16) {
@@ -40,11 +41,13 @@ struct TagSettingView: View {
                         set: { viewModel.selectedTag = $0 }
                     ),
                     isPresented: $viewModel.isShowingEditSheet,
+                    sheetHeight: $editTagSheetHeight,
                     onAddNewTag: { newTag in 
                         viewModel.updateTag(Tag(id: viewModel.selectedTag?.id ?? 0, name: newTag))
                     }
                 )
-                .presentationDetents([ .height(180) ])
+                .presentationDetents([.height(editTagSheetHeight)])
+                .animation(.easeInOut(duration: 0.3), value: editTagSheetHeight)
             }
         })
     }

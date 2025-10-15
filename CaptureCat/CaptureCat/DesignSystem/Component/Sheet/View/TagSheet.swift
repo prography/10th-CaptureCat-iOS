@@ -18,12 +18,31 @@ struct TagSheet: View {
     @Binding var tags: [String]
     @Binding var selectedTags: Set<String>
     @Binding var isPresented: Bool
+    @Binding var sheetHeight: CGFloat
     var onAddNewTag: ((String) -> Void)?
     var onDeleteTag: ((String) -> Void)?
     var onSaveTag: ((String) -> Void)?
     
     @State private var newTag: String = ""
     @State private var keyboardHeight: CGFloat = 0
+    @State private var contentSize: CGSize = .zero
+    
+    var dynamicHeight: CGFloat {
+        // contentSize가 아직 측정되지 않았다면 기본값 사용
+        guard contentSize != .zero else {
+            return mode == .add ? 200 : (isExpanded ? 450 : 300)
+        }
+        
+        let baseHeight = contentSize.height + 56 // 상하 패딩 고려
+        let keyboardAdjustment = keyboardHeight > 0 ? 60 : 0 // 버튼 높이 고려
+        let calculatedHeight = baseHeight + CGFloat(keyboardAdjustment)
+        
+        // 최소 높이와 최대 높이 제한 (모드와 확장 상태에 따라 조정)
+        let minHeight: CGFloat = mode == .add ? 200 : (isExpanded ? 400 : 250)
+        let maxHeight = UIScreen.main.bounds.height * 0.9
+        
+        return max(minHeight, min(calculatedHeight, maxHeight))
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
@@ -82,7 +101,37 @@ struct TagSheet: View {
             }
         }
         .padding(.top, 28)
+        .readSize { size in
+            contentSize = size
+            let newHeight = dynamicHeight
+            print("📏 TagSheet 크기 측정 - contentSize: \(size), dynamicHeight: \(newHeight), mode: \(mode)")
+            
+            // 부드러운 애니메이션과 함께 높이 업데이트
+            withAnimation(.easeInOut(duration: 0.3)) {
+                sheetHeight = newHeight
+            }
+        }
+        .onChange(of: mode) { _ in
+            // mode 변경 시 높이 재계산
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sheetHeight = dynamicHeight
+            }
+        }
+        .onChange(of: isExpanded) { _ in
+            // isExpanded 변경 시 높이 재계산
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sheetHeight = dynamicHeight
+            }
+        }
+        .onChange(of: selectedTags) { _ in
+            // selectedTags 변경 시 높이 재계산 (태그 추가/삭제)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sheetHeight = dynamicHeight
+            }
+        }
         .onAppear {
+            // 초기 높이 설정
+            sheetHeight = dynamicHeight
             // 키보드 notification 감지 시작
             NotificationCenter.default.addObserver(
                 forName: UIResponder.keyboardWillShowNotification,
@@ -91,6 +140,7 @@ struct TagSheet: View {
             ) { notification in
                 if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
                     keyboardHeight = keyboardFrame.height
+                    sheetHeight = dynamicHeight
                 }
             }
             
@@ -100,6 +150,7 @@ struct TagSheet: View {
                 queue: .main
             ) { _ in
                 keyboardHeight = 0
+                sheetHeight = dynamicHeight
             }
         }
         .onDisappear {
@@ -174,7 +225,8 @@ struct TagSheet: View {
                 )
             }
         }
-        .frame(maxHeight: isExpanded ? nil : 50)
+        .frame(maxHeight: isExpanded ? nil : 62)
+        .clipped()
     }
     
     private var inputTextField: some View {
