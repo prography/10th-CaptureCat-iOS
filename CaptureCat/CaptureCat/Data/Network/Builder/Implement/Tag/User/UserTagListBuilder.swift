@@ -17,4 +17,11 @@ struct UserTagListBuilder: BuilderProtocol {
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())
 
     var useAuthorization: Bool { true }
+    
+    init(page: Int = 0, size: Int = 100) {
+        self.queries = [
+            URLQueryItem(name: "page", value: String(page)),
+            URLQueryItem(name: "size", value: String(size))
+        ]
+    }
 }

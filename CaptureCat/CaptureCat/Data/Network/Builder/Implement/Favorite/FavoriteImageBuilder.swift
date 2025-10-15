@@ -18,11 +18,18 @@ struct FavoriteImageBuilder: BuilderProtocol {
 
     var useAuthorization: Bool { true }
     
-    init(page: Int, size: Int) {
-        
-        self.queries = [
-            URLQueryItem(name: "page", value: String(page)),
-            URLQueryItem(name: "size", value: String(size))
-        ]
+    init(page: Int, size: Int, tagId: Int?) {
+        if let tagId {
+            self.queries = [
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "size", value: String(size)),
+                URLQueryItem(name: "tagId", value: String(tagId))
+            ]
+        } else {
+            self.queries = [
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "size", value: String(size))
+            ]
+        }
     }
 }
