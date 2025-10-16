@@ -104,7 +104,6 @@ struct TagSheet: View {
         .readSize { size in
             contentSize = size
             let newHeight = dynamicHeight
-            print("📏 TagSheet 크기 측정 - contentSize: \(size), dynamicHeight: \(newHeight), mode: \(mode)")
             
             // 부드러운 애니메이션과 함께 높이 업데이트
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -195,7 +194,7 @@ struct TagSheet: View {
                 isExpanded.toggle()
             } label: {
                 HStack(spacing: 4) {
-                    Text("더보기")
+                    Text(isExpanded ? "접기" : "더보기")
                         .CFont(.body02Regular)
                         .foregroundStyle(.text03)
                         .underline(color: .text03)
