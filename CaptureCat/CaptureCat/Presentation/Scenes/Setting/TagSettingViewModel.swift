@@ -18,6 +18,16 @@ class TagSettingViewModel: ObservableObject {
     @Published var isLoading: Bool = false // 로딩 상태
     @Published var selectedTagIds: Set<Int> = [] // 선택된 태그 ID들
     
+    // MARK: - Error States
+    @Published var errorMessage: String? = nil // 태그 추가 에러 메시지
+    @Published var showError: Bool = false // 태그 추가 에러 표시 상태
+    @Published var loadErrorMessage: String? = nil // 태그 로딩 에러 메시지
+    @Published var showLoadError: Bool = false // 태그 로딩 에러 표시 상태
+    
+    // EditTagSheet 전용 에러 상태
+    @Published var editErrorMessage: String? = nil // 태그 수정 에러 메시지
+    @Published var showEditError: Bool = false // 태그 수정 에러 표시 상태
+    
     // MARK: - Dependencies
     private let repository: ScreenshotRepository
     
@@ -31,10 +41,65 @@ class TagSettingViewModel: ObservableObject {
     
     var isEditButtonEnabled: Bool { !tags.isEmpty }
     
+    // MARK: - Error Handling
+    private func showError(_ message: String) {
+        errorMessage = message
+        showError = true
+        
+        // 3초 후 자동으로 에러 메시지 숨김
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.clearError()
+        }
+    }
+    
+    private func clearError() {
+        errorMessage = nil
+        showError = false
+    }
+    
+    private func showLoadError(_ message: String) {
+        loadErrorMessage = message
+        showLoadError = true
+        
+        // 5초 후 자동으로 로딩 에러 메시지 숨김
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            self.clearLoadError()
+        }
+    }
+    
+    private func clearLoadError() {
+        loadErrorMessage = nil
+        showLoadError = false
+    }
+    
+    private func getErrorMessage(from error: Error) -> String {
+        if let networkError = error as? NetworkError {
+            return networkError.tagErrorMessage
+        }
+        return error.localizedDescription
+    }
+    
+    // MARK: - Edit Error Handling
+    private func showEditError(_ message: String) {
+        editErrorMessage = message
+        showEditError = true
+        
+        // 3초 후 자동으로 에러 메시지 숨김
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.clearEditError()
+        }
+    }
+    
+    private func clearEditError() {
+        editErrorMessage = nil
+        showEditError = false
+    }
+    
     // MARK: - Data Loading
     func loadTags() async {
         await MainActor.run {
             isLoading = true
+            clearLoadError()
         }
         
         do {
@@ -50,6 +115,7 @@ class TagSettingViewModel: ObservableObject {
                 self.tags = []
                 self.isDisabled = true
                 self.isLoading = false
+                self.showLoadError(self.getErrorMessage(from: error))
             }
         }
     }
@@ -57,9 +123,30 @@ class TagSettingViewModel: ObservableObject {
     // MARK: - Actions
     func registerTag() {
         let trimmed = addTag.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        guard !tags.contains(where: { $0.name.lowercased() == trimmed.lowercased() }) else { return }
-        guard tags.count < 30 else { return }
+        
+        // 클라이언트 측 검증
+        guard !trimmed.isEmpty else { 
+            showError("태그 이름을 입력해주세요")
+            return 
+        }
+        
+        guard !tags.contains(where: { $0.name.lowercased() == trimmed.lowercased() }) else { 
+            showError("이미 존재하는 태그입니다")
+            return 
+        }
+        
+        guard tags.count < 30 else { 
+            showError("태그는 최대 30개까지 생성할 수 있습니다")
+            return 
+        }
+        
+        guard trimmed.count <= 20 else {
+            showError("태그 이름은 20자 이하로 입력해주세요")
+            return
+        }
+        
+        // 에러 상태 초기화
+        clearError()
         
         Task {
             if AccountStorage.shared.isGuest ?? true {
@@ -84,13 +171,13 @@ class TagSettingViewModel: ObservableObject {
                     case .failure(let error):
                         print("태그 등록 실패: \(error)")
                         await MainActor.run {
-                            addTag = ""
+                            self.showError(self.getErrorMessage(from: error))
                         }
                     }
                 } catch {
                     print("태그 등록 중 오류: \(error)")
                     await MainActor.run {
-                        addTag = ""
+                        self.showError(self.getErrorMessage(from: error))
                     }
                 }
             }
@@ -103,26 +190,54 @@ class TagSettingViewModel: ObservableObject {
     }
     
     func updateTag(_ updated: Tag) {
+        // 클라이언트 측 검증
+        let trimmed = updated.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmed.isEmpty else {
+            showEditError("태그 이름을 입력해주세요")
+            return
+        }
+        
+        guard trimmed.count <= 20 else {
+            showEditError("태그 이름은 20자 이하로 입력해주세요")
+            return
+        }
+        
+        guard !tags.contains(where: { $0.id != updated.id && $0.name.lowercased() == trimmed.lowercased() }) else {
+            showEditError("이미 존재하는 태그입니다")
+            return
+        }
+        
+        clearEditError()
+        
         if AccountStorage.shared.isGuest ?? true {
             // 게스트 모드: 로컬에서만 업데이트
             guard let idx = tags.firstIndex(where: { $0.id == updated.id }) else { return }
-            tags[idx] = updated
+            tags[idx] = Tag(id: updated.id, name: trimmed)
+            isShowingEditSheet = false
         } else {
             // 로그인 모드: 서버에 업데이트
             Task {
                 do {
-                    let result = try await repository.updateUserTag(tag: updated)
+                    let result = try await repository.updateUserTag(tag: Tag(id: updated.id, name: trimmed))
                     switch result {
                     case .success(let userTag):
                         await MainActor.run {
                             guard let idx = tags.firstIndex(where: { $0.id == updated.id }) else { return }
                             tags[idx] = userTag.data
+                            isShowingEditSheet = false
                         }
                     case .failure(let error):
                         print("태그 업데이트 실패: \(error)")
+                        await MainActor.run {
+                            self.showEditError(self.getErrorMessage(from: error))
+                        }
                     }
                 } catch {
                     print("태그 업데이트 중 오류: \(error)")
+                    await MainActor.run {
+                        self.showEditError(self.getErrorMessage(from: error))
+                    }
                 }
             }
         }

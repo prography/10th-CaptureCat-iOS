@@ -34,6 +34,8 @@ struct TagView: View {
                     selectedTags: $viewModel.selectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
                     sheetHeight: $tagSheetHeight,
+                    errorMessage: $viewModel.errorMessage,
+                    showError: $viewModel.showError,
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
