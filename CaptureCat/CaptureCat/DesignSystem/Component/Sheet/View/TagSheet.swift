@@ -19,6 +19,8 @@ struct TagSheet: View {
     @Binding var selectedTags: Set<String>
     @Binding var isPresented: Bool
     @Binding var sheetHeight: CGFloat
+    @Binding var errorMessage: String?
+    @Binding var showError: Bool
     var onAddNewTag: ((String) -> Void)?
     var onDeleteTag: ((String) -> Void)?
     var onSaveTag: ((String) -> Void)?
@@ -229,16 +231,32 @@ struct TagSheet: View {
     }
     
     private var inputTextField: some View {
-        TextField("추가할 태그를 입력해주세요", text: $newTag)
-            .CFont(.body02Regular)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .frame(height: 38)
-            .background(.gray01)
-            .cornerRadius(8)
-            .foregroundColor(.text03)
-            .textFieldStyle(.plain)
-            .padding(.horizontal, 16)
+        VStack(alignment: .leading, spacing: 4) {
+            TextField("추가할 태그를 입력해주세요", text: $newTag)
+                .CFont(.body02Regular)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .frame(height: 38)
+                .background(.gray01)
+                .cornerRadius(8)
+                .foregroundColor(.text03)
+                .textFieldStyle(.plain)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(showError ? Color.red : Color.clear, lineWidth: 1)
+                )
+            
+            // 에러 메시지 표시
+            if showError, let errorMessage = errorMessage {
+                Text(errorMessage)
+                    .CFont(.caption02Regular)
+                    .foregroundColor(.red)
+                    .padding(.horizontal, 4)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(.horizontal, 16)
+        .animation(.easeInOut(duration: 0.2), value: showError)
     }
     
     private var selectedTagListViewAddMode: some View {
