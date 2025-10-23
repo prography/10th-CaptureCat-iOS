@@ -1338,13 +1338,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If you don’t have KakaoTalk, please contact us at capturecat77@gmail.com."
+            "value" : "Please contact us at capturecat77@gmail.com."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カカオトークがない方は、capturecat77@gmail.com に連絡してね！"
+            "value" : "capturecat77@gmail.com に連絡してね！"
           }
         },
         "ko" : {

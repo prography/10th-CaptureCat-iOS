@@ -153,6 +153,15 @@ struct HomeView: View {
                 await viewModel.refreshData()
             }
         }
+        .sheet(isPresented: $showChannel) {
+            let countryCode = Locale.current.region?.identifier ?? "KR"
+            
+            if countryCode == "KR" {
+                SafariView(url: KakaoChannelManger.safariURL!)
+            } else {
+                MailComposerViewController(recipients: ["capturecat77@gmail.com"])
+            }
+        }
     }
     
     func closeMenu() {

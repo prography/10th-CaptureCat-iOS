@@ -108,7 +108,13 @@ struct SettingsView: View {
             SafariView(url: URL(string: WebLink.terms.url)!)
         })
         .sheet(isPresented: $showChannel) {
-            SafariView(url: KakaoChannelManger.safariURL!)
+            let countryCode = Locale.current.region?.identifier ?? "KR"
+            
+            if countryCode == "KR" {
+                SafariView(url: KakaoChannelManger.safariURL!)
+            } else {
+                MailComposerViewController(recipients: ["capturecat77@gmail.com"])
+            }
         }
     }
     
