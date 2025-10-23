@@ -73,6 +73,15 @@ class NetworkManager {
                 throw NetworkError.serverError(serverErrorMessage)
             }
             throw NetworkError.responseNotFound
+        case 409:
+            debugPrint("🔴 409 Conflict - 리소스 충돌")
+            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
+            throw NetworkError.conflict
         case 429:
             debugPrint("🔴 429 Too Many Requests - 요청 한도 초과")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
@@ -151,6 +160,15 @@ class NetworkManager {
             debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
             throw NetworkError.responseNotFound
+        case 409:
+            debugPrint("🔴 로그인 409 Conflict - 이미 등록된 이메일")
+            debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
+            debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
+            throw NetworkError.conflict
         case 429:
             debugPrint("🔴 로그인 429 Too Many Requests")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")

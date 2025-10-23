@@ -28,6 +28,7 @@ class AuthViewModel: ObservableObject {
     @Published var isLoginPresented: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
+    @Published var showLogInPopUp: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
     @Published var withdrawSuccess: Bool = false
@@ -208,7 +209,16 @@ class AuthViewModel: ObservableObject {
                         handleLoginSuccess(/*isTutorial: success.data.tutorialCompleted*/)
                     case .failure(let failure):
                         debugPrint("🟡🔴 카카오 로그인 완전 실패 \(failure.localizedDescription) 🟡🔴")
-                        self.authenticationState = .initial
+                        
+                        // 409 ALREADY_REGISTERED_EMAIL 에러 처리
+                        if case NetworkError.conflict = failure {
+                            self.showLogInPopUp = true
+                        } else if case NetworkError.serverError(let message) = failure,
+                                  message.contains("ALREADY_REGISTERED_EMAIL") {
+                            self.showLogInPopUp = true
+                        } else {
+                            self.authenticationState = .initial
+                        }
                     }
                 case .failure(let failure):
                     debugPrint("🟡🔴 카카오에서 토큰 값 가져오기 실패 \(failure.localizedDescription) 🟡🔴")
@@ -233,8 +243,17 @@ class AuthViewModel: ObservableObject {
                     case .success(let success):
                         handleLoginSuccess()
                     case .failure(let failure):
-                        self.authenticationState = .initial
                         debugPrint("🔴🍎 apple sign in 함수 실패 \(failure.localizedDescription)🔴🍎")
+                        
+                        // 409 ALREADY_REGISTERED_EMAIL 에러 처리
+                        if case NetworkError.conflict = failure {
+                            self.showLogInPopUp = true
+                        } else if case NetworkError.serverError(let message) = failure,
+                                  message.contains("ALREADY_REGISTERED_EMAIL") {
+                            self.showLogInPopUp = true
+                        } else {
+                            self.authenticationState = .initial
+                        }
                     }
                 case .failure(let failure):
                     self.authenticationState = .initial

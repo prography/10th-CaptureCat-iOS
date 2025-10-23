@@ -13,6 +13,7 @@ enum NetworkError: Error {
     case unauthorized
     case forBidden
     case responseNotFound
+    case conflict
     case tooManyRequests
     case internalServerError
     case unknown(Int)
@@ -30,6 +31,8 @@ enum NetworkError: Error {
             return "접근 권한이 없습니다"
         case .responseNotFound:
             return "서버 응답을 받을 수 없습니다"
+        case .conflict:
+            return "리소스 충돌이 발생했습니다"
         case .tooManyRequests:
             return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요"
         case .internalServerError:
@@ -56,6 +59,8 @@ enum NetworkError: Error {
             return "태그 저장 중 오류가 발생했습니다"
         case .responseNotFound:
             return "태그를 불러올 수 없습니다"
+        case .conflict:
+            return "이미 존재하는 계정입니다"
         case .serverError(let message):
             return message
         default:
