@@ -11,6 +11,7 @@ import SwiftUI
 enum LocalUserKeys: String {
     case selectedTopics = "selectedTopics"
     case deleteOriginalsAfterSave = "deleteOriginalsAfterSave"
+    case taggedImageIds = "taggedImageIds"
 }
 
 final class SelectMainTagViewModel: ObservableObject {

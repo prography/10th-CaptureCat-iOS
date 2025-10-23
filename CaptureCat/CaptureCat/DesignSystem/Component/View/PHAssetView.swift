@@ -13,6 +13,14 @@ struct PHAssetView: View {
     
     let asset: PHAsset
     let isSelected: Bool
+    let isTagged: Bool
+    
+    // 기본값을 제공하는 초기화 메서드
+    init(asset: PHAsset, isSelected: Bool, isTagged: Bool = false) {
+        self.asset = asset
+        self.isSelected = isSelected
+        self.isTagged = isTagged
+    }
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -29,6 +37,16 @@ struct PHAssetView: View {
                 }
             }
             .clipped()
+            
+            // 태그된 이미지 상단 바 표시
+            if isTagged {
+                VStack {
+                    RoundedTopRectangle(cornerRadius: 4)
+                        .fill(Color.primary01)
+                        .frame(height: 4)
+                    Spacer()
+                }
+            }
             
             Image(systemName: "checkmark.square.fill")
                 .padding(6)

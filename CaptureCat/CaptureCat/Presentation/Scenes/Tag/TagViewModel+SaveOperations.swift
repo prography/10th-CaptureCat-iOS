@@ -33,6 +33,9 @@ extension TagViewModel {
             MixpanelManager.shared.trackImageSave(entry: .inbox, tagging: mode, tagCount: itemVMs.reduce(0) { partial, item in partial + item.tags.count }, screenshotCount: itemVMs.count)
         }
         
+        // 저장 성공 후 이미지 ID들을 UserDefaults에 저장
+        saveTaggedImageIds()
+        
         // 저장 완료 후 UserDefaults 설정에 따라 원본 사진 삭제
         await deleteOriginalsIfEnabled()
     }
@@ -341,5 +344,15 @@ extension TagViewModel {
                 continuation.resume()
             }
         }
+    }
+    
+    /// 태그된 이미지 ID들을 UserDefaults에 저장
+    private func saveTaggedImageIds() {
+        let imageIds = Set(itemVMs.map { $0.id })
+        var existingIds = UserDefaults.standard.taggedImageIds
+        existingIds.formUnion(imageIds)
+        UserDefaults.standard.taggedImageIds = existingIds
+        
+        debugPrint("💾 태그된 이미지 ID 저장 완료: \(imageIds.count)개 추가, 총 \(existingIds.count)개")
     }
 }

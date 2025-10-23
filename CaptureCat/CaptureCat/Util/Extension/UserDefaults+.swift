@@ -40,4 +40,17 @@ extension UserDefaults {
             debugPrint("🔧 선택된 토픽 목록 변경: \(newValue)")
         }
     }
+    
+    /// 태그된 이미지 ID 목록 가져오기
+    var taggedImageIds: Set<String> {
+        get {
+            let array = stringArray(forKey: LocalUserKeys.taggedImageIds.rawValue) ?? []
+            return Set(array)
+        }
+        set {
+            set(Array(newValue), forKey: LocalUserKeys.taggedImageIds.rawValue)
+            synchronize()
+            debugPrint("🔧 태그된 이미지 ID 목록 변경: \(newValue.count)개")
+        }
+    }
 }
