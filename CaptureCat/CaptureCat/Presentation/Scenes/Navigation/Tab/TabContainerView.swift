@@ -23,7 +23,7 @@ struct TabContainerView: View {
     var body: some View {
         VStack(spacing: 0) {
             if showTutorial {
-                let viewModel = SelectMainTagViewModel(networkManager: networkManager)
+                let viewModel = SelectMainTagViewModel(repository: repository)
                 SelectMainTagView(viewModel: viewModel)
             } else {
                 // 1) 탭별 화면 분기

@@ -106,12 +106,10 @@ struct HomeView: View {
                 VStack(spacing: 18) {
                     MenuCard(
                         uploadAction: {
-                            // TODO: 업로드 액션
                             router.push(.uploadPhotos)
                             closeMenu()
                         },
                         organizeAction: {
-                            // TODO: 캡처 정리 액션
                             router.push(.deletePhotos)
                             closeMenu()
                         }

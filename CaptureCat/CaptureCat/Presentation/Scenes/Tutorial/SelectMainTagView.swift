@@ -25,23 +25,21 @@ struct SelectMainTagView: View {
             .padding(.top, 16)
             
             VStack(alignment: .leading, spacing: 12) {
-                ForEach(viewModel.rows, id: \.self) { row in
-                    HStack(spacing: 12) {
-                        ForEach(row) { topic in
-                            Button {
-                                viewModel.toggle(topic)
-                            } label: {
-                                Text(topic.localizedKey)
-                            }
-                            .chipStyle(
-                                isSelected: viewModel.selected.contains(topic),
-                                selectedBackground: .primary01,
-                                selectedForeground: .white
-                            )
-                            
+                FlowLayout(spacing: 6, rowSpacing: 6) {
+                    ForEach(SelectMainTagViewModel.Topic.allCases, id: \.self) { topic in
+                        Button {
+                            viewModel.toggle(topic)
+                        } label: {
+                            Text(topic.localizedKey)
                         }
-                        Spacer()
+                        .chipStyle(
+                            isSelected: viewModel.selected.contains(topic),
+                            selectedBackground: .primary01,
+                            selectedForeground: .white
+                        )
+                        
                     }
+                    Spacer()
                 }
             }
             .padding(.horizontal, 16)

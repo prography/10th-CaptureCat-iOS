@@ -104,7 +104,7 @@ struct TagView: View {
             }
         } label: {
             VStack(spacing: 8) {
-                Text(tab.value)
+                Text(viewModel.segments[tab.rawValue])
                     .CFont(.subhead01Bold)
                     .foregroundColor(isSelected ? .primary01 : .text03)
                 Rectangle()

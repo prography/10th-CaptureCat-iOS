@@ -54,7 +54,7 @@ struct TabSection: View {
         let isSelected = selectedTag == tag || (tag == nil && selectedTag == nil)
         
         VStack(spacing: 8) {
-            Text(tag?.name ?? "전체")  // nil이면 "전체" 표시, Tag 객체면 name 사용
+            Text(tag?.name ?? (NSLocalizedString("전체", comment: "TabSelection")))  // nil이면 "전체" 표시, Tag 객체면 name 사용
                 .CFont(.subhead02Bold)
                 .foregroundStyle(isSelected ? .primary01 : .text03)
             Rectangle()
