@@ -19,6 +19,11 @@ struct TagSettingView: View {
                 .foregroundStyle(.divider)
             searchBar
             
+            // 로딩 에러 메시지 표시
+            if viewModel.showLoadError, let loadErrorMessage = viewModel.loadErrorMessage {
+                errorMessageView(loadErrorMessage)
+            }
+            
             if viewModel.isLoading {
                 loadingView
             } else if viewModel.tags.isEmpty {
@@ -42,6 +47,8 @@ struct TagSettingView: View {
                     ),
                     isPresented: $viewModel.isShowingEditSheet,
                     sheetHeight: $editTagSheetHeight,
+                    errorMessage: $viewModel.editErrorMessage,
+                    showError: $viewModel.showEditError,
                     onAddNewTag: { newTag in 
                         viewModel.updateTag(Tag(id: viewModel.selectedTag?.id ?? 0, name: newTag))
                     }
@@ -84,32 +91,48 @@ struct TagSettingView: View {
     }
     
     private var searchBar: some View {
-        // 기본 검색 TextField
-        HStack {
-            TextField("추가할 태그를 입력해주세요", text: $viewModel.addTag,
-                      prompt: Text("추가할 태그를 입력해주세요")
-                .foregroundStyle(.text03)
-            )
-            .CFont(.body02Regular)
-            .foregroundColor(.text02)
-            .padding(.leading, 12)
-            .padding(.trailing, 6)
-            .padding(.vertical, 8)
-            .cornerRadius(8)
-            
-            Button {
-                viewModel.registerTag()
-            } label: {
-                Text("등록")
-                    .CFont(.body02Regular)
+        VStack(alignment: .leading, spacing: 4) {
+            // 기본 검색 TextField
+            HStack {
+                TextField("추가할 태그를 입력해주세요", text: $viewModel.addTag,
+                          prompt: Text("추가할 태그를 입력해주세요")
                     .foregroundStyle(.text03)
+                )
+                .CFont(.body02Regular)
+                .foregroundColor(.text02)
+                .padding(.leading, 12)
+                .padding(.trailing, 6)
+                .padding(.vertical, 8)
+                .cornerRadius(8)
+                
+                Button {
+                    viewModel.registerTag()
+                } label: {
+                    Text("등록")
+                        .CFont(.body02Regular)
+                        .foregroundStyle(.text03)
+                }
+                .padding(.trailing, 12)
             }
-            .padding(.trailing, 12)
+            .cornerRadius(8)
+            .background(Color.gray01)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(viewModel.showError ? Color.red : Color.clear, lineWidth: 1)
+            )
+            
+            // 에러 메시지 표시
+            if viewModel.showError, let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .CFont(.caption02Regular)
+                    .foregroundColor(.red)
+                    .padding(.horizontal, 4)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
-        .cornerRadius(8)
-        .background(Color.gray01)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.showError)
     }
     
     private var loadingView: some View {
@@ -157,5 +180,24 @@ struct TagSettingView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .padding(.horizontal, 0)
         }
+    }
+    
+    private func errorMessageView(_ message: String) -> some View {
+        HStack {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.red)
+                .font(.caption)
+            
+            Text(message)
+                .CFont(.caption02Regular)
+                .foregroundColor(.red)
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color.red.opacity(0.1))
+        .cornerRadius(8)
+        .padding(.horizontal, 16)
     }
 }

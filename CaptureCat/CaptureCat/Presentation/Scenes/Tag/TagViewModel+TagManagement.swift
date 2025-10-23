@@ -121,10 +121,8 @@ extension TagViewModel {
         updateSelectedTags()
     }
     
-    // 새 태그 추가
+    // 새 태그 추가 또는 기존 태그 선택
     func addNewTag(name: String) {
-        guard !tags.contains(name) else { return }
-        
         // 4개 제한 확인
         if selectedTags.count >= 4 {
             // 5개째 태그를 추가하려고 할 때 토스트 표시
@@ -137,9 +135,16 @@ extension TagViewModel {
             return
         }
         
-        tags.append(name)
+        // 새로운 태그인 경우에만 tags 배열에 추가
+        if !tags.contains(name) {
+            tags.append(name)
+            // UserDefaults에 태그 목록 저장 (새 태그만)
+            saveTags()
+            // 서버에 userTag로 등록 (게스트가 아닌 경우, 새 태그만)
+            registerTagToServer(name)
+        }
         
-        // mode에 따라 다르게 처리
+        // 기존 태그든 새 태그든 현재 이미지에 적용
         switch mode {
         case .batch:
             // 배치 모드: 모든 아이템에 태그 추가
@@ -155,13 +160,35 @@ extension TagViewModel {
         }
         
         selectedTags.insert(name)
-        updateSelectedTags()
         checkHasChanges()
         
-        // UserDefaults에 태그 목록 저장 (영구 저장)
-        saveTags()
+        debugPrint("✅ 태그 선택/추가: \(name), 모드: \(mode)")
+    }
+    
+    /// 서버에 userTag로 등록
+    private func registerTagToServer(_ tagName: String) {
+        // 게스트 모드인지 확인
+        guard !(AccountStorage.shared.isGuest ?? true) else {
+            debugPrint("🔄 게스트 모드: 서버 태그 등록 건너뜀")
+            return
+        }
         
-        debugPrint("✅ 새 태그 추가: \(name), 모드: \(mode)")
+        Task {
+            do {
+                let result = try await repository.registerUserTag(name: tagName)
+                switch result {
+                case .success(let userTag):
+                    debugPrint("✅ 서버 태그 등록 성공: \(userTag.data.name)")
+                case .failure(let error):
+                    debugPrint("❌ 서버 태그 등록 실패: \(error)")
+                    // "이미 등록된 태그" 에러든 다른 에러든 상관없이 로컬 태그는 유지
+                    // 사용자는 이미 태그를 선택했으므로 서버 상태와 무관하게 로컬에서 사용 가능
+                }
+            } catch {
+                debugPrint("❌ 서버 태그 등록 중 오류: \(error.localizedDescription)")
+                // 네트워크 오류 등 모든 예외 상황에서도 로컬 태그는 유지
+            }
+        }
     }
     
     /// Favorite 상태 토글 (UI 업데이트 보장)

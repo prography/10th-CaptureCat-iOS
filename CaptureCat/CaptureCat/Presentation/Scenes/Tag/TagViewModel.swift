@@ -38,10 +38,14 @@ final class TagViewModel: ObservableObject {
     var batchSelectedTags: Set<String> = []
     @Published var canSelectTag: Bool = false
     
+    // MARK: - Error States
+    @Published var errorMessage: String? = nil
+    @Published var showError: Bool = false
+    
     @Published var currentIndex: Int = 0
     
     // MARK: - Dependencies
-    private let repository: ScreenshotRepository
+    let repository: ScreenshotRepository
     @Published var itemVMs: [ScreenshotItemViewModel] = []
 //    private var networkManager: NetworkManager
     var router: Router?

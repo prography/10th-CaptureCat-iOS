@@ -15,6 +15,7 @@ class DetailViewModel: ObservableObject {
     @Published var isDeleted: Bool = false
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var showError: Bool = false
     @Published var item: ScreenshotItemViewModel?
     @Published var isFavorite: Bool = false
     
@@ -33,6 +34,29 @@ class DetailViewModel: ObservableObject {
     }
     
     @Published var tags: [String] = []
+    
+    // MARK: - Error Handling
+    private func showError(_ message: String) {
+        errorMessage = message
+        showError = true
+        
+        // 3초 후 자동으로 에러 메시지 숨김
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.clearError()
+        }
+    }
+    
+    private func clearError() {
+        errorMessage = nil
+        showError = false
+    }
+    
+    private func getErrorMessage(from error: Error) -> String {
+        if let networkError = error as? NetworkError {
+            return networkError.tagErrorMessage
+        }
+        return error.localizedDescription
+    }
     
     // MARK: - Setup Methods
     private func setupInitialTags() {
@@ -109,15 +133,21 @@ class DetailViewModel: ObservableObject {
                 switch result {
                 case .success(let userTag):
                     await MainActor.run {
-                        tags.append(userTag.data.name)
+                        if !self.tags.contains(userTag.data.name) {
+                            self.tags.append(userTag.data.name)
+                        }
                     }
                 case .failure(let error):
                     print("태그 등록 실패: \(error)")
-                    errorMessage = error.localizedDescription
+                    await MainActor.run {
+                        self.showError(self.getErrorMessage(from: error))
+                    }
                 }
             } catch {
                 print("태그 등록 중 오류: \(error)")
-                errorMessage = error.localizedDescription
+                await MainActor.run {
+                    self.showError(self.getErrorMessage(from: error))
+                }
             }
         }
     }
@@ -125,44 +155,74 @@ class DetailViewModel: ObservableObject {
     func addNewTag(_ newTag: String) {
         guard let item = item else { return }
         
-        // 빈 문자열은 추가하지 않음
-        guard !newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-              /*!item.tags.contains(newTag)*/ else {
-            return }
+        let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // 최대 4개 태그 제한
-        guard item.tags.count < 4 else {
-            debugPrint("⚠️ 태그는 최대 4개까지만 추가할 수 있습니다.")
+        // 클라이언트 측 검증
+        guard !trimmed.isEmpty else {
+            showError("태그 이름을 입력해주세요")
             return
         }
         
+        guard trimmed.count <= 20 else {
+            showError("태그 이름은 20자 이하로 입력해주세요")
+            return
+        }
+        
+        // 이미 선택된 태그인지 확인
+        guard !tempSelectedTags.contains(trimmed) else {
+            showError("이미 추가된 태그입니다")
+            return
+        }
+        
+        // 최대 4개 태그 제한
+        guard item.tags.count < 4 else {
+            showError("태그는 최대 4개까지 추가할 수 있습니다")
+            return
+        }
+        
+        // 에러 상태 초기화
+        clearError()
+        
         // 새 태그 추가
-        registerTag(newTag)
-        item.addTag(newTag)
-        tags.append(newTag)  // UI 업데이트를 위해 @Published tags 배열에도 추가
-        tempSelectedTags.insert(newTag)
+        registerTag(trimmed)
+        item.addTag(trimmed)
+        if !tags.contains(trimmed) {
+            tags.append(trimmed)  // UI 업데이트를 위해 @Published tags 배열에도 추가
+        }
+        tempSelectedTags.insert(trimmed)
         
-        debugPrint("✅ 새 태그 추가됨: \(newTag)")
+        debugPrint("✅ 새 태그 추가됨: \(trimmed)")
         
-        saveTags(newTag)
+        saveTags(trimmed)
     }
     
     func addTagByChip(_ newTag: String) {
         guard let item = item else { return }
         
-        // 최대 4개 태그 제한
-        guard item.tags.count < 4 else {
-            debugPrint("⚠️ 태그는 최대 4개까지만 추가할 수 있습니다.")
+        let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // 이미 선택된 태그인지 확인
+        guard !tempSelectedTags.contains(trimmed) else {
+            showError("이미 추가된 태그입니다")
             return
         }
         
+        // 최대 4개 태그 제한
+        guard item.tags.count < 4 else {
+            showError("태그는 최대 4개까지 추가할 수 있습니다")
+            return
+        }
+        
+        // 에러 상태 초기화
+        clearError()
+        
         // 새 태그 추가
-        item.addTag(newTag)
-        tempSelectedTags.insert(newTag)
+        item.addTag(trimmed)
+        tempSelectedTags.insert(trimmed)
         
-        debugPrint("✅ 새 태그 추가됨: \(newTag)")
+        debugPrint("✅ 새 태그 추가됨: \(trimmed)")
         
-        saveTags(newTag)
+        saveTags(trimmed)
     }
     
     func deleteTag(_ tag: String) {
@@ -294,10 +354,5 @@ class DetailViewModel: ObservableObject {
                 debugPrint("❌ 즐겨찾기 토글 실패: \(error.localizedDescription)")
             }
         }
-    }
-    
-    // MARK: - Error Handling
-    func clearError() {
-        errorMessage = nil
     }
 }

@@ -43,6 +43,11 @@ class NetworkManager {
         case 400:
             debugPrint("🔴 400 Bad Request - 잘못된 요청")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            // 서버 에러 메시지 파싱 시도
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
             throw NetworkError.badRequest
         case 401:
             debugPrint("🔴 401 Unauthorized - 인증 실패")
@@ -54,15 +59,27 @@ class NetworkManager {
         case 403:
             debugPrint("🔴 403 Forbidden - 권한 없음")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
             throw NetworkError.forBidden
         case 404:
             debugPrint("🔴 404 Not Found - 리소스를 찾을 수 없음")
             debugPrint("🔴 요청 URL: \(request.url?.absoluteString ?? "nil")")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
             throw NetworkError.responseNotFound
         case 429:
             debugPrint("🔴 429 Too Many Requests - 요청 한도 초과")
             debugPrint("🔴 응답 내용: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
             throw NetworkError.tooManyRequests
         case 500:
             debugPrint("🔴 500 Internal Server Error - 서버 내부 오류")
@@ -74,6 +91,10 @@ class NetworkManager {
             }
             debugPrint("🔴 서버 응답: \(String(data: data, encoding: .utf8) ?? "nil")")
             debugPrint("🔴 응답 Headers: \(httpResponse.allHeaderFields)")
+            
+            if let serverErrorMessage = parseServerErrorMessage(from: data) {
+                throw NetworkError.serverError(serverErrorMessage)
+            }
             throw NetworkError.unknown(httpResponse.statusCode)
         default:
             debugPrint("🔴 예상하지 못한 HTTP 상태 코드: \(httpResponse.statusCode)")
@@ -326,6 +347,17 @@ extension NetworkManager {
         default:
             throw NetworkError.unknown(httpResponse.statusCode)
             debugPrint("🔴 \(httpResponse.statusCode)")
+        }
+    }
+    
+    // MARK: - Error Message Parsing
+    private func parseServerErrorMessage(from data: Data) -> String? {
+        do {
+            let errorDTO = try JSONDecoder().decode(ErrorDTO.self, from: data)
+            return errorDTO.error.message
+        } catch {
+            debugPrint("🔴 서버 에러 메시지 파싱 실패: \(error)")
+            return nil
         }
     }
 }

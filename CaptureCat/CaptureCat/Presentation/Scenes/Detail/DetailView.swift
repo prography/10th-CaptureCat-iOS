@@ -38,6 +38,8 @@ struct DetailView: View {
                     selectedTags: $viewModel.tempSelectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
                     sheetHeight: $tagSheetHeight,
+                    errorMessage: $viewModel.errorMessage,
+                    showError: $viewModel.showError,
                     onAddNewTag: { newTag in viewModel.addNewTag(newTag) },
                     onDeleteTag: { tag in viewModel.deleteTag(tag) },
                     onSaveTag: { tag in viewModel.addTagByChip(tag) }
