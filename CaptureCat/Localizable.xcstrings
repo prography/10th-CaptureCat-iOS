@@ -2682,6 +2682,28 @@
         }
       }
     },
+    "최근 로그인" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Login"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終ログイン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 로그인"
+          }
+        }
+      }
+    },
     "최근 추가한 태그" : {
       "localizations" : {
         "en" : {
@@ -2827,6 +2849,12 @@
             "state" : "translated",
             "value" : "をアップロード"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡쳐 업로드"
+          }
         }
       }
     },
@@ -2842,6 +2870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "整理"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡쳐 정리"
           }
         }
       }

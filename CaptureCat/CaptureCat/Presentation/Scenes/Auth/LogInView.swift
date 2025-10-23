@@ -33,7 +33,7 @@ struct LogInView: View {
             Image(.logInLogo)
             Spacer()
             ForEach(LogIn.allCases, id: \.self) { type in
-                LoginButton(type: type)
+                LoginButton(type: type, recentLoginTypes: viewModel.recentLoginTypes)
                     .onTapGesture {
                         switch type {
                         case .apple:
@@ -88,5 +88,8 @@ struct LogInView: View {
         .sheet(isPresented: $showTerms, content: {
             SafariView(url: URL(string: WebLink.terms.url)!)
         })
+        .onAppear {
+            viewModel.updateRecentLoginTypes() // 화면이 나타날 때마다 최근 로그인 상태 확인
+        }
     }
 }
