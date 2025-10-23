@@ -118,9 +118,6 @@ struct FavoriteView: View {
             Text("좋아요")
                 .CFont(.headline02Bold)
                 .foregroundStyle(.text02)
-            Text("\(viewModel.favoriteItems.count)")
-                .CFont(.headline02Regular)
-                .foregroundStyle(.text03)
             Spacer()
         }
         .padding(.horizontal, 16)

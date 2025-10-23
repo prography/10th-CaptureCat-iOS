@@ -119,7 +119,7 @@ struct DetailView: View {
             Button {
                 viewModel.toggleFavorite()
             } label: {
-                Image(viewModel.isFavorite ? .selectedFavorite : .unselectedFavorite)
+                Image(viewModel.isFavorite ? .favoriteSelected : .favoriteUnselected)
                     .resizable()
                     .frame(width: 24, height: 24)
                     .padding(3)
