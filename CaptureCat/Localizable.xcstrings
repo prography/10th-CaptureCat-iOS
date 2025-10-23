@@ -26,6 +26,9 @@
         }
       }
     },
+    "· 설정 후에도 삭제는 매번 직접 선택할 수 있어요.\n· 삭제된 이미지는 ‘휴지통' 또는 ‘최근 삭제된 항목'에 30일간 보관돼요." : {
+
+    },
     "%@" : {
       "localizations" : {
         "en" : {
@@ -48,6 +51,16 @@
         }
       }
     },
+    "%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
     "%lld/%lld 완료" : {
       "localizations" : {
         "en" : {
@@ -66,28 +79,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld/%2$lld 완료"
-          }
-        }
-      }
-    },
-    "%lld/20" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld/20"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld/20"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld/20"
           }
         }
       }
@@ -180,28 +171,6 @@
         }
       }
     },
-    "%lld장의 스크린샷이 있어요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "There are %lld screenshots."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld枚のスクショがあるよ。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld장의 스크린샷이 있어요."
-          }
-        }
-      }
-    },
     "1개의 항목을 삭제하시겠습니까?\n삭제시 복구할 수 없습니다." : {
       "localizations" : {
         "en" : {
@@ -259,22 +228,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "캡처캣"
-          }
-        }
-      }
-    },
-    "options" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "options"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "options"
           }
         }
       }
@@ -622,6 +575,7 @@
       }
     },
     "건너뛰기" : {
+      "comment" : "온보딩 건너뛰기 버튼",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -775,6 +729,9 @@
         }
       }
     },
+    "기존태그 보기" : {
+
+    },
     "나중에 하기" : {
       "localizations" : {
         "en" : {
@@ -820,6 +777,7 @@
       }
     },
     "다음" : {
+      "comment" : "다음 버튼",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -840,6 +798,9 @@
           }
         }
       }
+    },
+    "더보기" : {
+
     },
     "도움말" : {
       "localizations" : {
@@ -903,6 +864,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "등록"
+          }
+        }
+      }
+    },
+    "등록된 태그 %lld/4" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added Tag %lld/4"
           }
         }
       }
@@ -991,28 +962,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "로그인 시 다른 기기에서도 이미지를 관리할 수 있어요"
-          }
-        }
-      }
-    },
-    "로그인 하면 스크린샷을 저장할 수 있어요! " : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Log in to save screenshots!"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ログインするとスクショを保存できるよ！"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "로그인 하면 스크린샷을 저장할 수 있어요! "
           }
         }
       }
@@ -1171,6 +1120,9 @@
         }
       }
     },
+    "모든 캡쳐" : {
+
+    },
     "버전 정보" : {
       "localizations" : {
         "en" : {
@@ -1189,6 +1141,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "버전 정보"
+          }
+        }
+      }
+    },
+    "버전: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
           }
         }
       }
@@ -1347,6 +1309,16 @@
         }
       }
     },
+    "삭제하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
     "삭제하기 전에 도움을 받아보세요." : {
       "localizations" : {
         "en" : {
@@ -1365,28 +1337,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "삭제하기 전에 도움을 받아보세요."
-          }
-        }
-      }
-    },
-    "삭제할 이미지를 선택해 주세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please select the images to delete."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除する画像を選んでね。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "삭제할 이미지를 선택해 주세요."
           }
         }
       }
@@ -1436,28 +1386,6 @@
         }
       }
     },
-    "새로고침 중..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Refreshing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新中..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새로고침 중..."
-          }
-        }
-      }
-    },
     "새로운 버전 업데이트" : {
       "localizations" : {
         "en" : {
@@ -1502,45 +1430,23 @@
         }
       }
     },
-    "선택 삭제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete selected"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選んで削除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "선택 삭제"
-          }
-        }
-      }
-    },
     "선택 완료 %lld/%lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "선택 완료 %1$lld/%2$lld"
+            "state" : "translated",
+            "value" : "Select Complete %1$lld/%2$lld"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "選択完了  %1$lld/%2$lld"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "선택 완료 %1$lld/%2$lld"
           }
         }
@@ -1657,6 +1563,29 @@
         }
       }
     },
+    "스크린샷만 쏙\n골라서 저장해요" : {
+      "comment" : "온보딩 첫 번째 페이지 설명",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select and save\nonly screenshots"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクショだけを\n選んで保存"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스크린샷만 쏙\n골라서 저장해요"
+          }
+        }
+      }
+    },
     "스크린샷을 관리하지 못할 수 있어요.\n그래도 로그아웃하시겠어요?" : {
       "localizations" : {
         "en" : {
@@ -1767,6 +1696,29 @@
         }
       }
     },
+    "시작하기" : {
+      "comment" : "시작하기 버튼",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "始める"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작하기"
+          }
+        }
+      }
+    },
     "시작하기 전에" : {
       "localizations" : {
         "en" : {
@@ -1811,27 +1763,11 @@
         }
       }
     },
-    "아직 스크린샷이 없어요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No screenshots yet."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "まだスクショがないよ。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "아직 스크린샷이 없어요."
-          }
-        }
-      }
+    "아직 좋아요가 없어요." : {
+
+    },
+    "아직 태그가 없어요" : {
+
     },
     "아직 태그가 없어요." : {
       "localizations" : {
@@ -1921,6 +1857,9 @@
         }
       }
     },
+    "업로드 후 삭제 안내 팝업 설정" : {
+
+    },
     "에 동의하게 됩니다." : {
       "localizations" : {
         "en" : {
@@ -1939,6 +1878,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "에 동의하게 됩니다."
+          }
+        }
+      }
+    },
+    "여러 장을 한 번에\n태그로 정리해요" : {
+      "comment" : "온보딩 두 번째 페이지 설명",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize multiple images\nat once with tags"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複数枚を一度に\nタグで整理"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여러 장을 한 번에\n태그로 정리해요"
           }
         }
       }
@@ -1965,6 +1927,16 @@
         }
       }
     },
+    "올리기 %lld/20" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload %lld/20"
+          }
+        }
+      }
+    },
     "완료" : {
       "localizations" : {
         "en" : {
@@ -1986,6 +1958,9 @@
           }
         }
       }
+    },
+    "이미지 삭제 설정" : {
+
     },
     "이미지를 불러올 수 없습니다" : {
       "localizations" : {
@@ -2075,65 +2050,8 @@
         }
       }
     },
-    "임시보관함" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drafts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一時保存箱"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "임시보관함"
-          }
-        }
-      }
-    },
-    "임시보관함에서 스크린샷을 저장할 수 있어요!" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can save screenshots in Drafts!"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一時保存箱からスクショを保存できるよ！"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "임시보관함에서 스크린샷을 저장할 수 있어요!"
-          }
-        }
-      }
-    },
-    "자동 로그인 중..." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動でログインしてるよ..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "자동 로그인 중..."
-          }
-        }
-      }
+    "자주 보고 싶은 이미지에\n좋아요를 누르면 빠르게 찾아볼 수 있어요" : {
+
     },
     "자주 캡쳐하는 이미지가 있으신가요?" : {
       "localizations" : {
@@ -2180,6 +2098,16 @@
         }
       }
     },
+    "저장하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
     "전체 선택" : {
       "localizations" : {
         "en" : {
@@ -2201,6 +2129,19 @@
           }
         }
       }
+    },
+    "전체삭제" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "접기" : {
+
     },
     "정리하기 %lld/10" : {
       "localizations" : {
@@ -2224,24 +2165,12 @@
         }
       }
     },
-    "즐겨찾기" : {
+    "좋아요" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favorite"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お気に入り"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기"
           }
         }
       }
@@ -2264,28 +2193,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "즐겨찾기를 한 스크린샷은\n홈에서 더 자주 만날 수 있어요."
-          }
-        }
-      }
-    },
-    "즐겨찾기한 스크린샷이 없습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No favorited screenshots."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お気に入りにしたスクショはまだないよ。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기한 스크린샷이 없습니다."
           }
         }
       }
@@ -2400,46 +2307,12 @@
         }
       }
     },
-    "추가" : {
+    "추가하기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "追加"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "추가"
-          }
-        }
-      }
-    },
-    "추가된 태그" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Added tags"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "追加したタグ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "추가된 태그"
           }
         }
       }
@@ -2532,6 +2405,9 @@
         }
       }
     },
+    "캡처캣에 업로드가 완료되면, 갤러리에서 이미지를\n삭제할지 팝업으로 안내해요." : {
+
+    },
     "캡처캣이 사용성을 개선했어요.\n지금 바로 업데이트하고 편하게 사용해보세요!" : {
       "localizations" : {
         "en" : {
@@ -2553,6 +2429,9 @@
           }
         }
       }
+    },
+    "캡쳐 정리" : {
+
     },
     "캡쳐캣 사용이 불편해요" : {
       "localizations" : {
@@ -2752,24 +2631,12 @@
         }
       }
     },
-    "태그는 최대 4개까지 지정할 수 있어요" : {
+    "태그는 4개까지 추가할 수 있습니다" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can save up to 4 tags."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タグは最大4つまでつけられるよ。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "태그는 최대 4개까지 지정할 수 있어요"
           }
         }
       }
@@ -2796,6 +2663,32 @@
         }
       }
     },
+    "태그로 쉽게 찾고\n바로 활용해요" : {
+      "comment" : "온보딩 세 번째 페이지 설명",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find easily with tags\nand use right away"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグで簡単に見つけて\nすぐに活用"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그로 쉽게 찾고\n바로 활용해요"
+          }
+        }
+      }
+    },
+    "태그를 불러오는 중..." : {
+
+    },
     "태그하기" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2815,28 +2708,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "태그하기"
-          }
-        }
-      }
-    },
-    "태그하기 %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tagging %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タグする %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "태그하기 %@"
           }
         }
       }
@@ -2927,28 +2798,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "현재 게스트 모드로 사용하고 있어요"
-          }
-        }
-      }
-    },
-    "홈" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HOME"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ホーム"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "홈"
           }
         }
       }

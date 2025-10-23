@@ -17,7 +17,7 @@ struct OnBoardingView: View {
                 Button {
                     viewModel.skipOnBoarding()
                 } label: {
-                    Text("건너뛰기")
+                    Text(NSLocalizedString("건너뛰기", comment: "온보딩 건너뛰기 버튼"))
                         .CFont(.body02Regular)
                         .foregroundStyle(.text03)
                 }
