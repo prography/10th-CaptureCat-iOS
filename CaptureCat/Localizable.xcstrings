@@ -27,7 +27,26 @@
       }
     },
     "· 설정 후에도 삭제는 매번 직접 선택할 수 있어요.\n· 삭제된 이미지는 ‘휴지통' 또는 ‘최근 삭제된 항목'에 30일간 보관돼요." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· You can still choose to delete manually anytime, even after setting it up.\n· Deleted images are kept in the “Trash” or “Recently Deleted” folder for 30 days."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· 設定後でも、削除はいつでも手動で選択できます。\n· 削除された画像は「ゴミ箱」または「最近削除した項目」に30日間保管されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· 설정 후에도 삭제는 매번 직접 선택할 수 있어요.\n· 삭제된 이미지는 ‘휴지통' 또는 ‘최근 삭제된 항목'에 30일간 보관돼요."
+          }
+        }
+      }
     },
     "%@" : {
       "localizations" : {
@@ -54,6 +73,18 @@
     "%lld" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
@@ -730,7 +761,26 @@
       }
     },
     "기존태그 보기" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View existing tags"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既存のタグを見る"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기존태그 보기"
+          }
+        }
+      }
     },
     "나중에 하기" : {
       "localizations" : {
@@ -800,7 +850,26 @@
       }
     },
     "더보기" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "more"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もっと見る"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "더보기"
+          }
+        }
+      }
     },
     "도움말" : {
       "localizations" : {
@@ -874,6 +943,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Added Tag %lld/4"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登録されたタグ %lld/4"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록된 태그 %lld/4"
           }
         }
       }
@@ -1121,7 +1202,26 @@
       }
     },
     "모든 캡쳐" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Captures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのキャプチャ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 캡쳐"
+          }
+        }
+      }
     },
     "버전 정보" : {
       "localizations" : {
@@ -1151,6 +1251,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン: %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전: %@"
           }
         }
       }
@@ -1316,6 +1428,18 @@
             "state" : "translated",
             "value" : "Delete"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제하기"
+          }
         }
       }
     },
@@ -1440,13 +1564,13 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "選択完了  %1$lld/%2$lld"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "선택 완료 %1$lld/%2$lld"
           }
         }
@@ -1764,10 +1888,48 @@
       }
     },
     "아직 좋아요가 없어요." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No likes yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ「いいね」がありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 좋아요가 없어요."
+          }
+        }
+      }
     },
     "아직 태그가 없어요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tags yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだタグがありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 태그가 없어요"
+          }
+        }
+      }
     },
     "아직 태그가 없어요." : {
       "localizations" : {
@@ -1858,7 +2020,26 @@
       }
     },
     "업로드 후 삭제 안내 팝업 설정" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up a deletion notice popup after upload"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップロード後の削除案内ポップアップを設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업로드 후 삭제 안내 팝업 설정"
+          }
+        }
+      }
     },
     "에 동의하게 됩니다." : {
       "localizations" : {
@@ -1934,6 +2115,18 @@
             "state" : "translated",
             "value" : "Upload %lld/20"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップロード %lld/20"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "올리기 %lld/20"
+          }
         }
       }
     },
@@ -1960,7 +2153,26 @@
       }
     },
     "이미지 삭제 설정" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Deletion Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像削除の設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 삭제 설정"
+          }
+        }
+      }
     },
     "이미지를 불러올 수 없습니다" : {
       "localizations" : {
@@ -2051,7 +2263,26 @@
       }
     },
     "자주 보고 싶은 이미지에\n좋아요를 누르면 빠르게 찾아볼 수 있어요" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap ❤️ on images you want to see often to find them quickly."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よく見たい画像に「いいね」を押すと、すぐに見つけられます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자주 보고 싶은 이미지에\n좋아요를 누르면 빠르게 찾아볼 수 있어요"
+          }
+        }
+      }
     },
     "자주 캡쳐하는 이미지가 있으신가요?" : {
       "localizations" : {
@@ -2105,6 +2336,18 @@
             "state" : "translated",
             "value" : "Save"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장하기"
+          }
         }
       }
     },
@@ -2135,13 +2378,44 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select All"
+            "value" : "Delete All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체삭제"
           }
         }
       }
     },
     "접기" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "折りたたむ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "접기"
+          }
+        }
+      }
     },
     "정리하기 %lld/10" : {
       "localizations" : {
@@ -2171,6 +2445,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favorite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いいね"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "좋아요"
           }
         }
       }
@@ -2314,6 +2600,18 @@
             "state" : "translated",
             "value" : "Add"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추가하기"
+          }
         }
       }
     },
@@ -2406,7 +2704,26 @@
       }
     },
     "캡처캣에 업로드가 완료되면, 갤러리에서 이미지를\n삭제할지 팝업으로 안내해요." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once uploaded to CaptureCat, a popup will ask if you’d like to delete the image from your gallery."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CaptureCatへのアップロード完了後、ギャラリーから削除するかポップアップで案内します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡처캣에 업로드가 완료되면, 갤러리에서 이미지를\n삭제할지 팝업으로 안내해요."
+          }
+        }
+      }
     },
     "캡처캣이 사용성을 개선했어요.\n지금 바로 업데이트하고 편하게 사용해보세요!" : {
       "localizations" : {
@@ -2431,7 +2748,26 @@
       }
     },
     "캡쳐 정리" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize Captures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャプチャ整理"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡쳐 정리"
+          }
+        }
+      }
     },
     "캡쳐캣 사용이 불편해요" : {
       "localizations" : {
@@ -2638,6 +2974,18 @@
             "state" : "translated",
             "value" : "You can save up to 4 tags."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグは最大4個まで追加できます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그는 4개까지 추가할 수 있습니다"
+          }
         }
       }
     },
@@ -2687,7 +3035,26 @@
       }
     },
     "태그를 불러오는 중..." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading tags..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグを読み込み中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그를 불러오는 중…"
+          }
+        }
+      }
     },
     "태그하기" : {
       "extractionState" : "manual",
