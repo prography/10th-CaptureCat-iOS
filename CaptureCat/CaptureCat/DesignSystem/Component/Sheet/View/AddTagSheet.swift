@@ -47,15 +47,6 @@ struct AddTagSheet: View {
             
             // 선택된 태그 안내
             VStack(spacing: 12) {
-                HStack {
-                    Text("추가된 태그")
-                        .CFont(.headline03Bold)
-                    Spacer()
-                    Text("태그는 최대 4개까지 지정할 수 있어요")
-                        .CFont(.caption02Regular)
-                }
-                .padding(.horizontal, 16)
-                
                 // 이미 존재하는 태그 중 선택된 것만 보여주기
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {

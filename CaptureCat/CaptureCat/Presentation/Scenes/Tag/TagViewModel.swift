@@ -45,7 +45,7 @@ final class TagViewModel: ObservableObject {
     @Published var currentIndex: Int = 0
     
     // MARK: - Dependencies
-    private let repository: ScreenshotRepository
+    let repository: ScreenshotRepository
     @Published var itemVMs: [ScreenshotItemViewModel] = []
 //    private var networkManager: NetworkManager
     var router: Router?

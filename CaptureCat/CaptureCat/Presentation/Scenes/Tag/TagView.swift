@@ -16,9 +16,6 @@ struct TagView: View {
     @State private var draggingItem = 0.0
     @State private var isDragging = false
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
-    @State private var tagMode: TagSheetMode = .add
-    @State private var tagExpanded: Bool = false
-    @State private var tagSheetHeight: CGFloat = 300 // edit 모드를 고려한 더 큰 기본값
     
     var body: some View {
         mainContentView
@@ -27,20 +24,14 @@ struct TagView: View {
                 for itemVM in viewModel.itemVMs {  await itemVM.loadFullImage() }
             }
             .sheet(isPresented: $viewModel.isShowingAddTagSheet, content: {
-                TagSheet(
-                    mode: $tagMode,
-                    isExpanded: $tagExpanded,
+                AddTagSheet(
                     tags: $viewModel.tags,
                     selectedTags: $viewModel.selectedTags,
                     isPresented: $viewModel.isShowingAddTagSheet,
-                    sheetHeight: $tagSheetHeight,
-                    errorMessage: $viewModel.errorMessage,
-                    showError: $viewModel.showError,
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
-                .presentationDetents([.height(tagSheetHeight)])
-                .animation(.easeInOut(duration: 0.3), value: tagSheetHeight)
+                .presentationDetents([.height(200)])
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
@@ -57,11 +48,11 @@ struct TagView: View {
             modeTab
                 .padding(.bottom, 16)
             contentSectionView
-//            if viewModel.selectedTags.isEmpty {
-//                noTagButtonView
-//            } else {
+            if viewModel.selectedTags.isEmpty {
+                addTagButtonView
+            } else {
                 allTagListViewEditMode
-//            }
+            }
             tagSectionView
                 .padding(.bottom, 8)
             saveButton
@@ -153,11 +144,11 @@ struct TagView: View {
     }
     
     // MARK: - Tag Section
-    private var noTagButtonView: some View {
+    private var addTagButtonView: some View {
         Button {
-            viewModel.addNewTag(name: "태그 없음")
+            viewModel.addTagButtonTapped()
         } label: {
-            Text("태그 없음으로 태그")
+            Text("추가하기")
         }
         .chipStyle(
             isSelected: true,
@@ -191,6 +182,21 @@ struct TagView: View {
                                 icon: Image(.xmark)
                             )
                         }
+                        
+                        Button {
+                            viewModel.addTagButtonTapped()
+                        } label: {
+                            Image(.plus)
+                                .resizable()
+                                .frame(width: 14, height: 14)
+                        }
+                        .chipStyle(
+                            isSelected: true,
+                            selectedBackground: .gray02,
+                            selectedForeground: .text01,
+                            selectedBorderColor: .divider,
+                            icon: nil
+                        )
                     }
                     .padding(.horizontal, 8)
                 }
@@ -205,13 +211,6 @@ struct TagView: View {
                 Text("최근 추가한 태그")
                     .CFont(.subhead01Bold)
                 Spacer()
-                Button {
-                    viewModel.addTagButtonTapped()
-                } label: {
-                    Text("추가")
-                        .CFont(.caption02Regular)
-                        .foregroundStyle(.text03)
-                }
             }
             .padding(.horizontal, 16)
             
