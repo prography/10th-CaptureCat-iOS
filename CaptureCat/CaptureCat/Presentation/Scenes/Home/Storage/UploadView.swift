@@ -39,6 +39,7 @@ struct UploadView: View {
             
             if authViewModel.authenticationState == .guest {
                 VStack {
+                    navigationBar
                     Spacer()
                     
                     Button {
@@ -55,7 +56,6 @@ struct UploadView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.overlayDim.opacity(0.3))
             }
-
         }
         .onAppear(perform: viewModel.checkPhotoPermission)
         .popUp(
