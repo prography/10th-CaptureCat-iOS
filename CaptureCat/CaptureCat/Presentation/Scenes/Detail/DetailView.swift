@@ -120,7 +120,9 @@ struct DetailView: View {
                 viewModel.toggleFavorite()
             } label: {
                 Image(viewModel.isFavorite ? .favoriteSelected : .favoriteUnselected)
+                    .renderingMode(.template)
                     .resizable()
+                    .foregroundStyle(.white)
                     .frame(width: 24, height: 24)
                     .padding(3)
                     .background(.overlayDim)
