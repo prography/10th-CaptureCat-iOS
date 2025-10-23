@@ -16,6 +16,7 @@ struct AddTagSheet: View {
     
     @State private var newTag: String = ""
     @State private var keyboardHeight: CGFloat = 0
+    @State private var showError: Bool = false
     
     var body: some View {
         VStack(spacing: 28) {
@@ -33,17 +34,31 @@ struct AddTagSheet: View {
             }
             .padding(.horizontal, 16)
             
-            // 입력 필드
-            TextField("추가할 태그를 입력해주세요", text: $newTag)
-                .CFont(.body02Regular)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .frame(height: 38)
-                .background(.gray01)
-                .cornerRadius(8)
-                .foregroundColor(.text03)
-                .textFieldStyle(.plain)
-                .padding(.horizontal, 16)
+            // 입력 필드 및 에러 메시지
+            VStack(alignment: .leading, spacing: 8) {
+                TextField("추가할 태그를 입력해주세요", text: $newTag)
+                    .CFont(.body02Regular)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .frame(height: 38)
+                    .background(.gray01)
+                    .cornerRadius(8)
+                    .foregroundColor(.text03)
+                    .textFieldStyle(.plain)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(showError ? Color.red : Color.clear, lineWidth: 1)
+                    )
+                
+                // 에러 메시지
+                if showError {
+                    Text("태그는 4개까지 추가할 수 있습니다")
+                        .CFont(.caption02Regular)
+                        .foregroundColor(.error)
+                        .padding(.leading, 16)
+                }
+            }
+            .padding(.horizontal, 16)
             
             // 선택된 태그 안내
             VStack(spacing: 12) {
@@ -53,9 +68,8 @@ struct AddTagSheet: View {
                         ForEach(tags, id: \.self) { tag in
                             if selectedTags.contains(tag) {
                                 Button {
-                                    // selectedTags에서 제거
-//                                    selectedTags.remove(tag)
-                                    // 실제 태그 삭제 콜백 호출
+                                    // 에러 상태 초기화 (태그 삭제 시)
+                                    showError = false
                                     onDeleteTag?(tag)
                                 } label: {
                                     Text(tag)
@@ -71,6 +85,19 @@ struct AddTagSheet: View {
             if keyboardHeight != 0 {
                 Button("완료") {
                     let trimmedTag = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    // 4개 제한 확인
+                    if selectedTags.count >= 4 {
+                        showError = true
+                        // 3초 후 에러 메시지 자동 숨김
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            showError = false
+                        }
+                        return
+                    }
+                    
+                    // 에러 상태 초기화
+                    showError = false
                     
                     // 새 태그 추가 콜백 호출
                     if !trimmedTag.isEmpty {

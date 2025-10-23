@@ -31,7 +31,7 @@ struct TagView: View {
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
-                .presentationDetents([.height(200)])
+                .presentationDetents([.height(viewModel.selectedTags.isEmpty ? 180 : 210)])
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
