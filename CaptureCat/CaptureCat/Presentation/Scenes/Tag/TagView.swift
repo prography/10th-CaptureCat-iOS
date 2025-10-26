@@ -16,6 +16,7 @@ struct TagView: View {
     @State private var draggingItem = 0.0
     @State private var isDragging = false
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
+    @State private var horizontalPadding: CGFloat = 16
     
     var body: some View {
         mainContentView
@@ -304,32 +305,42 @@ struct TagView: View {
     
     private var carouselView: some View {
         ZStack {
-            // ID 기반 ForEach로 변경 (안정적인 렌더링)
-            ForEach(viewModel.itemVMs, id: \.id) { itemVM in
-                if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
-                    carouselCard(for: itemVM, at: index)
-                        .opacity(viewModel.isDeletingItem ? 0.3 : 1.0)  // 삭제 중 반투명
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 16) {
+                    ForEach(viewModel.itemVMs, id: \.id) { itemVM in
+                        if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
+                            carouselCard(for: itemVM, at: index)
+                                .scrollTransition(axis: .horizontal) { content, phase in
+                                    content
+                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.8)
+                                        .opacity(phase.isIdentity ? 1.0 : 0.6)
+                                }
+                                .id(itemVM.id)
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear {
+                                                // 카드 너비 측정
+                                                horizontalPadding = (UIScreen.main.bounds.width - geo.size.width) / 2
+                                            }
+                                    }
+                                )
+                        }
+                    }
                 }
+                .scrollTargetLayout()
+                .padding(.horizontal, horizontalPadding)
             }
+            .scrollTargetBehavior(.viewAligned)
+            .animation(.easeInOut(duration: 0.3), value: viewModel.itemVMs.count)
+            .disabled(viewModel.isDeletingItem)
+            .opacity(viewModel.isDeletingItem ? 0.3 : 1.0)
             
-            // 삭제 진행률 오버레이
             if viewModel.isDeletingItem {
                 deletionProgressOverlay
             }
         }
-        .simultaneousGesture(viewModel.isDeletingItem ? nil : dragGesture)  // 삭제 중 드래그 비활성화
         .allowsHitTesting(!viewModel.isDeletingItem)  // 삭제 중 터치 비활성화
-        .onAppear {
-            syncOnAppear()
-        }
-        .onChange(of: viewModel.currentIndex) { _, newIndex in
-            // 드래그 중이 아닐 때만 동기화
-            if !isDragging {
-                DispatchQueue.main.async {
-                    syncOnChange(to: newIndex)
-                }
-            }
-        }
         .onChange(of: viewModel.shouldSyncCarousel) { _, _ in
             // 삭제 후 캐러셀 상태 동기화
             DispatchQueue.main.async {
@@ -341,12 +352,6 @@ struct TagView: View {
     // 카드 하나를 그리는 뷰 빌더 (ID 기반, 안정성 강화)
     @ViewBuilder
     private func carouselCard(for itemVM: ScreenshotItemViewModel, at index: Int) -> some View {
-        let distance = distance(index)
-        let scale = max(0.8, 1.0 - abs(distance) * 0.2)
-        let opacity = max(0.3, 1.0 - abs(distance) * 0.3)
-        let zIndex = 1.0 - abs(distance) * 0.1
-        let xOffset = myXOffset(index)
-        
         SingleCardView(
             onDelete: {
                 guard !viewModel.isDeletingItem else {
@@ -382,11 +387,6 @@ struct TagView: View {
                 alignment: .bottomLeading
             )
         }
-        .padding(.horizontal, 50)
-        .scaleEffect(scale)
-        .opacity(opacity)
-        .offset(x: xOffset, y: 0)
-        .zIndex(zIndex)
         .animation(.none, value: draggingItem) // 드래그 중 애니메이션 비활성화
         .animation(.easeInOut(duration: 0.3), value: viewModel.isDeletingItem) // 삭제 상태 애니메이션
     }
@@ -412,91 +412,7 @@ struct TagView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.isDeletingItem)
     }
-    
-    private var dragGesture: some Gesture {
-        DragGesture(minimumDistance: 10)
-            .onChanged { value in
-                // 삭제 중에는 드래그 제스쳐 비활성화
-                guard !viewModel.isDeletingItem else { return }
-                guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                
-                // 드래그 시작 표시
-                if !isDragging {
-                    isDragging = true
-                }
-                
-                // 드래그 중에는 애니메이션 없이 직접 값 변경
-                let newDraggingItem = snappedItem - value.translation.width / 100
-                draggingItem = newDraggingItem
-            }
-            .onEnded { value in
-                isDragging = false
-                
-                // 아이템이 없으면 드래그 제스쳐 무시 (크래시 방지)
-                let itemCount = viewModel.itemVMs.count
-                guard itemCount > 0 else {
-                    return
-                }
-                
-                // 드래그 완료 시에만 애니메이션 적용
-                let pred = value.predictedEndTranslation.width / 100
-                let targetDragging = snappedItem - pred
-                
-                // 안전한 인덱스 계산 (0으로 나누기 방지)
-                let rawIndex = Int(round(targetDragging))
-                let normalizedIndex = ((rawIndex % itemCount) + itemCount) % itemCount
-                
-                // 최종 인덱스 범위 검증
-                let safeIndex = max(0, min(normalizedIndex, itemCount - 1))
-                
-                // 애니메이션과 함께 최종 위치로 이동
-                withAnimation(.easeOut(duration: 0.3)) {
-                    snappedItem = Double(safeIndex)
-                    draggingItem = Double(safeIndex)
-                }
-                
-                // 뷰모델 업데이트는 애니메이션 완료 후에 수행 (인덱스 재검증)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    // 애니메이션 완료 후에도 아이템이 존재하는지 확인
-                    if safeIndex < viewModel.itemVMs.count {
-                        viewModel.onAssetChanged(to: safeIndex)
-                    }
-                }
-            }
-    }
-    
-    private func syncOnAppear() {
-        let targetValue = Double(viewModel.currentIndex)
-        snappedItem = targetValue
-        draggingItem = targetValue
-    }
-    
-    private func syncOnChange(to newIndex: Int) {
-        let targetValue = Double(newIndex)
-        // 애니메이션 없이 즉시 동기화
-        snappedItem = targetValue
-        draggingItem = targetValue
-    }
-    
-    func distance(_ item: Int) -> Double {
-        let itemCount = Double(viewModel.itemVMs.count)
-        
-        // 아이템이 없는 경우 안전하게 처리
-        guard itemCount > 0 else { return 0 }
-        
-        let rawDistance = draggingItem - Double(item)
-        
-        // 개선된 거리 계산 (순환 거리)
-        let normalizedDistance = ((rawDistance.remainder(dividingBy: itemCount)) + itemCount).remainder(dividingBy: itemCount)
-        
-        // 가장 가까운 거리 선택 (앞으로 가거나 뒤로 가거나)
-        return normalizedDistance > itemCount / 2 ? normalizedDistance - itemCount : normalizedDistance
-    }
-    
-    func myXOffset(_ item: Int) -> Double {
-        return -distance(item) * 280  // 부호 반전으로 애니메이션 방향 수정
-    }
-    
+
     /// 아이템 안전 삭제 (큐 시스템 사용)
     private func safeDeleteItem(at index: Int) {
         debugPrint("🗑️ TagView: 삭제 요청 [\(index)/\(viewModel.itemVMs.count)]")

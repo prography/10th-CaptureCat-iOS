@@ -25,7 +25,7 @@ struct SelectMainTagView: View {
             .padding(.top, 16)
             
             VStack(alignment: .leading, spacing: 12) {
-                FlowLayout(spacing: 6, rowSpacing: 6) {
+                FlowLayout(spacing: 6, rowSpacing: 12) {
                     ForEach(SelectMainTagViewModel.Topic.allCases, id: \.self) { topic in
                         Button {
                             viewModel.toggle(topic)
