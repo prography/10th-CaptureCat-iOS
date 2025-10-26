@@ -59,15 +59,16 @@ struct HomeView: View {
                 ZStack {
                     if viewModel.allTags.isEmpty {
                         VStack(spacing: 8) {
+                            Spacer()
                             Text("아직 태그가 없어요")
                                 .CFont(.headline02Bold)
                                 .foregroundStyle(.text03)
                             Text("스크린샷을 태그해 정리해보세요!")
                                 .CFont(.body01Regular)
                                 .foregroundStyle(.text03)
+                            Spacer()
                         }
                         .multilineTextAlignment(.center)
-                        .padding(.top, 150)
                     } else {
                         selectedTagResults
                     }
