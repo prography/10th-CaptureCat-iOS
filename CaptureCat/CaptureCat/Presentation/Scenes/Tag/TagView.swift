@@ -306,14 +306,14 @@ struct TagView: View {
     private var carouselView: some View {
         ZStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 16) {
+                LazyHStack(spacing: 0) {
                     ForEach(viewModel.itemVMs, id: \.id) { itemVM in
                         if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
                             carouselCard(for: itemVM, at: index)
                                 .scrollTransition(axis: .horizontal) { content, phase in
                                     content
-                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.8)
-                                        .opacity(phase.isIdentity ? 1.0 : 0.6)
+                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.75)
+                                        .opacity(phase.isIdentity ? 1.0 : 0.7)
                                 }
                                 .id(itemVM.id)
                                 .background(
