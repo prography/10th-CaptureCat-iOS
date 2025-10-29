@@ -17,6 +17,7 @@ struct TagView: View {
     @State private var isDragging = false
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
     @State private var horizontalPadding: CGFloat = 16
+    @State private var currentID: String?
     
     var body: some View {
         mainContentView
@@ -158,6 +159,7 @@ struct TagView: View {
             selectedBorderColor: .divider,
             icon: Image(.plus)
         )
+        .frame(height: 50)
     }
     
     private var allTagListViewEditMode: some View {
@@ -305,36 +307,7 @@ struct TagView: View {
     
     private var carouselView: some View {
         ZStack {
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 0) {
-                    ForEach(viewModel.itemVMs, id: \.id) { itemVM in
-                        if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
-                            carouselCard(for: itemVM, at: index)
-                                .scrollTransition(axis: .horizontal) { content, phase in
-                                    content
-                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.75)
-                                        .opacity(phase.isIdentity ? 1.0 : 0.7)
-                                }
-                                .id(itemVM.id)
-                                .background(
-                                    GeometryReader { geo in
-                                        Color.clear
-                                            .onAppear {
-                                                // 카드 너비 측정
-                                                horizontalPadding = (UIScreen.main.bounds.width - geo.size.width) / 2
-                                            }
-                                    }
-                                )
-                        }
-                    }
-                }
-                .scrollTargetLayout()
-                .padding(.horizontal, horizontalPadding)
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .animation(.easeInOut(duration: 0.3), value: viewModel.itemVMs.count)
-            .disabled(viewModel.isDeletingItem)
-            .opacity(viewModel.isDeletingItem ? 0.3 : 1.0)
+            carouselScrollView
             
             if viewModel.isDeletingItem {
                 deletionProgressOverlay
@@ -346,6 +319,51 @@ struct TagView: View {
             DispatchQueue.main.async {
                 syncCarouselAfterDeletion()
             }
+        }
+    }
+    
+    private var carouselScrollView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: 0) {
+                ForEach(viewModel.itemVMs, id: \.id) { itemVM in
+                    carouselItemView(for: itemVM)
+                }
+            }
+            .scrollTargetLayout()
+            .padding(.horizontal, horizontalPadding)
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollPosition(id: $currentID)
+        .onChange(of: currentID) { _, newValue in
+            // scrollPosition이 바뀔 때마다 호출됨
+            guard let id = newValue,
+                  let index = viewModel.itemVMs.firstIndex(where: { $0.id == id }) else { return }
+            viewModel.currentIndex = index
+        }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.itemVMs.count)
+        .disabled(viewModel.isDeletingItem)
+        .opacity(viewModel.isDeletingItem ? 0.3 : 1.0)
+    }
+    
+    @ViewBuilder
+    private func carouselItemView(for itemVM: ScreenshotItemViewModel) -> some View {
+        if let index = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
+            carouselCard(for: itemVM, at: index)
+                .scrollTransition(axis: .horizontal) { content, phase in
+                    content
+                        .scaleEffect(phase.isIdentity ? 1.0 : 0.75)
+                        .opacity(phase.isIdentity ? 1.0 : 0.7)
+                }
+                .id(itemVM.id)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .onAppear {
+                                // 카드 너비 측정
+                                horizontalPadding = (UIScreen.main.bounds.width - geo.size.width) / 2
+                            }
+                    }
+                )
         }
     }
     
