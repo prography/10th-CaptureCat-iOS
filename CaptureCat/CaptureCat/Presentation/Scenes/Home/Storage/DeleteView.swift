@@ -34,6 +34,7 @@ struct DeleteView: View {
                     
                     Button {
                         authViewModel.authenticationState = .initial
+                        router.popToRoot()
                     } label: {
                         Text("로그인 후 이용하기")
                     }

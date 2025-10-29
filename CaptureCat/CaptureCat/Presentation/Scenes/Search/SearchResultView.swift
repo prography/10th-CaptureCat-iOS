@@ -39,6 +39,7 @@ struct SearchResultView: View {
         HStack {
             Button {
                 router.pop()
+                viewModel.selectedTags.removeAll()
             } label: {
                 Image(.arrowBack)
                     .foregroundStyle(.text02)

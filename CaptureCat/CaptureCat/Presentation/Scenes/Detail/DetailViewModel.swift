@@ -208,7 +208,7 @@ class DetailViewModel: ObservableObject {
         }
         
         // 최대 4개 태그 제한
-        guard item.tags.count < 4 else {
+        guard item.tags.count <= 4 else {
             showError("태그는 최대 4개까지 추가할 수 있습니다")
             return
         }

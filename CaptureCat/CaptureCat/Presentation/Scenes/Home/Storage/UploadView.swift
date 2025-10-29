@@ -32,8 +32,15 @@ struct UploadView: View {
                     Text("올리기 \(viewModel.selectedIDs.count)/20")
                 }
                 .buttonStyle(
-                    PrimaryButtonStyle(cornerRadius: 4, backgroundColor: .primary01, foregroundColor: .white, verticalPadding: 16, fillWidth: true)
+                    PrimaryButtonStyle(
+                        cornerRadius: 4,
+                        backgroundColor: .primary01,
+                        foregroundColor: .white,
+                        verticalPadding: 16,
+                        fillWidth: true
+                    )
                 )
+                .disabled(viewModel.selectedIDs.isEmpty)
                 .padding(.horizontal, 16)
             }
             
@@ -44,6 +51,7 @@ struct UploadView: View {
                     
                     Button {
                         authViewModel.authenticationState = .initial
+                        router.popToRoot()
                     } label: {
                         Text("로그인 후 이용하기")
                     }

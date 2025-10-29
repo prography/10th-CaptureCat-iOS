@@ -51,8 +51,11 @@ struct TagSheet: View {
             // 상단 바
             HStack {
                 Button(action: {
-                    mode = .edit
-                    isPresented = false
+                    if mode == .edit {
+                        isPresented = false
+                    } else {
+                        mode = .edit
+                    }
                 }) {
                     Image(systemName: "xmark")
                         .foregroundColor(.secondary)
@@ -63,6 +66,7 @@ struct TagSheet: View {
                     .foregroundStyle(.text01)
                 Spacer()
             }
+            .padding(.top, 28)
             .padding(.horizontal, 16)
             
             switch mode {
@@ -101,8 +105,8 @@ struct TagSheet: View {
                 .frame(height: 52)
                 .padding(.bottom, 8)
             }
+            Spacer()
         }
-        .padding(.top, 28)
         .readSize { size in
             contentSize = size
             let newHeight = dynamicHeight

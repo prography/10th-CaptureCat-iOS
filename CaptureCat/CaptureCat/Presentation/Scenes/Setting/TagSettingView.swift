@@ -42,6 +42,7 @@ struct TagSettingView: View {
                     
                     Button {
                         authViewModel.authenticationState = .initial
+                        router.pop()
                     } label: {
                         Text("로그인 후 이용하기")
                     }

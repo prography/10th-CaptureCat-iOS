@@ -33,6 +33,7 @@ struct AddTagSheet: View {
                 }
             }
             .padding(.horizontal, 16)
+            .padding(.top, 28)
             
             // 입력 필드 및 에러 메시지
             VStack(alignment: .leading, spacing: 8) {
@@ -107,15 +108,15 @@ struct AddTagSheet: View {
                     // 입력 필드 초기화 및 키보드 숨김
                     newTag = ""
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    isPresented = false
                 }
                 .primaryStyle(cornerRadius: 0)
                 .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
             }
         }
-        .padding(.top, 28)
         .onAppear {
             // 키보드 notification 감지 시작
             NotificationCenter.default.addObserver(
