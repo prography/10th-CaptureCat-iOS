@@ -101,7 +101,6 @@ struct DetailView: View {
             
             bottomBar
                 .padding(.horizontal, 16)
-                .padding(.bottom, 32)
         }
     }
     
@@ -125,8 +124,7 @@ struct DetailView: View {
                     .foregroundStyle(.white)
                     .frame(width: 24, height: 24)
                     .padding(3)
-                    .background(.overlayDim)
-                    .clipShape(Circle())
+                    .shadow(radius: 8, y: 4)
             }
                 .padding(.trailing, 16)
                 .padding(.bottom, 32),

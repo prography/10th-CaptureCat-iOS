@@ -158,7 +158,7 @@ struct FavoriteView: View {
         VStack(spacing: 8) {
             Text("아직 좋아요가 없어요.")
                 .CFont(.headline02Bold)
-                .foregroundStyle(.text02)
+                .foregroundStyle(.text03)
             Text("자주 보고 싶은 이미지에\n좋아요를 누르면 빠르게 찾아볼 수 있어요")
                 .CFont(.body01Regular)
                 .foregroundStyle(.text03)

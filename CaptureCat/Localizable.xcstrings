@@ -578,7 +578,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "가입하면 캡쳐캣의"
+            "value" : "가입하면 캡처캣의"
           }
         }
       }
@@ -717,6 +717,7 @@
       }
     },
     "계정 통합" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -783,6 +784,7 @@
       }
     },
     "기존에 사용하던 계정이 있어요" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1284,7 +1286,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "모든 캡쳐"
+            "value" : "모든 캡처"
           }
         }
       }
@@ -1976,6 +1978,7 @@
       }
     },
     "아직 태그가 없어요" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2219,6 +2222,7 @@
       }
     },
     "이미 해당 이메일로 가입되어 있어요.\n계정을 하나로 통합할까요?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2236,6 +2240,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미 해당 이메일로 가입되어 있어요.\n계정을 하나로 통합할까요?"
+          }
+        }
+      }
+    },
+    "이미 해당 이메일로 가입되어 있어요.\n다른 소셜로그인을 사용해주세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This email is already registered.\nPlease use a different social login."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このメールアドレスはすでに登録されています。\n別のソーシャルログインを使用してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 해당 이메일로 가입되어 있어요.\n다른 소셜로그인을 사용해주세요."
           }
         }
       }
@@ -2389,7 +2415,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "자주 캡쳐하는 이미지가 있으신가요?"
+            "value" : "자주 캡처하는 이미지가 있으신가요?"
           }
         }
       }
@@ -2853,7 +2879,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐 업로드"
+            "value" : "캡처 업로드"
           }
         }
       }
@@ -2875,7 +2901,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐 정리"
+            "value" : "캡처 정리"
           }
         }
       }
@@ -2941,7 +2967,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐 정리"
+            "value" : "캡처 정리"
           }
         }
       }
@@ -2963,7 +2989,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐캣 사용이 불편해요"
+            "value" : "캡처캣 사용이 불편해요"
           }
         }
       }
@@ -2985,7 +3011,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?"
+            "value" : "캡처캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?"
           }
         }
       }
@@ -3007,7 +3033,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
+            "value" : "캡처캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
           }
         }
       }

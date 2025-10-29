@@ -60,7 +60,7 @@ struct HomeView: View {
                     if viewModel.allTags.isEmpty {
                         VStack(spacing: 8) {
                             Spacer()
-                            Text("아직 태그가 없어요")
+                            Text("아직 태그가 없어요.")
                                 .CFont(.headline02Bold)
                                 .foregroundStyle(.text03)
                             Text("스크린샷을 태그해 정리해보세요!")
@@ -176,7 +176,7 @@ struct HomeView: View {
             Image(.mainLogo)
             Spacer()
             Button { router.push(.setting) } label: {
-                Image(.accountCircle)
+                Image(.my)
             }
         }
         .padding(.horizontal, 16)

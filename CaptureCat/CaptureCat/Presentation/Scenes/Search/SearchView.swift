@@ -173,11 +173,11 @@ struct SearchView: View {
                     if viewModel.searchText.isEmpty {
                         Text("아직 태그가 없어요.")
                             .CFont(.headline02Bold)
-                            .foregroundColor(.text01)
+                            .foregroundColor(.text03)
                     } else {
                         Text("검색결과가 없어요.")
                             .CFont(.headline02Bold)
-                            .foregroundColor(.text01)
+                            .foregroundColor(.text03)
                     }
                     Text("스크린샷을 태그해 정리해보세요!")
                         .CFont(.body01Regular)
