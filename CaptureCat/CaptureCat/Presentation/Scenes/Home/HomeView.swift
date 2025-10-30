@@ -39,12 +39,16 @@ struct HomeView: View {
                         }
                     }
                     
+                    Divider()
+                        .frame(width: 2, height: 16)
+                        .background(.divider)
+                    
                     Button {
                         router.push(.tagSetting)
                     } label: {
                         Image(.toc)
                             .resizable()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 32, height: 32)
                             .opacity(0.9)
                     }
                     .background(.clear)
