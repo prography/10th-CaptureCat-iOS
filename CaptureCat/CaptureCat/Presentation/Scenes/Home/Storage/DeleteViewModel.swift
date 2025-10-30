@@ -88,6 +88,10 @@ final class DeleteViewModel: ObservableObject {
         }
     }
     
+    func isTaggedImage(_ localIdentifier: String) -> Bool {
+        return UserDefaults.standard.taggedImageIds.contains(localIdentifier)
+    }
+    
     // 선택된 자산 삭제
     func deleteSelected() {
         // 선택된 ID에 해당하는 PHAsset만 골라서 삭제
@@ -98,6 +102,7 @@ final class DeleteViewModel: ObservableObject {
             return
         }
         manager.delete(assets: toDelete)
+        selectedIDs = manager.selectedIDs
     }
     
     func selectedAssets() -> [PHAsset] {

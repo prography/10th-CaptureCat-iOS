@@ -128,7 +128,8 @@ struct DeleteView: View {
                 ForEach(viewModel.assets, id: \.localIdentifier) { asset in
                     PHAssetView(
                         asset: asset,
-                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
+                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier),
+                        isTagged: viewModel.isTaggedImage(asset.localIdentifier)
                     )
                     .onTapGesture {
                         viewModel.toggleSelection(of: asset)
