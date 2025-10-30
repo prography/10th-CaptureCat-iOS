@@ -61,27 +61,7 @@ struct AddTagSheet: View {
             }
             .padding(.horizontal, 16)
             
-            // 선택된 태그 안내
-            VStack(spacing: 12) {
-                // 이미 존재하는 태그 중 선택된 것만 보여주기
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(tags, id: \.self) { tag in
-                            if selectedTags.contains(tag) {
-                                Button {
-                                    // 에러 상태 초기화 (태그 삭제 시)
-                                    showError = false
-                                    onDeleteTag?(tag)
-                                } label: {
-                                    Text(tag)
-                                }
-                                .chipStyle(isSelected: true, selectedBackground: .primary01, icon: Image(.xmark))
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                }
-            }
+            Spacer()
             
             if keyboardHeight != 0 {
                 Button("완료") {
