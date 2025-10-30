@@ -33,7 +33,7 @@ struct TagView: View {
                     onAddNewTag: { newTag in viewModel.addNewTag(name: newTag) },
                     onDeleteTag: { tag in viewModel.toggleTag(tag) }
                 )
-                .presentationDetents([.height(viewModel.selectedTags.isEmpty ? 180 : 210)])
+                .presentationDetents([.height(190)])
             })
             .navigationDestination(isPresented: $viewModel.pushNext) {
                 UploadCompleteView(count: viewModel.itemVMs.count)
@@ -41,6 +41,9 @@ struct TagView: View {
                     .toolbar(.hidden, for: .navigationBar)
             }
             .toast(isShowing: $viewModel.canSelectTag, message: "태그는 4개까지 추가할 수 있습니다.", cornerRadius: 0)
+            .onChange(of: viewModel.mode) { _, _ in
+                viewModel.updateSelectedTags()
+            }
     }
     
     // MARK: - Main Content View
@@ -338,7 +341,7 @@ struct TagView: View {
             // scrollPosition이 바뀔 때마다 호출됨
             guard let id = newValue,
                   let index = viewModel.itemVMs.firstIndex(where: { $0.id == id }) else { return }
-            viewModel.currentIndex = index
+            viewModel.onAssetChanged(to: index)
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.itemVMs.count)
         .disabled(viewModel.isDeletingItem)
@@ -393,7 +396,9 @@ struct TagView: View {
                     
                     // 즐겨찾기 토글
                     if let currentIndex = viewModel.itemVMs.firstIndex(where: { $0.id == itemVM.id }) {
-                        viewModel.toggleFavorite(at: currentIndex)
+                        withAnimation(.none) {
+                            viewModel.toggleFavorite(at: currentIndex)
+                        }
                     }
                 } label: {
                     Image(itemVM.isFavorite ? .favoriteSelected : .favoriteUnselected)
