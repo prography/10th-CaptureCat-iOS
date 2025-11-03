@@ -34,10 +34,10 @@ extension TagViewModel {
         }
         
         // 저장 성공 후 이미지 ID들을 UserDefaults에 저장
-        saveTaggedImageIds()
+//        saveTaggedImageIds()
         
         // 저장 완료 후 UserDefaults 설정에 따라 원본 사진 삭제
-        await deleteOriginalsIfEnabled()
+//        await deleteOriginalsIfEnabled()
     }
     
     /// 낙관적 업데이트로 서버 저장 (즉시 로컬 업데이트 + 백그라운드 서버 동기화)
@@ -153,6 +153,8 @@ extension TagViewModel {
         let totalItems = viewModels.count
         debugPrint("🔄 서버 업로드 시작: \(totalItems)개 아이템")
         
+        isUploading = true
+        
         // 1. 각 viewModel에서 이미지 데이터와 메타데이터 수집
         for (index, viewModel) in viewModels.enumerated() {
             // 진행률 업데이트 (데이터 수집 단계)
@@ -222,13 +224,18 @@ extension TagViewModel {
             
              // 업로드 성공 시 진행률 100%로 설정
              await MainActor.run {
+                 toastPublisher.send("\(imageDatas.count)장 저장되었어요.")
                  uploadProgress = 1.0
                  uploadedCount = imageDatas.count
                  debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
+                 isUploading = false
+                 saveCompleted.send()
              }
              
          case .failure(let error):
+            toastPublisher.send("\(imageDatas.count)장 저장하지 못했어요.")
             debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
+            isUploading = false
          }
     }
 }

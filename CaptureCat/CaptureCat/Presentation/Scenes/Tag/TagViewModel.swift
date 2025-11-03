@@ -5,6 +5,7 @@
 //  Created by minsong kim on 7/11/25.
 //
 
+import Combine
 import SwiftUI
 import Photos
 
@@ -61,6 +62,9 @@ final class TagViewModel: ObservableObject {
     @Published var isUploading: Bool = false
     @Published var uploadProgress: Double = 0.0  // 업로드 진행률 (0.0 ~ 1.0)
     @Published var uploadedCount: Int = 0  // 업로드 완료된 아이템 수
+    
+    let toastPublisher = PassthroughSubject<String, Never>()
+    let saveCompleted = PassthroughSubject<Void, Never>()
     
     init(itemsIds: [String], repository: ScreenshotRepository, router: Router? = nil) {
         self.repository = repository

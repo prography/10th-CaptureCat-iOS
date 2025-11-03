@@ -11,6 +11,7 @@ import Photos
 struct TagView: View {
     @EnvironmentObject private var authViewModel: AuthViewModel
     @EnvironmentObject private var router: Router
+    @EnvironmentObject private var homeViewModel: HomeViewModel
     @StateObject var viewModel: TagViewModel
     @State private var snappedItem = 0.0
     @State private var draggingItem = 0.0
@@ -18,10 +19,11 @@ struct TagView: View {
     @State private var isDeletingWithGesture = false // 삭제 제스처 진행 상태 추적
     @State private var horizontalPadding: CGFloat = 16
     @State private var currentID: String?
+    @State private var showToast: Bool = false
+    @State private var toastMessage = ""
     
     var body: some View {
         mainContentView
-            .overlay(uploadProgressOverlay)
             .task {
                 for itemVM in viewModel.itemVMs {  await itemVM.loadFullImage() }
             }
@@ -40,10 +42,21 @@ struct TagView: View {
                     .navigationBarBackButtonHidden()
                     .toolbar(.hidden, for: .navigationBar)
             }
-            .toast(isShowing: $viewModel.canSelectTag, message: "태그는 4개까지 추가할 수 있습니다.", cornerRadius: 0)
+            .toast(isShowing: $viewModel.canSelectTag, message: "태그는 4개까지 추가할 수 있습니다.")
             .onChange(of: viewModel.mode) { _, _ in
                 viewModel.updateSelectedTags()
             }
+            .onReceive(viewModel.toastPublisher) { message in
+                toastMessage = message
+                showToast = true
+            }
+            .onReceive(viewModel.saveCompleted) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    homeViewModel.savedImages = viewModel.itemVMs
+                    router.popToRoot()
+                }
+            }
+            .toast(isShowing: $showToast, message: toastMessage, fillWidth: false)
     }
     
     // MARK: - Main Content View
@@ -246,58 +259,22 @@ struct TagView: View {
         Button {
             Task {
                 await viewModel.save(isGuest: authViewModel.authenticationState == .guest)
+                homeViewModel.saveTaggedImageIds(viewModel.itemVMs.compactMap(\.id))
                 
-                router.push(.completeSave(count: viewModel.itemVMs.count))
+//                router.popToRoot()
             }
         } label: {
-            Text("저장하기")
+            if viewModel.isUploading {
+                CustomLoadingView()
+            } else {
+                Text("저장하기")
+            }
         }
+        .disabled(viewModel.isUploading)
         .buttonStyle(
             PrimaryButtonStyle(cornerRadius: 4, backgroundColor: .primary01, foregroundColor: .white, verticalPadding: 14, fillWidth: true)
         )
         .padding(.horizontal, 16)
-    }
-    
-    // MARK: - Upload Progress Overlay
-    private var uploadProgressOverlay: some View {
-        Group {
-            if viewModel.isUploading { uploadProgressView }
-        }
-    }
-    
-    private var uploadProgressView: some View {
-        ZStack {
-            uploadBackgroundOverlay
-            uploadContentView
-        }
-    }
-    
-    private var uploadBackgroundOverlay: some View {
-        Color.black.opacity(0.6).ignoresSafeArea()
-    }
-    
-    private var uploadContentView: some View {
-        VStack(spacing: 16) {
-            uploadProgressBar
-            uploadCountText
-        }
-    }
-    
-    private var uploadProgressBar: some View {
-        ProgressView(value: viewModel.uploadProgress)
-            .progressViewStyle(.circular)
-            .tint(.primary01)
-            .frame(width: 300)
-            .scaleEffect(1.2)
-    }
-    
-    @ViewBuilder
-    private var uploadCountText: some View {
-        if viewModel.uploadedCount > 0 {
-            Text("\(viewModel.uploadedCount)/\(viewModel.itemVMs.count) 완료")
-                .CFont(.body01Regular)
-                .foregroundColor(.white.opacity(0.8))
-        }
     }
     
     // 현재 표시되는 이미지의 인덱스 계산 (안전한 계산)
