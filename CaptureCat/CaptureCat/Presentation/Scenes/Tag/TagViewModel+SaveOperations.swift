@@ -219,107 +219,16 @@ extension TagViewModel {
                  switch result {
          case .success:
              debugPrint("✅ ImageService 서버 업로드 성공: \(imageDatas.count)개 이미지")
-             
+            
              // 업로드 성공 시 진행률 100%로 설정
              await MainActor.run {
                  uploadProgress = 1.0
                  uploadedCount = imageDatas.count
                  debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
-                 
-                 // imageSaveCompleted notification 삭제됨 - 홈뷰 NotificationCenter 사용 중단
              }
              
          case .failure(let error):
-             debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
-             // 실패 시에도 진행률 초기화는 defer에서 처리됨
+            debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
          }
-    }
-} 
-
-// MARK: - Original Asset Deletion
-extension TagViewModel {
-    
-    /// UserDefaults 설정에 따라 원본 사진 삭제 여부 결정
-    private func deleteOriginalsIfEnabled() async {
-        let shouldDelete = UserDefaults.standard.deleteOriginalsAfterSave
-        
-        guard shouldDelete else {
-            debugPrint("🔧 원본 사진 삭제 설정이 비활성화되어 있습니다")
-            return
-        }
-        
-        debugPrint("🗑️ 원본 사진 삭제 설정이 활성화되어 있어 삭제를 시작합니다")
-        await deleteOriginalAssets()
-    }
-    
-    /// 사진 라이브러리 쓰기 권한 확인
-    private func checkPhotoLibraryWritePermission() async -> Bool {
-        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        
-        switch status {
-        case .authorized:
-            return true
-        case .notDetermined:
-            let newStatus = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
-            return newStatus == .authorized
-        case .denied, .restricted:
-            debugPrint("❌ 사진 라이브러리 쓰기 권한이 거부되었습니다")
-            return false
-        case .limited:
-            // limited 권한에서도 삭제는 가능할 수 있음
-            return true
-        @unknown default:
-            return false
-        }
-    }
-    
-    /// 원본 PHAsset들을 갤러리에서 삭제
-    private func deleteOriginalAssets() async {
-        // 1. 권한 확인
-        guard await checkPhotoLibraryWritePermission() else {
-            debugPrint("❌ 사진 라이브러리 쓰기 권한이 없어 원본 사진을 삭제할 수 없습니다")
-            return
-        }
-        
-        // 2. PHAsset 가져오기
-        let assetIds = itemVMs.map { $0.id }
-        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: assetIds, options: nil)
-        
-        var assetsToDelete: [PHAsset] = []
-        fetchResult.enumerateObjects { asset, _, _ in
-            assetsToDelete.append(asset)
-        }
-        
-        guard !assetsToDelete.isEmpty else {
-            debugPrint("⚠️ 삭제할 PHAsset이 없습니다")
-            return
-        }
-        
-        debugPrint("🗑️ 원본 사진 삭제 시작: \(assetsToDelete.count)개")
-        
-        // 3. 실제 삭제 수행
-        await withCheckedContinuation { continuation in
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetChangeRequest.deleteAssets(assetsToDelete as NSFastEnumeration)
-            }) { success, error in
-                if success {
-                    debugPrint("✅ 원본 사진 삭제 완료: \(assetsToDelete.count)개")
-                } else {
-                    let errorMessage = error?.localizedDescription ?? "Unknown error"
-                    debugPrint("❌ 원본 사진 삭제 실패: \(errorMessage)")
-                }
-                continuation.resume()
-            }
-        }
-    }
-    
-    /// 태그된 이미지 ID들을 UserDefaults에 저장
-    private func saveTaggedImageIds() {
-        let imageIds = Set(itemVMs.map { $0.id })
-        var existingIds = UserDefaults.standard.taggedImageIds
-        existingIds.formUnion(imageIds)
-        UserDefaults.standard.taggedImageIds = existingIds
-        
-        debugPrint("💾 태그된 이미지 ID 저장 완료: \(imageIds.count)개 추가, 총 \(existingIds.count)개")
     }
 }
