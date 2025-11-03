@@ -103,9 +103,10 @@ struct TagSheet: View {
                 .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
+            } else {
+                Spacer()
             }
-            Spacer()
         }
         .readSize { size in
             contentSize = size
