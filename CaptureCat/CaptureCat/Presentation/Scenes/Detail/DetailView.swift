@@ -199,8 +199,6 @@ struct DetailView: View {
             .padding(.horizontal, 16)
             .padding(.top, 10)
             
-            
-            
             Spacer()
             
             ProgressView("로딩 중...")
