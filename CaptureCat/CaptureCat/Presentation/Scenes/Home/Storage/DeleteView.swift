@@ -11,6 +11,8 @@ struct DeleteView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
     @StateObject var viewModel: DeleteViewModel
+    @State private var showToast = false
+    @State private var toastMessage = ""
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
@@ -50,6 +52,11 @@ struct DeleteView: View {
 
         }
         .onAppear(perform: viewModel.checkPhotoPermission)
+        .onReceive(viewModel.manager.toastPublisher) { message in
+            toastMessage = message
+            showToast = true
+        }
+        .toast(isShowing: $showToast, message: toastMessage, fillWidth: false, isCenter: true)
         .popUp(
             isPresented: $viewModel.showPermissionAlert,
             title: "사진 접근 권한이 필요합니다.",

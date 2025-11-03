@@ -5,9 +5,9 @@
 //  Created by minsong kim on 10/9/25.
 //
 
+import Combine
 import SwiftUI
 import Photos
-import Combine
 
 final class DeleteViewModel: ObservableObject {
     // MARK: - Published state
@@ -19,7 +19,7 @@ final class DeleteViewModel: ObservableObject {
     @Published var showPermissionAlert = false
     
     // MARK: - Dependencies
-    private let manager: ScreenshotManager
+    let manager: ScreenshotManager
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
