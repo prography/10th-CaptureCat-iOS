@@ -8,12 +8,6 @@
 import Combine
 import SwiftUI
 
-enum LocalUserKeys: String {
-    case selectedTopics = "selectedTopics"
-    case deleteOriginalsAfterSave = "deleteOriginalsAfterSave"
-    case taggedImageIds = "taggedImageIds"
-}
-
 final class SelectMainTagViewModel: ObservableObject {
     enum Topic: String, CaseIterable, Identifiable {
         case shopping, job, reference, fashion, study, quotes, travel, selfImprovement, restaurant, music, recipe, fitness
