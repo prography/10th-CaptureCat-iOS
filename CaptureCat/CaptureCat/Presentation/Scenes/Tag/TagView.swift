@@ -260,8 +260,6 @@ struct TagView: View {
             Task {
                 await viewModel.save(isGuest: authViewModel.authenticationState == .guest)
                 homeViewModel.saveTaggedImageIds(viewModel.itemVMs.compactMap(\.id))
-                
-//                router.popToRoot()
             }
         } label: {
             if viewModel.isUploading {
