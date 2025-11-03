@@ -26,6 +26,8 @@ final class ScreenshotManager: ObservableObject {
     private var allAssets: PHFetchResult<PHAsset>?
     private var currentIndex: Int = 0
     private let pageSize: Int = 20
+    
+    let toastPublisher = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     private let repository: ScreenshotRepository
     
@@ -161,6 +163,7 @@ final class ScreenshotManager: ObservableObject {
         }) { success, error in
             DispatchQueue.main.async {
                 if success {
+                    self.toastPublisher.send("\(toDelete.count)장 삭제되었어요.")
                     // 삭제 후 다시 페칭
                     self.fetchInitialScreenshots()
                     
