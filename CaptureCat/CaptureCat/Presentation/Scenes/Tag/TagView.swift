@@ -235,18 +235,18 @@ struct TagView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(viewModel.tags, id: \.self) { tag in
+                    ForEach(homeViewModel.allTags, id: \.self) { tag in
                         Button {
-                            viewModel.toggleTag(tag)
+                            viewModel.toggleTag(tag.name)
                         } label: {
-                            Text(tag)
+                            Text(tag.name)
                         }
                         .chipStyle(
-                            isSelected: viewModel.selectedTags.contains(tag),
+                            isSelected: viewModel.selectedTags.contains(tag.name),
                             selectedBackground: .clear,
                             selectedForeground: .gray04,
                             unselectedBorderColor: .divider,
-                            icon: viewModel.selectedTags.contains(tag) ? Image(.check) : nil
+                            icon: viewModel.selectedTags.contains(tag.name) ? Image(.check) : nil
                         )
                     }
                 }
