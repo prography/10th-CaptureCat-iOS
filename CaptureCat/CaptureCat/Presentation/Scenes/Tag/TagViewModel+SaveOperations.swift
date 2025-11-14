@@ -33,8 +33,11 @@ extension TagViewModel {
             MixpanelManager.shared.trackImageSave(entry: .inbox, tagging: mode, tagCount: itemVMs.reduce(0) { partial, item in partial + item.tags.count }, screenshotCount: itemVMs.count)
         }
         
+        // 저장 성공 후 이미지 ID들을 UserDefaults에 저장
+//        saveTaggedImageIds()
+        
         // 저장 완료 후 UserDefaults 설정에 따라 원본 사진 삭제
-        await deleteOriginalsIfEnabled()
+//        await deleteOriginalsIfEnabled()
     }
     
     /// 낙관적 업데이트로 서버 저장 (즉시 로컬 업데이트 + 백그라운드 서버 동기화)
@@ -54,30 +57,7 @@ extension TagViewModel {
             debugPrint("✅ 낙관적 업데이트 완료 - 백그라운드에서 서버 동기화 진행 중")
         }
     }
-    
-//    /// 로컬 상태를 즉시 업데이트 (낙관적 업데이트)
-//    private func updateLocalStateOptimistically() async {
-//        let totalItems = itemVMs.count
-//        
-//        for (index, viewModel) in itemVMs.enumerated() {
-//            // 진행률 업데이트
-//            let progress = Double(index + 1) / Double(totalItems)
-//            await MainActor.run {
-//                uploadProgress = progress * 0.5  // 로컬 업데이트는 50%까지
-//                uploadedCount = index + 1
-//                debugPrint("📊 낙관적 로컬 업데이트 진행률: \(Int(progress * 50))% (\(uploadedCount)/\(totalItems))")
-//            }
-//            
-//            // 즉시 로컬에 저장 (사용자가 즉시 볼 수 있도록)
-//            await viewModel.saveToLocal()
-//            
-//            // 홈뷰에서 사용할 수 있도록 NotificationCenter로 즉시 알림
-//            NotificationCenter.default.post(name: .optimisticUpdateCompleted, object: nil)
-//        }
-//        
-//        debugPrint("✅ 낙관적 로컬 업데이트 완료: \(itemVMs.count)개")
-//    }
-//    
+
     /// 백그라운드에서 실제 서버 업로드 수행
     private func performServerUploadInBackground() async {
         debugPrint("🚀 백그라운드 서버 업로드 시작")
@@ -98,16 +78,6 @@ extension TagViewModel {
             
             // 실패 시 롤백
             await rollbackOptimisticUpdate(originalStates: originalStates)
-            
-//            // 사용자에게 실패 알림
-//            await MainActor.run {
-//                // Toast나 알림을 통해 사용자에게 알림
-//                NotificationCenter.default.post(
-//                    name: .serverSyncFailed, 
-//                    object: nil, 
-//                    userInfo: ["error": error.localizedDescription]
-//                )
-//            }
         }
     }
     
@@ -183,6 +153,8 @@ extension TagViewModel {
         let totalItems = viewModels.count
         debugPrint("🔄 서버 업로드 시작: \(totalItems)개 아이템")
         
+        isUploading = true
+        
         // 1. 각 viewModel에서 이미지 데이터와 메타데이터 수집
         for (index, viewModel) in viewModels.enumerated() {
             // 진행률 업데이트 (데이터 수집 단계)
@@ -249,97 +221,21 @@ extension TagViewModel {
                  switch result {
          case .success:
              debugPrint("✅ ImageService 서버 업로드 성공: \(imageDatas.count)개 이미지")
-             
+            
              // 업로드 성공 시 진행률 100%로 설정
              await MainActor.run {
+                 toastPublisher.send("\(imageDatas.count)장 저장되었어요.")
                  uploadProgress = 1.0
                  uploadedCount = imageDatas.count
                  debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
-                 
-                 // imageSaveCompleted notification 삭제됨 - 홈뷰 NotificationCenter 사용 중단
+                 isUploading = false
+                 saveCompleted.send()
              }
              
          case .failure(let error):
-             debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
-             // 실패 시에도 진행률 초기화는 defer에서 처리됨
+            toastPublisher.send("\(imageDatas.count)장 저장하지 못했어요.")
+            debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
+            isUploading = false
          }
-    }
-} 
-
-// MARK: - Original Asset Deletion
-extension TagViewModel {
-    
-    /// UserDefaults 설정에 따라 원본 사진 삭제 여부 결정
-    private func deleteOriginalsIfEnabled() async {
-        let shouldDelete = UserDefaults.standard.deleteOriginalsAfterSave
-        
-        guard shouldDelete else {
-            debugPrint("🔧 원본 사진 삭제 설정이 비활성화되어 있습니다")
-            return
-        }
-        
-        debugPrint("🗑️ 원본 사진 삭제 설정이 활성화되어 있어 삭제를 시작합니다")
-        await deleteOriginalAssets()
-    }
-    
-    /// 사진 라이브러리 쓰기 권한 확인
-    private func checkPhotoLibraryWritePermission() async -> Bool {
-        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        
-        switch status {
-        case .authorized:
-            return true
-        case .notDetermined:
-            let newStatus = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
-            return newStatus == .authorized
-        case .denied, .restricted:
-            debugPrint("❌ 사진 라이브러리 쓰기 권한이 거부되었습니다")
-            return false
-        case .limited:
-            // limited 권한에서도 삭제는 가능할 수 있음
-            return true
-        @unknown default:
-            return false
-        }
-    }
-    
-    /// 원본 PHAsset들을 갤러리에서 삭제
-    private func deleteOriginalAssets() async {
-        // 1. 권한 확인
-        guard await checkPhotoLibraryWritePermission() else {
-            debugPrint("❌ 사진 라이브러리 쓰기 권한이 없어 원본 사진을 삭제할 수 없습니다")
-            return
-        }
-        
-        // 2. PHAsset 가져오기
-        let assetIds = itemVMs.map { $0.id }
-        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: assetIds, options: nil)
-        
-        var assetsToDelete: [PHAsset] = []
-        fetchResult.enumerateObjects { asset, _, _ in
-            assetsToDelete.append(asset)
-        }
-        
-        guard !assetsToDelete.isEmpty else {
-            debugPrint("⚠️ 삭제할 PHAsset이 없습니다")
-            return
-        }
-        
-        debugPrint("🗑️ 원본 사진 삭제 시작: \(assetsToDelete.count)개")
-        
-        // 3. 실제 삭제 수행
-        await withCheckedContinuation { continuation in
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetChangeRequest.deleteAssets(assetsToDelete as NSFastEnumeration)
-            }) { success, error in
-                if success {
-                    debugPrint("✅ 원본 사진 삭제 완료: \(assetsToDelete.count)개")
-                } else {
-                    let errorMessage = error?.localizedDescription ?? "Unknown error"
-                    debugPrint("❌ 원본 사진 삭제 실패: \(errorMessage)")
-                }
-                continuation.resume()
-            }
-        }
     }
 }

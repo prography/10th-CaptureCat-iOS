@@ -578,7 +578,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "가입하면 캡쳐캣의"
+            "value" : "가입하면 캡처캣의"
           }
         }
       }
@@ -716,6 +716,29 @@
         }
       }
     },
+    "계정 통합" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account Integration"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "統合する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계정 통합"
+          }
+        }
+      }
+    },
     "관심 주제를 선택(5개 이하)해주시면\n캐치가 미리 태그로 만들어드려요." : {
       "localizations" : {
         "en" : {
@@ -756,6 +779,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "그동안 이용해주셔서 감사합니다. 계정을 삭제하는 이유를 알려주시면 해당 문제에 관해 저희가 도움을 드릴 수 있습니다. 원치않으시는 경우 이유를 선택하지 않고 삭제를 계속 진행하실 수 있습니다."
+          }
+        }
+      }
+    },
+    "기존에 사용하던 계정이 있어요" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I already have an existing account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでに利用しているアカウントがあります"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기존에 사용하던 계정이 있어요"
           }
         }
       }
@@ -845,6 +891,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다음"
+          }
+        }
+      }
+    },
+    "닫기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いいえ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
           }
         }
       }
@@ -1218,7 +1286,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "모든 캡쳐"
+            "value" : "모든 캡처"
           }
         }
       }
@@ -1272,13 +1340,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If you don’t have KakaoTalk, please contact us at capturecat77@gmail.com."
+            "value" : "Please contact us at capturecat77@gmail.com."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カカオトークがない方は、capturecat77@gmail.com に連絡してね！"
+            "value" : "capturecat77@gmail.com に連絡してね！"
           }
         },
         "ko" : {
@@ -1910,6 +1978,7 @@
       }
     },
     "아직 태그가 없어요" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2152,6 +2221,51 @@
         }
       }
     },
+    "이미 해당 이메일로 가입되어 있어요.\n계정을 하나로 통합할까요?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This email is already registered.\nWould you like to merge your accounts?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このメールアドレスはすでに登録されています。\nアカウントを統合しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 해당 이메일로 가입되어 있어요.\n계정을 하나로 통합할까요?"
+          }
+        }
+      }
+    },
+    "이미 해당 이메일로 가입되어 있어요.\n다른 소셜로그인을 사용해주세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This email is already registered.\nPlease use a different social login."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このメールアドレスはすでに登録されています。\n別のソーシャルログインを使用してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 해당 이메일로 가입되어 있어요.\n다른 소셜로그인을 사용해주세요."
+          }
+        }
+      }
+    },
     "이미지 삭제 설정" : {
       "localizations" : {
         "en" : {
@@ -2301,7 +2415,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "자주 캡쳐하는 이미지가 있으신가요?"
+            "value" : "자주 캡처하는 이미지가 있으신가요?"
           }
         }
       }
@@ -2347,6 +2461,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "저장하기"
+          }
+        }
+      }
+    },
+    "전체" : {
+      "comment" : "TabSelection",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체"
           }
         }
       }
@@ -2571,6 +2708,28 @@
         }
       }
     },
+    "최근 로그인" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Login"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終ログイン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 로그인"
+          }
+        }
+      }
+    },
     "최근 추가한 태그" : {
       "localizations" : {
         "en" : {
@@ -2703,6 +2862,50 @@
         }
       }
     },
+    "캡처 업로드" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "をアップロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡처 업로드"
+          }
+        }
+      }
+    },
+    "캡처 정리" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "整理"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡처 정리"
+          }
+        }
+      }
+    },
     "캡처캣에 업로드가 완료되면, 갤러리에서 이미지를\n삭제할지 팝업으로 안내해요." : {
       "localizations" : {
         "en" : {
@@ -2764,7 +2967,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐 정리"
+            "value" : "캡처 정리"
           }
         }
       }
@@ -2786,7 +2989,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐캣 사용이 불편해요"
+            "value" : "캡처캣 사용이 불편해요"
           }
         }
       }
@@ -2808,7 +3011,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?"
+            "value" : "캡처캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 초기화하시겠어요?"
           }
         }
       }
@@ -2830,7 +3033,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "캡쳐캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
+            "value" : "캡처캣에 쌓인 유저님의 모든 데이터가 삭제됩니다.\n그래도 회원탈퇴하시겠어요?"
           }
         }
       }

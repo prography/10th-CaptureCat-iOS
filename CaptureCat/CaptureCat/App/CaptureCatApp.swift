@@ -46,7 +46,7 @@ struct CaptureCatApp: App {
 
     init() {
         // 1) 의존성 생성
-        let baseURL = BaseURLType.production.url!
+        let baseURL = BaseURLType.development.url!
         
         let networkManager = NetworkManager(baseURL: baseURL)
         self.networkManager = networkManager

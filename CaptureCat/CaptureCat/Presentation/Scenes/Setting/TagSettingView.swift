@@ -9,27 +9,50 @@ import SwiftUI
 
 struct TagSettingView: View {
     @EnvironmentObject var router: Router
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject var viewModel: TagSettingViewModel
     @State private var editTagSheetHeight: CGFloat = 180
     
     var body: some View {
-        VStack(spacing: 16) {
-            navigationBar
-            Divider()
-                .foregroundStyle(.divider)
-            searchBar
-            
-            // 로딩 에러 메시지 표시
-            if viewModel.showLoadError, let loadErrorMessage = viewModel.loadErrorMessage {
-                errorMessageView(loadErrorMessage)
+        ZStack {
+            VStack(spacing: 16) {
+                navigationBar
+                Divider()
+                    .foregroundStyle(.divider)
+                searchBar
+                
+                // 로딩 에러 메시지 표시
+                if viewModel.showLoadError, let loadErrorMessage = viewModel.loadErrorMessage {
+                    errorMessageView(loadErrorMessage)
+                }
+                
+                if viewModel.isLoading {
+                    loadingView
+                } else if viewModel.tags.isEmpty {
+                    noTagListView
+                } else {
+                    tagListView
+                }
             }
             
-            if viewModel.isLoading {
-                loadingView
-            } else if viewModel.tags.isEmpty {
-                noTagListView
-            } else {
-                tagListView
+            if authViewModel.authenticationState == .guest {
+                VStack {
+                    Spacer()
+                    
+                    Button {
+                        authViewModel.authenticationState = .initial
+                        router.pop()
+                    } label: {
+                        Text("로그인 후 이용하기")
+                    }
+                    .primaryStyle(fillWidth: false)
+                    .padding(.horizontal, 32)
+                    .padding(.bottom, 80)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.overlayDim.opacity(0.3))
             }
         }
         .onAppear {

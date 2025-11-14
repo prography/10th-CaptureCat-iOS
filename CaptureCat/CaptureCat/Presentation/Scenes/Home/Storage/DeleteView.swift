@@ -11,6 +11,8 @@ struct DeleteView: View {
     @EnvironmentObject private var router: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
     @StateObject var viewModel: DeleteViewModel
+    @State private var showToast = false
+    @State private var toastMessage = ""
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
@@ -29,10 +31,12 @@ struct DeleteView: View {
             
             if authViewModel.authenticationState == .guest {
                 VStack {
+                    navigationBar
                     Spacer()
                     
                     Button {
                         authViewModel.authenticationState = .initial
+                        router.popToRoot()
                     } label: {
                         Text("로그인 후 이용하기")
                     }
@@ -48,6 +52,11 @@ struct DeleteView: View {
 
         }
         .onAppear(perform: viewModel.checkPhotoPermission)
+        .onReceive(viewModel.manager.toastPublisher) { message in
+            toastMessage = message
+            showToast = true
+        }
+        .toast(isShowing: $showToast, message: toastMessage, fillWidth: false, isCenter: true)
         .popUp(
             isPresented: $viewModel.showPermissionAlert,
             title: "사진 접근 권한이 필요합니다.",
@@ -126,7 +135,8 @@ struct DeleteView: View {
                 ForEach(viewModel.assets, id: \.localIdentifier) { asset in
                     PHAssetView(
                         asset: asset,
-                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
+                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier),
+                        isTagged: viewModel.isTaggedImage(asset.localIdentifier)
                     )
                     .onTapGesture {
                         viewModel.toggleSelection(of: asset)

@@ -13,7 +13,8 @@ extension View {
                textColor: Color = .white,
                duration: TimeInterval = 1,
                fillWidth: Bool = true,
-               cornerRadius: CGFloat = 8) -> some View {
+               cornerRadius: CGFloat = 8,
+               isCenter: Bool = false) -> some View {
         self.modifier(
             ToastModifier(
                 isShowing: isShowing,
@@ -21,7 +22,8 @@ extension View {
                 textColor: textColor,
                 duration: duration,
                 fillWidth: fillWidth,
-                cornerRadius: cornerRadius
+                cornerRadius: cornerRadius,
+                isCenter: isCenter
             )
         )
     }

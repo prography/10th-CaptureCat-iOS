@@ -118,9 +118,6 @@ struct FavoriteView: View {
             Text("좋아요")
                 .CFont(.headline02Bold)
                 .foregroundStyle(.text02)
-            Text("\(viewModel.favoriteItems.count)")
-                .CFont(.headline02Regular)
-                .foregroundStyle(.text03)
             Spacer()
         }
         .padding(.horizontal, 16)
@@ -142,12 +139,16 @@ struct FavoriteView: View {
                 }
             }
             
+            Divider()
+                .frame(width: 2, height: 16)
+                .background(.divider)
+            
             Button {
                 router.push(.tagSetting)
             } label: {
                 Image(.toc)
                     .resizable()
-                    .frame(width: 20, height: 20)
+                    .frame(width: 32, height: 32)
                     .opacity(0.9)
             }
             .background(.clear)
@@ -161,7 +162,7 @@ struct FavoriteView: View {
         VStack(spacing: 8) {
             Text("아직 좋아요가 없어요.")
                 .CFont(.headline02Bold)
-                .foregroundStyle(.text02)
+                .foregroundStyle(.text03)
             Text("자주 보고 싶은 이미지에\n좋아요를 누르면 빠르게 찾아볼 수 있어요")
                 .CFont(.body01Regular)
                 .foregroundStyle(.text03)

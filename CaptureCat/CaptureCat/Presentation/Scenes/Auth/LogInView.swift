@@ -33,7 +33,7 @@ struct LogInView: View {
             Image(.logInLogo)
             Spacer()
             ForEach(LogIn.allCases, id: \.self) { type in
-                LoginButton(type: type)
+                LoginButton(type: type, recentLoginTypes: viewModel.recentLoginTypes)
                     .onTapGesture {
                         switch type {
                         case .apple:
@@ -75,11 +75,21 @@ struct LogInView: View {
             .padding(.top, 24)
         }
         .padding(EdgeInsets(top: 0, leading: 12, bottom: 20, trailing: 12))
+        .popUp(isPresented: $viewModel.showLogInPopUp,
+               title: "기존에 사용하던 계정이 있어요",
+               message: "이미 해당 이메일로 가입되어 있어요.\n계정을 하나로 통합할까요?",
+               cancelTitle: "닫기",
+               confirmTitle: "계정 통합",
+               confirmAction: {print("계정 통합")}
+        )
         .sheet(isPresented: $showPersonal, content: {
             SafariView(url: URL(string: WebLink.personal.url)!)
         })
         .sheet(isPresented: $showTerms, content: {
             SafariView(url: URL(string: WebLink.terms.url)!)
         })
+        .onAppear {
+            viewModel.updateRecentLoginTypes() // 화면이 나타날 때마다 최근 로그인 상태 확인
+        }
     }
 }

@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct HomeView: View {
+    @AppStorage(LocalUserKeys.didImageDeleteBottomSheetPresented.rawValue) private var hasSeenSheet: Bool = false
+    
     @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: HomeViewModel
+    
     @State private var showChannel = false
+    @State private var showImageSettingSheet = false
     @State private var isMenuPresented = false
+    @State private var showToast = false
+    @State private var toastMessage = ""
     
     var body: some View {
         ZStack {
@@ -29,9 +35,13 @@ struct HomeView: View {
                         showAll: true
                     ) { newTag in
                         if let tag = newTag {
-                            viewModel.selectTag(tag)
+                            Task {
+                                await viewModel.selectTag(tag)
+                            }
                         } else {
-                            viewModel.clearAllSelections()
+                            Task {
+                                await viewModel.clearAllSelections()
+                            }
                         }
                         
                         Task {
@@ -39,12 +49,16 @@ struct HomeView: View {
                         }
                     }
                     
+                    Divider()
+                        .frame(width: 2, height: 16)
+                        .background(.divider)
+                    
                     Button {
                         router.push(.tagSetting)
                     } label: {
                         Image(.toc)
                             .resizable()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 32, height: 32)
                             .opacity(0.9)
                     }
                     .background(.clear)
@@ -59,15 +73,16 @@ struct HomeView: View {
                 ZStack {
                     if viewModel.allTags.isEmpty {
                         VStack(spacing: 8) {
-                            Text("아직 태그가 없어요")
+                            Spacer()
+                            Text("아직 태그가 없어요.")
                                 .CFont(.headline02Bold)
                                 .foregroundStyle(.text03)
                             Text("스크린샷을 태그해 정리해보세요!")
                                 .CFont(.body01Regular)
                                 .foregroundStyle(.text03)
+                            Spacer()
                         }
                         .multilineTextAlignment(.center)
-                        .padding(.top, 150)
                     } else {
                         selectedTagResults
                     }
@@ -106,12 +121,10 @@ struct HomeView: View {
                 VStack(spacing: 18) {
                     MenuCard(
                         uploadAction: {
-                            // TODO: 업로드 액션
                             router.push(.uploadPhotos)
                             closeMenu()
                         },
                         organizeAction: {
-                            // TODO: 캡처 정리 액션
                             router.push(.deletePhotos)
                             closeMenu()
                         }
@@ -148,11 +161,45 @@ struct HomeView: View {
         }
         .background(Color(.systemBackground))
         .task {
-            await viewModel.loadTags()
+            await viewModel.refreshData()
         }
         .onAppear {
+            showImageSettingSheet = (hasSeenSheet == false) && (AccountStorage.shared.isGuest == false)
+        }
+        .onReceive(viewModel.toastPublisher) { message in
+            toastMessage = message
+            showToast = true
+        }
+        .toast(isShowing: $showToast, message: toastMessage, fillWidth: false)
+        .sheet(isPresented: $showChannel) {
+            let countryCode = Locale.current.region?.identifier ?? "KR"
+            
+            if countryCode == "KR" {
+                SafariView(url: KakaoChannelManger.safariURL!)
+            } else {
+                MailComposerViewController(recipients: ["capturecat77@gmail.com"])
+            }
+        }
+        .sheet(isPresented: $showImageSettingSheet, content: {
+            DeletePermissionSheet(
+                isPresented: $showImageSettingSheet,
+                goToSetting: {
+                    hasSeenSheet = true
+                    UserDefaults.standard.deleteOriginalsAfterSave = true
+                    Task {
+                        await viewModel.deleteOriginalsIfEnabled(viewModel.savedImages)
+                    }
+                },
+                later: {
+                    hasSeenSheet = true
+                    UserDefaults.standard.deleteOriginalsAfterSave = false
+                }
+            )
+            .presentationDetents([.height(300)])
+        })
+        .onReceive(viewModel.$savedImages) { _ in
             Task {
-                await viewModel.refreshData()
+                await viewModel.deleteOriginalsIfEnabled(viewModel.savedImages)
             }
         }
     }
@@ -168,7 +215,7 @@ struct HomeView: View {
             Image(.mainLogo)
             Spacer()
             Button { router.push(.setting) } label: {
-                Image(.accountCircle)
+                Image(.my)
             }
         }
         .padding(.horizontal, 16)
@@ -250,6 +297,9 @@ struct HomeView: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 100)
                 }
+//                .refreshable {
+//                    await viewModel.refreshData()
+//                }
             }
         }
     }

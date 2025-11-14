@@ -7,6 +7,7 @@
 
 import Combine
 import SwiftUI
+import Photos
 
 @MainActor
 class HomeViewModel: ObservableObject {
@@ -22,8 +23,14 @@ class HomeViewModel: ObservableObject {
     private var currentPage: Int = 0
     private let pageSize: Int = 20
     
+    // For toast
+    let toastPublisher = PassthroughSubject<String, Never>()
+    var isSavedImages = PassthroughSubject<Bool, Never>()
+    
     private let repository: ScreenshotRepository
     private let service: SearchService
+    
+    @Published var savedImages: [ScreenshotItemViewModel] = []
     
     private var searchTask: Task<Void, Never>?
     private var cancellables = Set<AnyCancellable>()
@@ -43,30 +50,35 @@ class HomeViewModel: ObservableObject {
     }
     
     func loadTags() async {
+        debugPrint("🏷️ loadTags 시작")
         isLoading = true
         do {
             allTags = try await repository.fetchAllTags()
+            debugPrint("🏷️ 태그 로딩 성공: \(allTags.count)개")
         } catch {
-            print("태그 로딩 실패: \(error)")
-            allTags = []
+            debugPrint("❌ 태그 로딩 실패: \(error)")
+            // 실패 시 기존 태그 유지 (빈 배열로 초기화하지 않음)
+            debugPrint("🔄 기존 태그 유지: \(allTags.count)개")
         }
         isLoading = false
+        debugPrint("🏷️ loadTags 완료 - allTags.count: \(allTags.count)")
     }
     
-    func selectTag(_ tag: Tag) {
+    func selectTag(_ tag: Tag) async {
         // 이미 선택된 태그가 아닌 경우에만 추가
         guard selectedTag != tag else { return }
         
         selectedTag = tag
         resetPagination()
-        loadScreenshotsByTags()
+        filteredScreenshots = [] // 태그 선택 시에는 화면 비우기
+        await loadScreenshotsByTags()
     }
     
     // 페이지네이션 상태 초기화
     private func resetPagination() {
         currentPage = 0
         hasMoreData = true
-        filteredScreenshots = []
+        // filteredScreenshots는 새 데이터가 로드될 때만 교체
     }
     
     private func loadScreenshotFromLocal() {
@@ -105,19 +117,27 @@ class HomeViewModel: ObservableObject {
         currentPage += 1
     }
     
-    private func loadScreenshotsByTags() {
+    private func loadScreenshotsByTags() async {
         isLoadingScreenshots = true
-        Task {
-            await loadScreenshotsForCurrentPage()
-        }
+        await loadScreenshotsForCurrentPage()
+        isLoadingScreenshots = false
     }
     
     // 현재 페이지의 스크린샷 로드
     private func loadScreenshotsForCurrentPage() async {
+        debugPrint("📱 loadScreenshotsForCurrentPage 시작 - currentPage: \(currentPage), selectedTag: \(selectedTag?.name ?? "nil")")
+        
+        // Task 취소 확인
+        guard !Task.isCancelled else {
+            debugPrint("📱 Task가 취소됨 - loadScreenshotsForCurrentPage 중단")
+            return
+        }
+        
         do {
             let newScreenshots: [ScreenshotItemViewModel]
             
             if AccountStorage.shared.isGuest ?? true {
+                debugPrint("📱 게스트 모드 - 로컬에서 로드")
                 // 게스트 모드에서는 로컬에서 로드
                 if let selectedTag {
                     newScreenshots = try await repository.loadByTags([selectedTag.name])
@@ -126,14 +146,18 @@ class HomeViewModel: ObservableObject {
                     newScreenshots = try repository.loadAll()
                 }
                 hasMoreData = false // 로컬에서는 모든 데이터를 한 번에 로드
-            } else if let selectedTag {
-                // 로그인 모드에서는 서버에서 페이지네이션으로 로드
-                _ = try await repository.loadByTags([selectedTag.name])
-                // 실제로는 repository의 loadByTagsFromServer 메서드를 직접 호출해야 함
-                newScreenshots = try await loadByTagsFromServerWithPagination([selectedTag.name], page: currentPage, size: pageSize)
+        } else if let selectedTag {
+            // 로그인 모드에서는 서버에서 페이지네이션으로 로드
+            newScreenshots = try await loadByTagsFromServerWithPagination([selectedTag.name], page: currentPage, size: pageSize)
             } else {
                 // 전체 탭일 때 서버에서 페이지네이션으로 로드
                 newScreenshots = try await repository.loadFromServerOnly(page: currentPage)
+            }
+            
+            // Task 취소 확인
+            guard !Task.isCancelled else {
+                debugPrint("📱 Task가 취소됨 - 데이터 로드 후 중단")
+                return
             }
             
             if currentPage == 0 {
@@ -152,37 +176,46 @@ class HomeViewModel: ObservableObject {
             await loadThumbnailsForNewScreenshots(newScreenshots)
             
         } catch {
-            print("태그별 스크린샷 로딩 실패: \(error)")
+            // Task 취소 에러는 무시
+            if (error as NSError).code == NSURLErrorCancelled {
+                debugPrint("📱 네트워크 요청이 취소됨 - 무시")
+                return
+            }
+            debugPrint("❌ 태그별 스크린샷 로딩 실패: \(error)")
+            // 첫 페이지가 아닌 경우에만 기존 데이터 유지
             if currentPage == 0 {
+                // 첫 페이지에서 실패한 경우에만 빈 배열로 설정
                 filteredScreenshots = []
+                debugPrint("📱 첫 페이지 로딩 실패 - 빈 배열로 설정")
+            } else {
+                debugPrint("📱 추가 페이지 로딩 실패 - 기존 데이터 유지")
             }
             hasMoreData = false
         }
-        
-        isLoadingScreenshots = false
         isLoadingMore = false
     }
     
     // 서버에서 페이지네이션으로 태그별 스크린샷 로드
-    private func loadByTagsFromServerWithPagination(_ tags: [String?], page: Int, size: Int) async throws -> [ScreenshotItemViewModel] {
-        let result = await ImageService.shared.checkImageList(by: tags.compactMap { $0 ?? "" }, page: page, size: size)
+    private func loadByTagsFromServerWithPagination(_ tags: [String], page: Int, size: Int) async throws -> [ScreenshotItemViewModel] {
+        // Task 취소 확인
+        guard !Task.isCancelled else {
+            debugPrint("📱 Task가 취소됨 - loadByTagsFromServerWithPagination 중단")
+            throw URLError(.cancelled)
+        }
+        
+        // repository의 loadByTags 메서드를 사용하되, 페이지네이션을 위해 직접 ImageService 호출
+        let result = await ImageService.shared.checkImageList(by: tags, page: page, size: size)
+        
+        // Task 취소 확인
+        guard !Task.isCancelled else {
+            debugPrint("📱 Task가 취소됨 - 네트워크 응답 후 중단")
+            throw URLError(.cancelled)
+        }
         
         switch result {
         case .success(let response):
-            let serverItems = response.data.items.compactMap { serverItem -> ScreenshotItem? in
-                let mappedTags = serverItem.tags
-                
-                let screenshotItem = ScreenshotItem(
-                    id: String(serverItem.id),
-                    imageData: Data(),
-                    imageURL: serverItem.url,
-                    fileName: serverItem.name,
-                    createDate: serverItem.captureDate,
-                    tags: mappedTags,
-                    isFavorite: serverItem.isBookmarked
-                )
-                
-                return screenshotItem
+            let serverItems = response.data.items.map { serverItem in
+                ScreenshotItem(serverItem: serverItem)
             }
             
             let viewModels = serverItems.map { item in
@@ -234,18 +267,45 @@ class HomeViewModel: ObservableObject {
     }
     
     func refreshData() async {
-        // 1. 태그 목록 다시 로드
+        // 이전 Task 취소 방지
+        searchTask?.cancel()
+        
+        // 1. 태그 목록 다시 로드 (완료까지 대기)
         await loadTags()
         
         // 2. 페이지네이션 초기화 후 데이터 로드 (전체 탭 포함)
         resetPagination()
-        loadScreenshotsByTags()
+        
+        // 3. 로딩 상태 설정 후 데이터 로드
+        isLoadingScreenshots = true
+        debugPrint("📢 refresh Data 시자")
+        
+        // Task 생성하여 취소 방지
+        searchTask = Task {
+            do {
+                if selectedTag != nil {
+                    await loadScreenshotsByTags()
+                } else {
+                    await loadScreenshotsForCurrentPage()
+                }
+            } catch {
+                debugPrint("❌ refreshData 중 에러 발생: \(error)")
+                // 에러가 발생해도 기존 데이터 유지
+            }
+        }
+        
+        await searchTask?.value
+        isLoadingScreenshots = false
     }
     
-    func clearAllSelections() {
+    func clearAllSelections() async {
         selectedTag = nil
         resetPagination()
-        loadScreenshotsByTags()
+        filteredScreenshots = [] // 전체 탭 선택 시에는 화면 비우기
+        
+        isLoadingScreenshots = true
+        await loadScreenshotsForCurrentPage()
+        isLoadingScreenshots = false
     }
     
     private func mapTags(from dto: SearchDTO) -> [Tag] {
@@ -256,5 +316,94 @@ class HomeViewModel: ObservableObject {
     deinit {
         searchTask?.cancel()
         cancellables.forEach { $0.cancel() }
+    }
+}
+
+extension HomeViewModel {
+    /// UserDefaults 설정에 따라 원본 사진 삭제 여부 결정
+    func deleteOriginalsIfEnabled(_ itemVMs: [ScreenshotItemViewModel]) async {
+        let shouldDelete = UserDefaults.standard.deleteOriginalsAfterSave
+        
+        guard shouldDelete else {
+            debugPrint("🔧 원본 사진 삭제 설정이 비활성화되어 있습니다")
+            return
+        }
+        
+        debugPrint("🗑️ 원본 사진 삭제 설정이 활성화되어 있어 삭제를 시작합니다")
+        await deleteOriginalAssets(itemVMs)
+    }
+    
+    /// 사진 라이브러리 쓰기 권한 확인
+    private func checkPhotoLibraryWritePermission() async -> Bool {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        
+        switch status {
+        case .authorized:
+            return true
+        case .notDetermined:
+            let newStatus = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+            return newStatus == .authorized
+        case .denied, .restricted:
+            debugPrint("❌ 사진 라이브러리 쓰기 권한이 거부되었습니다")
+            return false
+        case .limited:
+            // limited 권한에서도 삭제는 가능할 수 있음
+            return true
+        @unknown default:
+            return false
+        }
+    }
+    
+    /// 원본 PHAsset들을 갤러리에서 삭제
+    private func deleteOriginalAssets(_ itemVMs: [ScreenshotItemViewModel]) async {
+        // 1. 권한 확인
+        guard await checkPhotoLibraryWritePermission() else {
+            debugPrint("❌ 사진 라이브러리 쓰기 권한이 없어 원본 사진을 삭제할 수 없습니다")
+            return
+        }
+        
+        // 2. PHAsset 가져오기
+        let assetIds = itemVMs.map { $0.id }
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: assetIds, options: nil)
+        
+        var assetsToDelete: [PHAsset] = []
+        fetchResult.enumerateObjects { asset, _, _ in
+            assetsToDelete.append(asset)
+        }
+        
+        guard !assetsToDelete.isEmpty else {
+            debugPrint("⚠️ 삭제할 PHAsset이 없습니다")
+            return
+        }
+        
+        debugPrint("🗑️ 원본 사진 삭제 시작: \(assetsToDelete.count)개")
+        
+        // 3. 실제 삭제 수행
+        await withCheckedContinuation { continuation in
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.deleteAssets(assetsToDelete as NSFastEnumeration)
+            }) { success, error in
+                if success {
+                    debugPrint("✅ 원본 사진 삭제 완료: \(assetsToDelete.count)개")
+                    Task { @MainActor in
+                        self.toastPublisher.send("\(assetsToDelete.count)장 삭제되었어요.")
+                    }
+                } else {
+                    let errorMessage = error?.localizedDescription ?? "Unknown error"
+                    debugPrint("❌ 원본 사진 삭제 실패: \(errorMessage)")
+                }
+                continuation.resume()
+            }
+        }
+    }
+    
+    /// 태그된 이미지 ID들을 UserDefaults에 저장
+    func saveTaggedImageIds(_ itemVMIDs: [String]) {
+        let imageIds = Set(itemVMIDs)
+        var existingIds = UserDefaults.standard.taggedImageIds
+        existingIds.formUnion(imageIds)
+        UserDefaults.standard.taggedImageIds = existingIds
+        
+        debugPrint("💾 태그된 이미지 ID 저장 완료: \(imageIds.count)개 추가, 총 \(existingIds.count)개")
     }
 }

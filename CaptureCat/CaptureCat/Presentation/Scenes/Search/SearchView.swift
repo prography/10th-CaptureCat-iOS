@@ -10,6 +10,8 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var viewModel: SearchViewModel
+    @State private var isSearchMode: Bool = false
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -85,11 +87,59 @@ struct SearchView: View {
     }
     
     // MARK: - 검색바
+    private var searchArea: some View {
+        HStack {
+            if isSearchMode {
+                TextField("태그 이름으로 검색해 보세요", text: $viewModel.searchText)
+                    .CFont(.body02Regular)
+                    .focused($isTextFieldFocused)
+                    .onAppear {
+                        UITextField.appearance().clearButtonMode = .whileEditing
+                        // TextField가 실제로 렌더링된 뒤에 포커스 줌
+                        DispatchQueue.main.async {
+                            isTextFieldFocused = true
+                        }
+                    }
+                    .onChange(of: isTextFieldFocused) { focused in
+                        if !focused {
+                            // 포커스 해제 시 검색 모드 종료
+                            withAnimation(.easeInOut) {
+                                isSearchMode = false
+                                viewModel.searchText = ""
+                            }
+                        }
+                    }
+                    .transition(.opacity)
+            } else {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray06)
+                    Text("태그 이름으로 검색해 보세요")
+                        .CFont(.body02Regular)
+                        .foregroundColor(.gray06)
+                    Spacer()
+                }
+                .onTapGesture {
+                    withAnimation(.easeInOut) {
+                        isSearchMode = true
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.gray01)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color.gray06, lineWidth: 1)
+        )
+    }
+    
     private var searchBar: some View {
         HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray06)
-            
             if !viewModel.selectedTags.isEmpty {
                 HStack {
                     // 선택된 태그들을 칩 형태로 표시
@@ -120,6 +170,9 @@ struct SearchView: View {
                     .cornerRadius(8)
                     Button {
                         viewModel.selectedTags.removeAll()
+                        isSearchMode = false
+                        isTextFieldFocused = false
+                        viewModel.searchText = ""
                     } label: {
                         Text("취소")
                             .CFont(.body02Regular)
@@ -128,13 +181,7 @@ struct SearchView: View {
                 }
             } else {
                 // 기본 검색 TextField
-                TextField("태그 이름으로 검색해 보세요", text: $viewModel.searchText)
-                    .CFont(.body02Regular)
-                    .foregroundColor(.gray06)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.gray03)
-                    .cornerRadius(8)
+                searchArea
             }
         }
     }
@@ -173,11 +220,11 @@ struct SearchView: View {
                     if viewModel.searchText.isEmpty {
                         Text("아직 태그가 없어요.")
                             .CFont(.headline02Bold)
-                            .foregroundColor(.text01)
+                            .foregroundColor(.text03)
                     } else {
                         Text("검색결과가 없어요.")
                             .CFont(.headline02Bold)
-                            .foregroundColor(.text01)
+                            .foregroundColor(.text03)
                     }
                     Text("스크린샷을 태그해 정리해보세요!")
                         .CFont(.body01Regular)

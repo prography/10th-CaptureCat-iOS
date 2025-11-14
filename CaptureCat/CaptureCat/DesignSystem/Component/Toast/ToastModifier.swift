@@ -14,10 +14,11 @@ struct ToastModifier: ViewModifier {
     let duration: TimeInterval
     let fillWidth: Bool
     let cornerRadius: CGFloat
+    let isCenter: Bool
     
     func body(content: Content) -> some View {
         content
-            .overlay(alignment: .bottom) {
+            .overlay(alignment: isCenter ? .center : .bottom) {
                 if isShowing {
                     Text(message)
                         .CFont(.subhead02Bold)
@@ -25,10 +26,10 @@ struct ToastModifier: ViewModifier {
                         .multilineTextAlignment(.center)
                         .frame(height: 46)
                         .frame(maxWidth: fillWidth ? .infinity : nil)
+                        .padding(.horizontal, 16)
                         .background(.secondary01)
                         .cornerRadius(cornerRadius)
-                        .padding(.bottom, 80)
-                        .padding(.horizontal, 16)
+                        .padding(.bottom, isCenter ? 0 : 60)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }

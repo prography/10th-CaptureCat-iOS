@@ -24,10 +24,12 @@ class AuthViewModel: ObservableObject {
     
     @Published var authenticationState: AuthenticationState = .initial
     @Published var isAutoLoginInProgress: Bool = false
+    @Published var recentLoginTypes: Set<LogIn> = []
     
     @Published var isLoginPresented: Bool = false
     @Published var isLogOutPresented: Bool = false
     @Published var isSignOutPresented: Bool = false
+    @Published var showLogInPopUp: Bool = false
     @Published var errorToast: Bool = false
     @Published var errorMessage: String?
     @Published var withdrawSuccess: Bool = false
@@ -37,6 +39,7 @@ class AuthViewModel: ObservableObject {
         self.authService = AuthService(networkManager: networkManager)
         self.repository = repository
         setupNotificationObservers()
+        updateRecentLoginTypes()
     }
     
     func checkAutoLogin() {
@@ -179,11 +182,13 @@ class AuthViewModel: ObservableObject {
     private func cleanupAppleTokens() {
         debugPrint("🍏🧹 Apple 토큰 정리 시작")
         KeyChainModule.delete(key: .appleToken)
+        updateRecentLoginTypes()
     }
     
     private func cleanupKakaoTokens() {
         debugPrint("🟡🧹 카카오 토큰 정리 시작")
         KeyChainModule.delete(key: .kakaoToken)
+        updateRecentLoginTypes()
     }
     
     @MainActor
@@ -205,10 +210,22 @@ class AuthViewModel: ObservableObject {
                     switch kakaoSignIn {
                     case .success(let success):
                         KeyChainModule.create(key: .kakaoToken, data: "true")
+                        KeyChainModule.delete(key: .isRecentApple)
+                        KeyChainModule.create(key: .isRecentKakao, data: "true")
+                        updateRecentLoginTypes()
                         handleLoginSuccess(/*isTutorial: success.data.tutorialCompleted*/)
                     case .failure(let failure):
                         debugPrint("🟡🔴 카카오 로그인 완전 실패 \(failure.localizedDescription) 🟡🔴")
-                        self.authenticationState = .initial
+                        
+                        // 409 ALREADY_REGISTERED_EMAIL 에러 처리
+                        if case NetworkError.conflict = failure {
+                            self.showLogInPopUp = true
+                        } else if case NetworkError.serverError(let message) = failure,
+                                  message.contains("ALREADY_REGISTERED_EMAIL") {
+                            self.showLogInPopUp = true
+                        } else {
+                            self.authenticationState = .initial
+                        }
                     }
                 case .failure(let failure):
                     debugPrint("🟡🔴 카카오에서 토큰 값 가져오기 실패 \(failure.localizedDescription) 🟡🔴")
@@ -231,10 +248,23 @@ class AuthViewModel: ObservableObject {
                     
                     switch appleSignIn {
                     case .success(let success):
+                        KeyChainModule.create(key: .appleToken, data: token.0)
+                        KeyChainModule.delete(key: .isRecentKakao)
+                        KeyChainModule.create(key: .isRecentApple, data: "true")
+                        updateRecentLoginTypes()
                         handleLoginSuccess()
                     case .failure(let failure):
-                        self.authenticationState = .initial
                         debugPrint("🔴🍎 apple sign in 함수 실패 \(failure.localizedDescription)🔴🍎")
+                        
+                        // 409 ALREADY_REGISTERED_EMAIL 에러 처리
+                        if case NetworkError.conflict = failure {
+                            self.showLogInPopUp = true
+                        } else if case NetworkError.serverError(let message) = failure,
+                                  message.contains("ALREADY_REGISTERED_EMAIL") {
+                            self.showLogInPopUp = true
+                        } else {
+                            self.authenticationState = .initial
+                        }
                     }
                 case .failure(let failure):
                     self.authenticationState = .initial
@@ -247,21 +277,24 @@ class AuthViewModel: ObservableObject {
     func logOut() {
         safelyCleanupAllTokens()
         clearAllCacheData()
+        updateRecentLoginTypes() // 토큰 정리 후 상태 다시 확인
         self.authenticationState = .initial
 //        MixpanelManager.shared.logout()
     }
     
     func withdraw(reason: String) {
-        KeyChainModule.delete(key: .didStarted)
 //        MixpanelManager.shared.withdraw()
         Task {
             let result = await authService.withdraw(reason: reason)
             
             switch result {
             case .success (_):
+                // 회원 탈퇴 성공 시에만 모든 데이터 정리 작업 실행
+                KeyChainModule.delete(key: .didStarted)
                 safelyCleanupAllTokens()
                 clearAllCacheData()
                 safelyCleanupUserDefaults()
+                recentLoginTypes.removeAll()
                 self.authenticationState = .initial
                 self.withdrawSuccess = true
             case .failure (let error):
@@ -313,6 +346,7 @@ class AuthViewModel: ObservableObject {
         debugPrint("🧹 UserDefaults 안전 정리 시작")
         UserDefaults.standard.removeObject(forKey: LocalUserKeys.selectedTopics.rawValue)
         UserDefaults.standard.removeObject(forKey: LocalUserKeys.deleteOriginalsAfterSave.rawValue)
+        UserDefaults.standard.removeObject(forKey: LocalUserKeys.taggedImageIds.rawValue)
         UserDefaults.standard.synchronize()
         debugPrint("🧹 UserDefaults 안전 정리 완료")
     }
@@ -381,5 +415,23 @@ class AuthViewModel: ObservableObject {
 extension AuthViewModel {
     func getUserInfo() async -> Result<LogInResponseDTO, Error> {
         await UserService(networkManager: networkManager).userInfo()
+    }
+}
+
+extension AuthViewModel {
+    func updateRecentLoginTypes() {
+        var types: Set<LogIn> = []
+        
+        // Apple 토큰 확인 (실제 Apple ID가 저장되어 있으면 최근 로그인으로 간주)
+        if KeyChainModule.read(key: .isRecentApple) == "true" {
+            types.insert(.apple)
+        }
+        
+        // Kakao 토큰 확인
+        if KeyChainModule.read(key: .isRecentKakao) == "true" {
+            types.insert(.kakao)
+        }
+        
+        recentLoginTypes = types
     }
 }

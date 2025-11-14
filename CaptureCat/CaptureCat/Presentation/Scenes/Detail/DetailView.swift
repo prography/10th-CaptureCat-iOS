@@ -101,7 +101,6 @@ struct DetailView: View {
             
             bottomBar
                 .padding(.horizontal, 16)
-                .padding(.bottom, 32)
         }
     }
     
@@ -119,12 +118,13 @@ struct DetailView: View {
             Button {
                 viewModel.toggleFavorite()
             } label: {
-                Image(viewModel.isFavorite ? .selectedFavorite : .unselectedFavorite)
+                Image(viewModel.isFavorite ? .favoriteSelected : .favoriteUnselected)
+                    .renderingMode(.template)
                     .resizable()
+                    .foregroundStyle(.white)
                     .frame(width: 24, height: 24)
                     .padding(3)
-                    .background(.overlayDim)
-                    .clipShape(Circle())
+                    .shadow(radius: 8, y: 4)
             }
                 .padding(.trailing, 16)
                 .padding(.bottom, 32),
@@ -198,8 +198,6 @@ struct DetailView: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 10)
-            
-            
             
             Spacer()
             

@@ -118,7 +118,11 @@ extension TagViewModel {
             }
         }
         checkHasChanges()
-        updateSelectedTags()
+        // single 모드에서는 이미 selectedTags를 직접 업데이트했으므로 updateSelectedTags() 호출 불필요
+        // batch 모드에서는 batchSelectedTags와 selectedTags를 동기화해야 함
+        if mode == .batch {
+            updateSelectedTags()
+        }
     }
     
     // 새 태그 추가 또는 기존 태그 선택

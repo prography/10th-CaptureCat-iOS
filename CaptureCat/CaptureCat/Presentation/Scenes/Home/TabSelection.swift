@@ -24,7 +24,8 @@ struct TabSection: View {
                 HStack(spacing: 0) {
                     ForEach(displayed, id: \.self) { tag in
                         tabItem(tag)
-                            .padding(.horizontal, 4)
+                            .padding(.top, 5)
+                            .padding(.horizontal, 8)
                             .id(tag?.id ?? -1) // nil이면 -1로 아이디 부여
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -38,7 +39,6 @@ struct TabSection: View {
                                 }
                             }
                     }
-                    .padding(.horizontal, 2)
                 }
             }
             .onChange(of: selectedTag) { _, newTag in
@@ -53,9 +53,9 @@ struct TabSection: View {
     private func tabItem(_ tag: Tag?) -> some View {
         let isSelected = selectedTag == tag || (tag == nil && selectedTag == nil)
         
-        VStack(spacing: 8) {
-            Text(tag?.name ?? "전체")  // nil이면 "전체" 표시, Tag 객체면 name 사용
-                .CFont(.subhead02Bold)
+        VStack(spacing: 10) {
+            Text(tag?.name ?? (NSLocalizedString("전체", comment: "TabSelection")))  // nil이면 "전체" 표시, Tag 객체면 name 사용
+                .CFont(.subhead01Bold)
                 .foregroundStyle(isSelected ? .primary01 : .text03)
             Rectangle()
                 .fill(isSelected ? .primary01 : .clear)

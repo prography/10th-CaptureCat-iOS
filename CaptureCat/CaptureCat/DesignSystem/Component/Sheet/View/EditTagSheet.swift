@@ -47,6 +47,7 @@ struct EditTagSheet: View {
                 }
             }
             .padding(.horizontal, 16)
+            .padding(.top, 28)
             
             // 입력 필드
             VStack(alignment: .leading, spacing: 4) {
@@ -76,7 +77,9 @@ struct EditTagSheet: View {
             .padding(.horizontal, 16)
             .animation(.easeInOut(duration: 0.2), value: showError)
             
-//            if keyboardHeight != 0 {
+            Spacer()
+            
+            if keyboardHeight != 0 {
                 Button("완료") {
                     let trimmedTag = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
                     
@@ -95,6 +98,7 @@ struct EditTagSheet: View {
                     // 입력 필드 초기화 및 키보드 숨김
                     newTag = ""
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    isPresented = false
                 }
                 .primaryStyle(cornerRadius: keyboardHeight != 0 ? 0 : 8)
                 .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -102,9 +106,8 @@ struct EditTagSheet: View {
                 .frame(height: 52)
                 .padding(.bottom, 8)
                 .padding(.horizontal, keyboardHeight != 0 ? 0 : 16)
-//            }
+            }
         }
-        .padding(.top, 28)
         .readSize { size in
             contentSize = size
                 sheetHeight = dynamicHeight

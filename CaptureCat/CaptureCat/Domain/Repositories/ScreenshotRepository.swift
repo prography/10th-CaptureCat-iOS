@@ -79,10 +79,15 @@ final class ScreenshotRepository: ObservableObject {
             
             switch result {
             case .success(let tagDTO):
+                debugPrint("✅ 서버에서 태그 목록 로드 성공: \(tagDTO.data.items.count)개")
                 return tagDTO.data.items
                 
-            case .failure:
-                return InMemoryScreenshotCache.shared.getAllTagsAsTag()
+            case .failure(let error):
+                debugPrint("❌ 서버에서 태그 목록 로드 실패: \(error.localizedDescription)")
+                // 실패 시 캐시 사용 (기존 동작 유지)
+                let cachedTags = InMemoryScreenshotCache.shared.getAllTagsAsTag()
+                debugPrint("🔄 캐시된 태그 사용: \(cachedTags.count)개")
+                return cachedTags
             }
         }
     }

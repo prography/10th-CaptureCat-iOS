@@ -32,17 +32,26 @@ struct UploadView: View {
                     Text("올리기 \(viewModel.selectedIDs.count)/20")
                 }
                 .buttonStyle(
-                    PrimaryButtonStyle(cornerRadius: 4, backgroundColor: .primary01, foregroundColor: .white, verticalPadding: 16, fillWidth: true)
+                    PrimaryButtonStyle(
+                        cornerRadius: 4,
+                        backgroundColor: .primary01,
+                        foregroundColor: .white,
+                        verticalPadding: 16,
+                        fillWidth: true
+                    )
                 )
+                .disabled(viewModel.selectedIDs.isEmpty)
                 .padding(.horizontal, 16)
             }
             
             if authViewModel.authenticationState == .guest {
                 VStack {
+                    navigationBar
                     Spacer()
                     
                     Button {
                         authViewModel.authenticationState = .initial
+                        router.popToRoot()
                     } label: {
                         Text("로그인 후 이용하기")
                     }
@@ -55,7 +64,6 @@ struct UploadView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.overlayDim.opacity(0.3))
             }
-
         }
         .onAppear(perform: viewModel.checkPhotoPermission)
         .popUp(
@@ -104,7 +112,8 @@ struct UploadView: View {
                 ForEach(viewModel.assets, id: \.localIdentifier) { asset in
                     PHAssetView(
                         asset: asset,
-                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier)
+                        isSelected: viewModel.selectedIDs.contains(asset.localIdentifier),
+                        isTagged: viewModel.isTaggedImage(asset.localIdentifier)
                     )
                     .onTapGesture {
                         viewModel.toggleSelection(of: asset)

@@ -77,28 +77,62 @@ enum LogIn: String, CaseIterable {
 
 struct LoginButton: View {
     let type: LogIn
+    let recentLoginTypes: Set<LogIn>
     
-    init(type: LogIn) {
+    init(type: LogIn, recentLoginTypes: Set<LogIn>) {
         self.type = type
+        self.recentLoginTypes = recentLoginTypes
+    }
+    
+    private var isRecent: Bool {
+        recentLoginTypes.contains(type)
     }
     
     var body: some View {
-        HStack(spacing: 8) {
-            type.image
-                .resizable()
-                .frame(width: type.width, height: 18)
-                .padding(.leading, 16)
-            Text(type.title)
-                .font(.headline)
-                .foregroundStyle(type.titleColor)
+        ZStack(alignment: .topTrailing) {
+            HStack(spacing: 8) {
+                type.image
+                    .resizable()
+                    .frame(width: type.width, height: 18)
+                    .padding(.leading, 16)
+                Text(type.title)
+                    .font(.headline)
+                    .foregroundStyle(type.titleColor)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .background(type.backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            
+            if isRecent {
+                recentComment
+                    .offset(x: -16, y: -8)
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 15)
-        .background(type.backgroundColor)
-        .clipShape(RoundedRectangle(cornerRadius: 4))
+    }
+    
+    private var recentComment: some View {
+        VStack(alignment: .center, spacing: 0) {
+            Text("최근 로그인")
+                .CFont(.caption02Regular)
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.primary01)
+                )
+            
+            Image(systemName: "arrowtriangle.down.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 10, height: 10)
+                .foregroundStyle(.primary01)
+                .offset(y: -4)
+        }
     }
 }
 
 #Preview {
-    LoginButton(type: .kakao)
+    LoginButton(type: .kakao, recentLoginTypes: [.kakao])
 }

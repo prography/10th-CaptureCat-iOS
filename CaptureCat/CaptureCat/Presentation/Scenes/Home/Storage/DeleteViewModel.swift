@@ -5,9 +5,9 @@
 //  Created by minsong kim on 10/9/25.
 //
 
+import Combine
 import SwiftUI
 import Photos
-import Combine
 
 final class DeleteViewModel: ObservableObject {
     // MARK: - Published state
@@ -19,7 +19,7 @@ final class DeleteViewModel: ObservableObject {
     @Published var showPermissionAlert = false
     
     // MARK: - Dependencies
-    private let manager: ScreenshotManager
+    let manager: ScreenshotManager
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
@@ -88,6 +88,10 @@ final class DeleteViewModel: ObservableObject {
         }
     }
     
+    func isTaggedImage(_ localIdentifier: String) -> Bool {
+        return UserDefaults.standard.taggedImageIds.contains(localIdentifier)
+    }
+    
     // 선택된 자산 삭제
     func deleteSelected() {
         // 선택된 ID에 해당하는 PHAsset만 골라서 삭제
@@ -98,6 +102,7 @@ final class DeleteViewModel: ObservableObject {
             return
         }
         manager.delete(assets: toDelete)
+        selectedIDs = manager.selectedIDs
     }
     
     func selectedAssets() -> [PHAsset] {

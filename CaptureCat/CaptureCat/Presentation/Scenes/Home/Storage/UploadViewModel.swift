@@ -77,6 +77,11 @@ final class UploadViewModel: ObservableObject {
         
         return selectedAssets
     }
+    
+    /// 해당 이미지가 태그된 이미지인지 확인
+    func isTaggedImage(_ localIdentifier: String) -> Bool {
+        return UserDefaults.standard.taggedImageIds.contains(localIdentifier)
+    }
 }
 
 extension UploadViewModel {

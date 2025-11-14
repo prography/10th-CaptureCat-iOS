@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MenuRow: View {
     let icon: Image
-    let title: String
+    let title: LocalizedStringKey
     let action: () -> Void
 
     var body: some View {
