@@ -164,7 +164,7 @@ struct HomeView: View {
             await viewModel.refreshData()
         }
         .onAppear {
-            showImageSettingSheet = !hasSeenSheet
+            showImageSettingSheet = (hasSeenSheet == false) && (AccountStorage.shared.isGuest == false)
         }
         .onReceive(viewModel.toastPublisher) { message in
             toastMessage = message

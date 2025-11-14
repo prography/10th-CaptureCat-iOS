@@ -37,7 +37,6 @@ struct TagSettingView: View {
             
             if authViewModel.authenticationState == .guest {
                 VStack {
-                    navigationBar
                     Spacer()
                     
                     Button {
