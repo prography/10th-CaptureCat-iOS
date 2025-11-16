@@ -17,6 +17,7 @@ struct WithdrawBuilder: BuilderProtocol {
     let deserializer: NetworkDeserializable = JSONNetworkDeserializer(decoder: JSONDecoder())
 
     var useAuthorization: Bool { true }
+    var useRefreshToken: Bool { true }
     
     init(reason: String) {
         self.parameters = ["reason": reason]

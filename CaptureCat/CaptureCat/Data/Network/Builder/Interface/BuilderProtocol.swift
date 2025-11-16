@@ -19,6 +19,7 @@ protocol BuilderProtocol {
     var deserializer: NetworkDeserializable { get }
 
     var useAuthorization: Bool { get }
+    var useRefreshToken: Bool { get }
 }
 
 extension BuilderProtocol {
@@ -28,5 +29,9 @@ extension BuilderProtocol {
     
     var headers: [String: String] {
         ["Content-Type": serializer.contentType]
+    }
+    
+    var useRefreshToken: Bool {
+        false
     }
 }
