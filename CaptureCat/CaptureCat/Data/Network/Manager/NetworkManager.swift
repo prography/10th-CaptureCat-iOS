@@ -82,9 +82,12 @@ final class NetworkManager {
     }
     
     private func reissueToken() async throws {
-        let refreshSuccess = await TokenManager.shared.ensureValidToken()
+        let result = await TokenManager.shared.ensureValidToken()
         
-        if refreshSuccess == false {
+        switch result {
+        case .success:
+            return
+        case .noRefreshToken, .expired, .networkError:
             throw NetworkError.unauthorized
         }
     }
