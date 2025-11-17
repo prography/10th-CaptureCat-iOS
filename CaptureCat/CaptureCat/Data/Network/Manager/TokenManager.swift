@@ -12,6 +12,7 @@ actor TokenManager {
     static let shared = TokenManager(
         service: TokenRefreshService()
     )
+    
     private var currentRefreshTask: Task<TokenRefreshResult, Never>?
     private let service: TokenRefreshService
     
@@ -19,7 +20,6 @@ actor TokenManager {
         self.service = service
     }
     
-    // MARK: - Public Methods
     func ensureValidToken() async -> TokenRefreshResult {
         debugPrint("🔄 [TokenManager] ensureValidToken 호출됨")
         

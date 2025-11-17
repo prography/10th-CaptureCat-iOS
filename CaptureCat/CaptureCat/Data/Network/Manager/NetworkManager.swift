@@ -16,7 +16,6 @@ final class NetworkManager {
         self.session = session
     }
     
-    // MARK: - Public
     func fetchData<Builder: BuilderProtocol>(
         _ builder: Builder,
         isRetry: Bool = false,
@@ -102,7 +101,6 @@ final class NetworkManager {
         }
     }
     
-    // MARK: - Private
     private func makeRequest<Builder: BuilderProtocol>(_ builder: Builder) async throws -> URLRequest {
         let fullURL = baseURL.appendingPathComponent(builder.path)
         
