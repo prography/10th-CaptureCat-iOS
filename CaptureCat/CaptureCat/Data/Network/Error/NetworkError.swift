@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NetworkError: Error {
+enum NetworkError: Error, Equatable {
     case urlNotFound
     case badRequest
     case unauthorized
@@ -17,8 +17,40 @@ enum NetworkError: Error {
     case tooManyRequests
     case internalServerError
     case unknown(Int)
-    case serverError(String) // 서버에서 제공하는 구체적인 에러 메시지
+    case serverError(String)
     
+    init(statusCode: Int, message: String?) {
+        guard let message else {
+            self = Self.getDefaultCase(by: statusCode)
+            return
+        }
+        
+        self = .serverError(message)
+    }
+    
+    private static func getDefaultCase(by statusCode: Int) -> Self {
+        return switch statusCode {
+        case 400:
+                .badRequest
+        case 401:
+                .unauthorized
+        case 403:
+                .forBidden
+        case 404:
+                .responseNotFound
+        case 409:
+                .conflict
+        case 429:
+                .tooManyRequests
+        case 500:
+                .internalServerError
+        default:
+                .unknown(statusCode)
+        }
+    }
+}
+
+extension NetworkError {
     var localizedDescription: String {
         switch self {
         case .urlNotFound:

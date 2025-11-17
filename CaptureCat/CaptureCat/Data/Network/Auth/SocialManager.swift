@@ -17,7 +17,6 @@ struct SocialManager {
         switch result {
         case .success(let success):
             AccountStorage.shared.kakaoToken = success.1
-//            AccountStorage.shared.kakaoIdToken = success.1
             return .success(success)
         case .failure(let failure):
             debugPrint("카카오 토큰 가져오기 실패 \(failure.localizedDescription)")
