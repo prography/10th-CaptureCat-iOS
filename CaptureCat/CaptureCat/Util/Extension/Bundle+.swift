@@ -15,6 +15,10 @@ extension Bundle {
     var mixpanelToken: String? {
         object(forInfoDictionaryKey: "MIXPANEL_TOKEN") as? String
     }
+    
+    var baseURL: URL? {
+        URL(string: object(forInfoDictionaryKey: "BASE_URL") as? String ?? "")
+    }
 }
 
 extension Bundle {

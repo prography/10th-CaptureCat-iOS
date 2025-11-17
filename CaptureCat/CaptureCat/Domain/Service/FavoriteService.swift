@@ -12,7 +12,7 @@ final class FavoriteService {
     private let networkManager: NetworkManager
     
     private init() {
-        self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
+        self.networkManager = NetworkManager(baseURL: Bundle.main.baseURL!)
     }
     
     func fetchFavoriteTagList() async -> Result<TagDTO, Error> {

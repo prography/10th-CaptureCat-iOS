@@ -16,16 +16,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
         
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.didReceiveMemoryWarningNotification,
-            object: nil,
-            queue: .main
-        ) { _ in
-            // App 전역에서 부를 수 있는 정적/싱글턴 로직만 사용
-            PhotoLoader.shared.cacheInfo()
-            debugPrint("✅ 메모리 경고 대응 완료(AppDelegate)")
-        }
-        
         return true
     }
 }
@@ -46,7 +36,7 @@ struct CaptureCatApp: App {
 
     init() {
         // 1) 의존성 생성
-        let baseURL = BaseURLType.development.url!
+        let baseURL = Bundle.main.baseURL!
         
         let networkManager = NetworkManager(baseURL: baseURL)
         self.networkManager = networkManager

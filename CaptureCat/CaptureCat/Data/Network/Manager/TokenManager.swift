@@ -82,7 +82,7 @@ actor TokenManager {
     /// 직접 토큰 갱신 요청 수행 (NetworkManager 의존성 제거)
     private func performDirectTokenRefreshRequest<Builder: BuilderProtocol>(_ builder: Builder) async throws -> Builder.Response {
         // 실제 API URL 사용
-        guard let baseURL = BaseURLType.production.url else {
+        guard let baseURL = Bundle.main.baseURL else {
             throw NetworkError.urlNotFound
         }
         

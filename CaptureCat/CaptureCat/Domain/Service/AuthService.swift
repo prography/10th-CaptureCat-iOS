@@ -18,11 +18,16 @@ final class AuthService {
         let builder = AuthBuilder(social: social, idToken: idToken, authToken: authToken, nickname: nickname)
         
         do {
-            let response = try await networkManager.fetchLoginData(builder)
+            let response = try await networkManager.fetchData(builder, interceptors: [TokenParsingInterceptor()])
             return Result<LogInResponseDTO, NetworkError>.success(response)
         } catch {
             debugPrint("🔥 Error:\(error)")
-            return .failure(NetworkError.unauthorized)
+            // 원본 NetworkError를 그대로 전달
+            if let networkError = error as? NetworkError {
+                return .failure(networkError)
+            } else {
+                return .failure(NetworkError.unauthorized)
+            }
         }
     }
     
@@ -30,7 +35,7 @@ final class AuthService {
         let builder = WithdrawBuilder(reason: reason)
         
         do {
-            let response = try await networkManager.fetchDataWithRefresh(builder)
+            let response = try await networkManager.fetchData(builder, interceptors: [AuthTokenInterceptor()])
             return Result<ResponseDTO, Error>.success(response)
         } catch {
             debugPrint("🔥 Withdraw Error:\(error)")

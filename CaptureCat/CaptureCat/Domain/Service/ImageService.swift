@@ -12,7 +12,7 @@ final class ImageService {
     private let networkManager: NetworkManager
     
     private init() {
-        self.networkManager = NetworkManager(baseURL: BaseURLType.production.url!)
+        self.networkManager = NetworkManager(baseURL: Bundle.main.baseURL!)
     }
     
     func uploadImages(imageDatas: [Data], imageMetas: [PhotoDTO]) async -> Result<ResponseDTO, Error> {
