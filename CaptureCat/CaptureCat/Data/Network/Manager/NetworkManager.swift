@@ -87,6 +87,7 @@ final class NetworkManager {
         case .success:
             return
         case .noRefreshToken, .expired, .networkError:
+            await notifyRefreshFailed()
             throw NetworkError.unauthorized
         }
     }
@@ -168,5 +169,12 @@ extension NetworkManager {
         }
         
         return httpResponse
+    }
+    
+    func notifyRefreshFailed() async {
+        await MainActor.run {
+            NotificationCenter.default.post(name: .tokenRefreshFailed, object: nil)
+            debugPrint("📢 토큰 갱신 실패 알림 발송")
+        }
     }
 }

@@ -14,17 +14,6 @@ struct AuthTokenInterceptor: NetworkInterceptor {
     ) async throws -> URLRequest {
         var request = request
         
-        // AccessToken
-        if builder.useAuthorization {
-            if let accessToken = KeyChainModule.read(key: .accessToken),
-               !accessToken.isEmpty {
-                request.setValue(accessToken, forHTTPHeaderField: "Authorization")
-                debugPrint("🔑 AccessToken 추가: \(accessToken.prefix(20))...")
-            } else {
-                debugPrint("⚠️ AccessToken 없음 (useAuthorization=true)")
-            }
-        }
-        
         // RefreshToken
         if builder.useRefreshToken {
             if let refreshToken = KeyChainModule.read(key: .refreshToken),

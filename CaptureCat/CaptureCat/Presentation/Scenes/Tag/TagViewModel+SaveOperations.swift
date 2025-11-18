@@ -218,24 +218,24 @@ extension TagViewModel {
         
         let result = await ImageService.shared.uploadImages(imageDatas: imageDatas, imageMetas: imageMetas)
         
-                 switch result {
-         case .success:
-             debugPrint("✅ ImageService 서버 업로드 성공: \(imageDatas.count)개 이미지")
+        switch result {
+        case .success:
+            debugPrint("✅ ImageService 서버 업로드 성공: \(imageDatas.count)개 이미지")
             
-             // 업로드 성공 시 진행률 100%로 설정
-             await MainActor.run {
-                 toastPublisher.send("\(imageDatas.count)장 저장되었어요.")
-                 uploadProgress = 1.0
-                 uploadedCount = imageDatas.count
-                 debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
-                 isUploading = false
-                 saveCompleted.send()
-             }
-             
-         case .failure(let error):
+            // 업로드 성공 시 진행률 100%로 설정
+            await MainActor.run {
+                toastPublisher.send("\(imageDatas.count)장 저장되었어요.")
+                uploadProgress = 1.0
+                uploadedCount = imageDatas.count
+                debugPrint("📊 서버 업로드 완료: 100% (\(uploadedCount)/\(totalItems))")
+                isUploading = false
+                saveCompleted.send()
+            }
+            
+        case .failure(let error):
             toastPublisher.send("\(imageDatas.count)장 저장하지 못했어요.")
             debugPrint("❌ ImageService 서버 업로드 실패: \(error.localizedDescription)")
             isUploading = false
-         }
+        }
     }
 }
